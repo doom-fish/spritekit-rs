@@ -108,3 +108,45 @@ public func sk_action_repeat_forever(_ actionHandle: UnsafeMutableRawPointer?) -
     guard let action: SKAction = skBorrow(actionHandle) else { return nil }
     return skRetain(SKAction.repeatForever(action))
 }
+
+@_cdecl("sk_action_get_duration")
+public func sk_action_get_duration(_ actionHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let action: SKAction = skBorrow(actionHandle) else { return 0 }
+    return action.duration
+}
+
+@_cdecl("sk_action_set_duration")
+public func sk_action_set_duration(_ actionHandle: UnsafeMutableRawPointer?, _ duration: Double) {
+    guard let action: SKAction = skBorrow(actionHandle) else { return }
+    action.duration = duration
+}
+
+@_cdecl("sk_action_get_timing_mode")
+public func sk_action_get_timing_mode(_ actionHandle: UnsafeMutableRawPointer?) -> Int32 {
+    guard let action: SKAction = skBorrow(actionHandle) else { return 0 }
+    return Int32(action.timingMode.rawValue)
+}
+
+@_cdecl("sk_action_set_timing_mode")
+public func sk_action_set_timing_mode(_ actionHandle: UnsafeMutableRawPointer?, _ mode: Int32) {
+    guard let action: SKAction = skBorrow(actionHandle) else { return }
+    action.timingMode = SKActionTimingMode(rawValue: Int(mode)) ?? .linear
+}
+
+@_cdecl("sk_action_get_speed")
+public func sk_action_get_speed(_ actionHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let action: SKAction = skBorrow(actionHandle) else { return 1 }
+    return Double(action.speed)
+}
+
+@_cdecl("sk_action_set_speed")
+public func sk_action_set_speed(_ actionHandle: UnsafeMutableRawPointer?, _ speed: Double) {
+    guard let action: SKAction = skBorrow(actionHandle) else { return }
+    action.speed = CGFloat(speed)
+}
+
+@_cdecl("sk_action_reversed")
+public func sk_action_reversed(_ actionHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+    guard let action: SKAction = skBorrow(actionHandle) else { return nil }
+    return skRetain(action.reversed())
+}

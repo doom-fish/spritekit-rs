@@ -1,0 +1,34 @@
+use core::ffi::c_void;
+
+extern "C" {
+    pub fn sk_view_new_with_frame(x: f64, y: f64, width: f64, height: f64) -> *mut c_void;
+    pub fn sk_view_get_paused(view: *mut c_void) -> bool;
+    pub fn sk_view_set_paused(view: *mut c_void, paused: bool);
+    pub fn sk_view_get_shows_fps(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_fps(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_shows_draw_count(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_draw_count(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_shows_node_count(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_node_count(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_shows_quad_count(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_quad_count(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_shows_physics(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_physics(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_shows_fields(view: *mut c_void) -> bool;
+    pub fn sk_view_set_shows_fields(view: *mut c_void, shows: bool);
+    pub fn sk_view_get_asynchronous(view: *mut c_void) -> bool;
+    pub fn sk_view_set_asynchronous(view: *mut c_void, asynchronous: bool);
+    pub fn sk_view_get_allows_transparency(view: *mut c_void) -> bool;
+    pub fn sk_view_set_allows_transparency(view: *mut c_void, allows: bool);
+    pub fn sk_view_get_ignores_sibling_order(view: *mut c_void) -> bool;
+    pub fn sk_view_set_ignores_sibling_order(view: *mut c_void, ignores: bool);
+    pub fn sk_view_get_should_cull_non_visible_nodes(view: *mut c_void) -> bool;
+    pub fn sk_view_set_should_cull_non_visible_nodes(view: *mut c_void, should_cull: bool);
+    pub fn sk_view_get_preferred_frames_per_second(view: *mut c_void) -> isize;
+    pub fn sk_view_set_preferred_frames_per_second(view: *mut c_void, fps: isize);
+    pub fn sk_view_get_disable_depth_stencil_buffer(view: *mut c_void) -> bool;
+    pub fn sk_view_set_disable_depth_stencil_buffer(view: *mut c_void, disable: bool);
+    pub fn sk_view_present_scene(view: *mut c_void, scene: *mut c_void);
+    pub fn sk_view_get_scene(view: *mut c_void) -> *mut c_void;
+    pub fn sk_view_texture_from_node(view: *mut c_void, node: *mut c_void) -> *mut c_void;
+}

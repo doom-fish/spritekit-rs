@@ -67,3 +67,33 @@ public func sk_scene_physics_world(_ sceneHandle: UnsafeMutableRawPointer?) -> U
     guard let scene: SKScene = skBorrow(sceneHandle) else { return nil }
     return skRetain(scene.physicsWorld)
 }
+
+@_cdecl("sk_scene_get_view")
+public func sk_scene_get_view(_ sceneHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+    guard let scene: SKScene = skBorrow(sceneHandle), let view = scene.view else { return nil }
+    return skRetain(view)
+}
+
+@_cdecl("sk_scene_convert_point_from_view_x")
+public func sk_scene_convert_point_from_view_x(_ sceneHandle: UnsafeMutableRawPointer?, _ x: Double, _ y: Double) -> Double {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return 0 }
+    return Double(scene.convertPoint(fromView: CGPoint(x: x, y: y)).x)
+}
+
+@_cdecl("sk_scene_convert_point_from_view_y")
+public func sk_scene_convert_point_from_view_y(_ sceneHandle: UnsafeMutableRawPointer?, _ x: Double, _ y: Double) -> Double {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return 0 }
+    return Double(scene.convertPoint(fromView: CGPoint(x: x, y: y)).y)
+}
+
+@_cdecl("sk_scene_convert_point_to_view_x")
+public func sk_scene_convert_point_to_view_x(_ sceneHandle: UnsafeMutableRawPointer?, _ x: Double, _ y: Double) -> Double {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return 0 }
+    return Double(scene.convertPoint(toView: CGPoint(x: x, y: y)).x)
+}
+
+@_cdecl("sk_scene_convert_point_to_view_y")
+public func sk_scene_convert_point_to_view_y(_ sceneHandle: UnsafeMutableRawPointer?, _ x: Double, _ y: Double) -> Double {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return 0 }
+    return Double(scene.convertPoint(toView: CGPoint(x: x, y: y)).y)
+}

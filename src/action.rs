@@ -1,6 +1,6 @@
 use core::ffi::c_void;
 
-use apple_cf::cg::CGPoint;
+use apple_cf::cg::{CGPoint, CGSize};
 
 use crate::ffi;
 use crate::private::handle_type;
@@ -8,47 +8,67 @@ use crate::texture::Texture;
 
 handle_type!(Action);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[repr(i32)]
+pub enum ActionTimingMode {
+    #[default]
+    Linear = 0,
+    EaseIn = 1,
+    EaseOut = 2,
+    EaseInEaseOut = 3,
+}
+
+impl ActionTimingMode {
+    #[must_use]
+    pub const fn from_raw(value: i32) -> Self {
+        match value {
+            1 => Self::EaseIn,
+            2 => Self::EaseOut,
+            3 => Self::EaseInEaseOut,
+            _ => Self::Linear,
+        }
+    }
+}
+
 impl Action {
-    /// Moves a node by `(dx, dy)` over `duration` seconds.
     #[must_use]
     pub fn move_by(dx: f64, dy: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_move_by(dx, dy, duration)) }
     }
 
-    /// Moves a node to `position` over `duration` seconds.
     #[must_use]
     pub fn move_to(position: CGPoint, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_move_to(position.x, position.y, duration)) }
     }
 
-    /// Rotates a node by `angle` radians over `duration` seconds.
     #[must_use]
     pub fn rotate_by(angle: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_rotate_by(angle, duration)) }
     }
 
-    /// Rotates a node to `angle` radians over `duration` seconds.
     #[must_use]
     pub fn rotate_to(angle: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_rotate_to(angle, duration)) }
     }
 
-    /// Scales a node by `scale` over `duration` seconds.
     #[must_use]
     pub fn scale_by(scale: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_scale_by(scale, duration)) }
     }
 
-    /// Scales a node to `scale` over `duration` seconds.
     #[must_use]
     pub fn scale_to(scale: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_scale_to(scale, duration)) }
     }
 
-    /// Resizes a sprite node to `(width, height)` over `duration` seconds.
     #[must_use]
     pub fn resize_to(width: f64, height: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_resize_to(width, height, duration)) }
+    }
+
+    #[must_use]
+    pub fn scale_to_size(size: CGSize, duration: f64) -> Option<Self> {
+        Self::resize_to(size.width, size.height, duration)
     }
 
     #[must_use]
@@ -86,13 +106,17 @@ impl Action {
         unsafe { Self::from_raw(ffi::sk_action_set_texture(texture.as_ptr())) }
     }
 
-    /// Animates through a slice of textures.
     #[must_use]
     pub fn animate_with_textures(textures: &[&Texture], time_per_frame: f64) -> Option<Self> {
-        let mut raw: Vec<*mut c_void> = textures.iter().map(|t| t.as_ptr()).collect();
+        let mut raw: Vec<*mut c_void> = textures.iter().map(|texture| texture.as_ptr()).collect();
+        let raw_ptr = if raw.is_empty() {
+            core::ptr::null_mut()
+        } else {
+            raw.as_mut_ptr().cast()
+        };
         unsafe {
             Self::from_raw(ffi::sk_action_animate_with_textures(
-                raw.as_mut_ptr().cast(),
+                raw_ptr,
                 raw.len(),
                 time_per_frame,
             ))
@@ -106,14 +130,24 @@ impl Action {
 
     #[must_use]
     pub fn sequence(actions: &[&Self]) -> Option<Self> {
-        let mut raw: Vec<*mut c_void> = actions.iter().map(|a| a.as_ptr()).collect();
-        unsafe { Self::from_raw(ffi::sk_action_sequence(raw.as_mut_ptr().cast(), raw.len())) }
+        let mut raw: Vec<*mut c_void> = actions.iter().map(|action| action.as_ptr()).collect();
+        let raw_ptr = if raw.is_empty() {
+            core::ptr::null_mut()
+        } else {
+            raw.as_mut_ptr().cast()
+        };
+        unsafe { Self::from_raw(ffi::sk_action_sequence(raw_ptr, raw.len())) }
     }
 
     #[must_use]
     pub fn group(actions: &[&Self]) -> Option<Self> {
-        let mut raw: Vec<*mut c_void> = actions.iter().map(|a| a.as_ptr()).collect();
-        unsafe { Self::from_raw(ffi::sk_action_group(raw.as_mut_ptr().cast(), raw.len())) }
+        let mut raw: Vec<*mut c_void> = actions.iter().map(|action| action.as_ptr()).collect();
+        let raw_ptr = if raw.is_empty() {
+            core::ptr::null_mut()
+        } else {
+            raw.as_mut_ptr().cast()
+        };
+        unsafe { Self::from_raw(ffi::sk_action_group(raw_ptr, raw.len())) }
     }
 
     #[must_use]
@@ -124,5 +158,37 @@ impl Action {
     #[must_use]
     pub fn repeat_forever(action: &Self) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_repeat_forever(action.as_ptr())) }
+    }
+
+    #[must_use]
+    pub fn duration(&self) -> f64 {
+        unsafe { ffi::sk_action_get_duration(self.ptr) }
+    }
+
+    pub fn set_duration(&self, duration: f64) {
+        unsafe { ffi::sk_action_set_duration(self.ptr, duration) };
+    }
+
+    #[must_use]
+    pub fn timing_mode(&self) -> ActionTimingMode {
+        ActionTimingMode::from_raw(unsafe { ffi::sk_action_get_timing_mode(self.ptr) })
+    }
+
+    pub fn set_timing_mode(&self, mode: ActionTimingMode) {
+        unsafe { ffi::sk_action_set_timing_mode(self.ptr, mode as i32) };
+    }
+
+    #[must_use]
+    pub fn speed(&self) -> f64 {
+        unsafe { ffi::sk_action_get_speed(self.ptr) }
+    }
+
+    pub fn set_speed(&self, speed: f64) {
+        unsafe { ffi::sk_action_set_speed(self.ptr, speed) };
+    }
+
+    #[must_use]
+    pub fn reversed(&self) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_reversed(self.ptr)) }
     }
 }

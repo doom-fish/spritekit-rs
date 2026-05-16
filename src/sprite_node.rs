@@ -1,9 +1,10 @@
-use apple_cf::cg::{CGPoint, CGSize};
+use apple_cf::cg::{CGPoint, CGRect, CGSize};
 
 use crate::color::Color;
 use crate::ffi;
 use crate::node::AsNode;
-use crate::private::handle_type;
+use crate::private::{cstring_from_str, handle_type};
+use crate::shader::Shader;
 use crate::texture::Texture;
 
 handle_type!(SpriteNode);
@@ -15,7 +16,6 @@ impl AsNode for SpriteNode {
 }
 
 impl SpriteNode {
-    /// Creates a sprite with the given texture.
     #[must_use]
     pub fn with_texture(texture: Option<&Texture>) -> Option<Self> {
         unsafe {
@@ -25,7 +25,6 @@ impl SpriteNode {
         }
     }
 
-    /// Creates a solid-color sprite with the given color and size.
     #[must_use]
     pub fn with_color(color: Color, size: CGSize) -> Option<Self> {
         unsafe {
@@ -38,6 +37,12 @@ impl SpriteNode {
                 size.height,
             ))
         }
+    }
+
+    #[must_use]
+    pub fn image_named(name: &str) -> Option<Self> {
+        let name = cstring_from_str(name)?;
+        unsafe { Self::from_raw(ffi::sk_sprite_node_new_image_named(name.as_ptr())) }
     }
 
     #[must_use]
@@ -55,21 +60,41 @@ impl SpriteNode {
     }
 
     #[must_use]
+    pub fn normal_texture(&self) -> Option<Texture> {
+        unsafe { Texture::from_raw(ffi::sk_sprite_node_get_normal_texture(self.ptr)) }
+    }
+
+    pub fn set_normal_texture(&self, texture: Option<&Texture>) {
+        unsafe {
+            ffi::sk_sprite_node_set_normal_texture(
+                self.ptr,
+                texture.map_or(core::ptr::null_mut(), Texture::as_ptr),
+            );
+        };
+    }
+
+    #[must_use]
     pub fn size(&self) -> CGSize {
-        let w = unsafe { ffi::sk_sprite_node_get_size_w(self.ptr) };
-        let h = unsafe { ffi::sk_sprite_node_get_size_h(self.ptr) };
-        CGSize::new(w, h)
+        CGSize::new(
+            unsafe { ffi::sk_sprite_node_get_size_w(self.ptr) },
+            unsafe { ffi::sk_sprite_node_get_size_h(self.ptr) },
+        )
     }
 
     pub fn set_size(&self, size: CGSize) {
         unsafe { ffi::sk_sprite_node_set_size(self.ptr, size.width, size.height) };
     }
 
+    pub fn scale_to_size(&self, size: CGSize) {
+        unsafe { ffi::sk_sprite_node_scale_to_size(self.ptr, size.width, size.height) };
+    }
+
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
-        let x = unsafe { ffi::sk_sprite_node_get_anchor_x(self.ptr) };
-        let y = unsafe { ffi::sk_sprite_node_get_anchor_y(self.ptr) };
-        CGPoint::new(x, y)
+        CGPoint::new(
+            unsafe { ffi::sk_sprite_node_get_anchor_x(self.ptr) },
+            unsafe { ffi::sk_sprite_node_get_anchor_y(self.ptr) },
+        )
     }
 
     pub fn set_anchor_point(&self, anchor: CGPoint) {
@@ -77,9 +102,7 @@ impl SpriteNode {
     }
 
     pub fn set_color(&self, color: Color) {
-        unsafe {
-            ffi::sk_sprite_node_set_color(self.ptr, color.r, color.g, color.b, color.a);
-        };
+        unsafe { ffi::sk_sprite_node_set_color(self.ptr, color.r, color.g, color.b, color.a) };
     }
 
     #[must_use]
@@ -98,5 +121,62 @@ impl SpriteNode {
 
     pub fn set_blend_mode(&self, mode: crate::physics::BlendMode) {
         unsafe { ffi::sk_sprite_node_set_blend_mode(self.ptr, mode as i32) };
+    }
+
+    #[must_use]
+    pub fn lighting_bitmask(&self) -> u32 {
+        unsafe { ffi::sk_sprite_node_get_lighting_bitmask(self.ptr) }
+    }
+
+    pub fn set_lighting_bitmask(&self, mask: u32) {
+        unsafe { ffi::sk_sprite_node_set_lighting_bitmask(self.ptr, mask) };
+    }
+
+    #[must_use]
+    pub fn shadow_cast_bitmask(&self) -> u32 {
+        unsafe { ffi::sk_sprite_node_get_shadow_cast_bitmask(self.ptr) }
+    }
+
+    pub fn set_shadow_cast_bitmask(&self, mask: u32) {
+        unsafe { ffi::sk_sprite_node_set_shadow_cast_bitmask(self.ptr, mask) };
+    }
+
+    #[must_use]
+    pub fn shadowed_bitmask(&self) -> u32 {
+        unsafe { ffi::sk_sprite_node_get_shadowed_bitmask(self.ptr) }
+    }
+
+    pub fn set_shadowed_bitmask(&self, mask: u32) {
+        unsafe { ffi::sk_sprite_node_set_shadowed_bitmask(self.ptr, mask) };
+    }
+
+    #[must_use]
+    pub fn center_rect(&self) -> CGRect {
+        CGRect::new(
+            unsafe { ffi::sk_sprite_node_get_center_rect_x(self.ptr) },
+            unsafe { ffi::sk_sprite_node_get_center_rect_y(self.ptr) },
+            unsafe { ffi::sk_sprite_node_get_center_rect_w(self.ptr) },
+            unsafe { ffi::sk_sprite_node_get_center_rect_h(self.ptr) },
+        )
+    }
+
+    pub fn set_center_rect(&self, rect: CGRect) {
+        unsafe {
+            ffi::sk_sprite_node_set_center_rect(self.ptr, rect.x, rect.y, rect.width, rect.height);
+        };
+    }
+
+    #[must_use]
+    pub fn shader(&self) -> Option<Shader> {
+        unsafe { Shader::from_raw(ffi::sk_sprite_node_get_shader(self.ptr)) }
+    }
+
+    pub fn set_shader(&self, shader: Option<&Shader>) {
+        unsafe {
+            ffi::sk_sprite_node_set_shader(
+                self.ptr,
+                shader.map_or(core::ptr::null_mut(), Shader::as_ptr),
+            );
+        };
     }
 }

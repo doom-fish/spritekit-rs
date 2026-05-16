@@ -2,7 +2,7 @@
 
 Safe Rust bindings for Apple's [SpriteKit](https://developer.apple.com/documentation/spritekit) framework on macOS.
 
-> **Status:** v0.1.0 covers 2D scene construction, node hierarchy management, sprite nodes, textures, actions, physics bodies and world, effect nodes, and offline rendering through `SKRenderer` into Metal textures.
+> **Status:** v0.2.0 expands the bridge to 17 SpriteKit logical areas using the `screencapturekit-rs` handle-based pattern. The crate now covers scenes, nodes, actions, physics bodies/world/joints, label/sprite/view/constraint/keyframe/emitter/shader/audio/video/light/3D nodes, effect nodes, and offline rendering through `SKRenderer` into Metal textures.
 
 ## Quick start
 
@@ -59,25 +59,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Highlights
 
-- `Scene::with_size` — create a `SKScene` of a given point size; set background colour, scale mode, and anchor point; access the `PhysicsWorld`
-- `Node` — base 2-D node with `position`, `zPosition`, `zRotation`, `xScale`/`yScale`/`setScale`, `alpha`, `hidden`, `paused`, `speed`, hierarchy and action APIs
-- `SpriteNode` — create from a `Texture` or a solid colour+size; get/set `texture`, `size`, `anchorPoint`, `color`, `colorBlendFactor`, `blendMode`
-- `Texture` — load by name, from a `CGImage` pointer, or from raw RGBA bytes; subrect cropping; `filteringMode`, `usesMipmaps`
-- `Action` — `moveBy/To`, `rotateBy/To`, `scaleBy/To`, `resizeTo`, `fadeIn/Out/To/By`, `hide/unhide`, `setTexture`, `animateWithTextures`, `wait`, `sequence`, `group`, `repeat`, `repeatForever`
-- `PhysicsBody` — `circle`, `rect`, `edgeLoopRect`, `fromTexture`; `isDynamic`, `allowsRotation`, `preciseCollision`, `pinned`, `friction`, `restitution`, `linearDamping`, `angularDamping`, `density`, `mass`, `affectedByGravity`, category/contact/collision bitmasks, `velocity`, `applyForce`, `applyImpulse`
-- `PhysicsWorld` — `gravity`, `speed`
-- `EffectNode` — `shouldEnableEffects`, `shouldRasterize`, `blendMode`
-- `Renderer` + `RenderPassDescriptor` — offline `SKRenderer` rendering into `apple-metal` textures via `updateAtTime` + `render`
-- `NodeExt` trait — all node types (`Scene`, `Node`, `SpriteNode`, `EffectNode`) share `addChild`, `removeFromParent`, position/scale/alpha methods, physics and action APIs via a blanket impl
-- `apple_cf::cg::{CGPoint, CGSize, CGRect, CGVector}` geometry types — no duplicated 2-D structs
+- Bridge architecture follows the `screencapturekit-rs` pattern: per-area Rust modules, per-area Swift bridge files, `@_cdecl` exports, retained opaque handles, and explicit `sk_release` cleanup.
+- Scene graph coverage includes `SKScene`, `SKNode`, `SKSpriteNode`, `SKLabelNode`, `SKEffectNode`, `SKLightNode`, and `SK3DNode`, plus shared `NodeExt` helpers for hierarchy, transforms, actions, physics bodies, and constraints.
+- Animation and simulation coverage includes `SKAction`, `SKPhysicsBody`, `SKPhysicsWorld`, headless-safe `SKPhysicsJoint` wrappers (`pin`, `spring`, `fixed`, `sliding`), `SKConstraint`/`SKRange`, and `SKKeyframeSequence`.
+- Rendering and assets coverage includes `SKTexture`, `SKShader`, `SKEmitterNode`, `SKView`, and offline `SKRenderer` rendering into `apple-metal` textures.
+- Media coverage includes `SKAudioNode` and `SKVideoNode` with asset-free AVFoundation-backed constructors for examples/tests.
+- The repository now includes 18 numbered examples under `examples/` and 17 focused integration tests under `tests/`, with at least one example and one test per requested logical area.
+- Detailed area-by-area status, including intentionally skipped APIs, lives in [`COVERAGE.md`](COVERAGE.md).
 
-## Smoke example
+## Examples, tests, and coverage
 
 ```bash
+cargo test
 cargo run --example 01_offline_render_smoke
+cargo run --example 10_view_present_scene
+cargo run --example 18_three_d_node_basic
 ```
 
-Creates a 128×128 `SpriteKit` scene with a red sprite at the centre, renders it into a Metal texture via `SKRenderer`, reads the pixels back, and asserts at least one non-zero byte.
+- `examples/01_*.rs` through `examples/18_*.rs` provide headless smoke coverage for the renderer plus every requested `SpriteKit` logical area.
+- `tests/*_area.rs` exercise the same surfaces under `cargo test`.
+- [`COVERAGE.md`](COVERAGE.md) records which logical areas are fully wrapped, partially wrapped, or intentionally skipped.
+
+## Coverage notes
+
+- `SKPhysicsJointLimit` and headless `SKPhysicsWorld.addJoint/removeJoint` flows are intentionally omitted because `PhysicsKit` crashed during direct validation; `pin`, `spring`, `fixed`, and `sliding` joints are covered.
+- `SKAudioNode` / `SKVideoNode` currently use default AVFoundation-backed constructors so examples and tests stay asset-free and deterministic.
 
 ## License
 

@@ -1,16 +1,13 @@
-use apple_cf::cg::{CGPoint, CGSize};
+use apple_cf::cg::{CGPoint, CGRect};
 
 use crate::action::Action;
+use crate::constraint::Constraint;
 use crate::ffi;
-use crate::physics::PhysicsBody;
+use crate::physics_body::PhysicsBody;
 use crate::private::{cstring_from_str, handle_type};
 
 handle_type!(Node);
 
-/// Trait implemented by all `SpriteKit` node types.
-///
-/// Allows `Node`, `SpriteNode`, `Scene`, and `EffectNode` to all participate
-/// in hierarchy management and action APIs without code duplication.
 pub trait AsNode {
     #[doc(hidden)]
     fn as_node_ptr(&self) -> *mut core::ffi::c_void;
@@ -22,13 +19,13 @@ impl AsNode for Node {
     }
 }
 
-/// Extension trait blanket-implemented for every `AsNode` type.
-///
-/// Provides `add_child`, `remove_from_parent`, position/scale/alpha setters,
-/// physics body attachment, and action execution.
 pub trait NodeExt: AsNode {
     fn add_child<C: AsNode>(&self, child: &C) {
         unsafe { ffi::sk_node_add_child(self.as_node_ptr(), child.as_node_ptr()) };
+    }
+
+    fn move_to_parent<P: AsNode>(&self, parent: &P) {
+        unsafe { ffi::sk_node_move_to_parent(self.as_node_ptr(), parent.as_node_ptr()) };
     }
 
     fn remove_from_parent(&self) {
@@ -51,10 +48,31 @@ pub trait NodeExt: AsNode {
     }
 
     #[must_use]
+    fn frame(&self) -> CGRect {
+        CGRect::new(
+            unsafe { ffi::sk_node_get_frame_x(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_get_frame_y(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_get_frame_w(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_get_frame_h(self.as_node_ptr()) },
+        )
+    }
+
+    #[must_use]
+    fn accumulated_frame(&self) -> CGRect {
+        CGRect::new(
+            unsafe { ffi::sk_node_calculate_accumulated_frame_x(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_calculate_accumulated_frame_y(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_calculate_accumulated_frame_w(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_calculate_accumulated_frame_h(self.as_node_ptr()) },
+        )
+    }
+
+    #[must_use]
     fn position(&self) -> CGPoint {
-        let x = unsafe { ffi::sk_node_get_position_x(self.as_node_ptr()) };
-        let y = unsafe { ffi::sk_node_get_position_y(self.as_node_ptr()) };
-        CGPoint::new(x, y)
+        CGPoint::new(
+            unsafe { ffi::sk_node_get_position_x(self.as_node_ptr()) },
+            unsafe { ffi::sk_node_get_position_y(self.as_node_ptr()) },
+        )
     }
 
     fn set_position(&self, position: CGPoint) {
@@ -138,6 +156,20 @@ pub trait NodeExt: AsNode {
     }
 
     #[must_use]
+    fn is_user_interaction_enabled(&self) -> bool {
+        unsafe { ffi::sk_node_get_user_interaction_enabled(self.as_node_ptr()) }
+    }
+
+    fn set_user_interaction_enabled(&self, enabled: bool) {
+        unsafe { ffi::sk_node_set_user_interaction_enabled(self.as_node_ptr(), enabled) };
+    }
+
+    #[must_use]
+    fn children_count(&self) -> usize {
+        unsafe { ffi::sk_node_get_children_count(self.as_node_ptr()) }
+    }
+
+    #[must_use]
     fn physics_body(&self) -> Option<PhysicsBody> {
         unsafe { PhysicsBody::from_raw(ffi::sk_node_get_physics_body(self.as_node_ptr())) }
     }
@@ -151,12 +183,42 @@ pub trait NodeExt: AsNode {
         };
     }
 
+    #[must_use]
+    fn constraint_count(&self) -> usize {
+        unsafe { ffi::sk_node_get_constraints_count(self.as_node_ptr()) }
+    }
+
+    fn set_constraints(&self, constraints: &[&Constraint]) {
+        let mut raw: Vec<*mut core::ffi::c_void> =
+            constraints.iter().map(|constraint| constraint.as_ptr()).collect();
+        let raw_ptr = if raw.is_empty() {
+            core::ptr::null_mut()
+        } else {
+            raw.as_mut_ptr().cast()
+        };
+        unsafe { ffi::sk_node_set_constraints(self.as_node_ptr(), raw_ptr, raw.len()) };
+    }
+
+    fn clear_constraints(&self) {
+        self.set_constraints(&[]);
+    }
+
     fn run_action(&self, action: &Action) {
         unsafe { ffi::sk_node_run_action(self.as_node_ptr(), action.as_ptr()) };
     }
 
+    #[must_use]
+    fn has_actions(&self) -> bool {
+        unsafe { ffi::sk_node_has_actions(self.as_node_ptr()) }
+    }
+
     fn remove_all_actions(&self) {
         unsafe { ffi::sk_node_remove_all_actions(self.as_node_ptr()) };
+    }
+
+    #[must_use]
+    fn contains_point(&self, point: CGPoint) -> bool {
+        unsafe { ffi::sk_node_contains_point(self.as_node_ptr(), point.x, point.y) }
     }
 }
 
@@ -173,10 +235,4 @@ impl Default for Node {
     fn default() -> Self {
         Self::new().expect("SKNode creation failed")
     }
-}
-
-// Provide a size helper needed in node.rs for conformance with CGSize-based APIs
-#[allow(dead_code)]
-pub(crate) const fn cgsize_to_wh(size: CGSize) -> (f64, f64) {
-    (size.width, size.height)
 }

@@ -52,30 +52,33 @@ func skBlendMode(_ rawValue: Int32) -> SKBlendMode {
     SKBlendMode(rawValue: Int(rawValue)) ?? .alpha
 }
 
-func skActions(from rawActions: UnsafeMutableRawPointer?, count: Int) -> [SKAction] {
-    guard let rawActions else { return [] }
-    let pointers = rawActions.assumingMemoryBound(to: UnsafeMutableRawPointer?.self)
-    var actions: [SKAction] = []
-    actions.reserveCapacity(count)
+func skHandles<T>(from rawHandles: UnsafeMutableRawPointer?, count: Int) -> [T] {
+    guard let rawHandles else { return [] }
+    let pointers = rawHandles.assumingMemoryBound(to: UnsafeMutableRawPointer?.self)
+    var objects: [T] = []
+    objects.reserveCapacity(count)
     for index in 0..<count {
-        if let action: SKAction = skBorrow(pointers[index]) {
-            actions.append(action)
+        if let object: T = skBorrow(pointers[index]) {
+            objects.append(object)
         }
     }
-    return actions
+    return objects
+}
+
+func skActions(from rawActions: UnsafeMutableRawPointer?, count: Int) -> [SKAction] {
+    skHandles(from: rawActions, count: count)
 }
 
 func skTextures(from rawTextures: UnsafeMutableRawPointer?, count: Int) -> [SKTexture] {
-    guard let rawTextures else { return [] }
-    let pointers = rawTextures.assumingMemoryBound(to: UnsafeMutableRawPointer?.self)
-    var textures: [SKTexture] = []
-    textures.reserveCapacity(count)
-    for index in 0..<count {
-        if let texture: SKTexture = skBorrow(pointers[index]) {
-            textures.append(texture)
-        }
-    }
-    return textures
+    skHandles(from: rawTextures, count: count)
+}
+
+func skBodies(from rawBodies: UnsafeMutableRawPointer?, count: Int) -> [SKPhysicsBody] {
+    skHandles(from: rawBodies, count: count)
+}
+
+func skConstraints(from rawConstraints: UnsafeMutableRawPointer?, count: Int) -> [SKConstraint] {
+    skHandles(from: rawConstraints, count: count)
 }
 
 func skBorrowCGImage(_ handle: UnsafeMutableRawPointer?) -> CGImage? {

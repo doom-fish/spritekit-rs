@@ -2,12 +2,12 @@ use apple_cf::cg::{CGPoint, CGSize};
 
 use crate::ffi;
 use crate::node::AsNode;
-use crate::physics::PhysicsWorld;
+use crate::physics_world::PhysicsWorld;
 use crate::private::handle_type;
+use crate::view::View;
 
 handle_type!(Scene);
 
-/// `SKSceneScaleMode` values.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum SceneScaleMode {
@@ -36,7 +36,6 @@ impl AsNode for Scene {
 }
 
 impl Scene {
-    /// Creates a new scene with the given size (in points).
     #[must_use]
     pub fn with_size(size: CGSize) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_scene_new_with_size(size.width, size.height)) }
@@ -44,9 +43,10 @@ impl Scene {
 
     #[must_use]
     pub fn size(&self) -> CGSize {
-        let w = unsafe { ffi::sk_scene_get_size_w(self.ptr) };
-        let h = unsafe { ffi::sk_scene_get_size_h(self.ptr) };
-        CGSize::new(w, h)
+        CGSize::new(
+            unsafe { ffi::sk_scene_get_size_w(self.ptr) },
+            unsafe { ffi::sk_scene_get_size_h(self.ptr) },
+        )
     }
 
     pub fn set_size(&self, size: CGSize) {
@@ -63,16 +63,15 @@ impl Scene {
     }
 
     pub fn set_background_color(&self, color: crate::color::Color) {
-        unsafe {
-            ffi::sk_scene_set_background_color(self.ptr, color.r, color.g, color.b, color.a);
-        };
+        unsafe { ffi::sk_scene_set_background_color(self.ptr, color.r, color.g, color.b, color.a) };
     }
 
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
-        let x = unsafe { ffi::sk_scene_get_anchor_x(self.ptr) };
-        let y = unsafe { ffi::sk_scene_get_anchor_y(self.ptr) };
-        CGPoint::new(x, y)
+        CGPoint::new(
+            unsafe { ffi::sk_scene_get_anchor_x(self.ptr) },
+            unsafe { ffi::sk_scene_get_anchor_y(self.ptr) },
+        )
     }
 
     pub fn set_anchor_point(&self, anchor: CGPoint) {
@@ -82,5 +81,26 @@ impl Scene {
     #[must_use]
     pub fn physics_world(&self) -> PhysicsWorld {
         unsafe { PhysicsWorld::from_raw_unchecked(ffi::sk_scene_physics_world(self.ptr)) }
+    }
+
+    #[must_use]
+    pub fn view(&self) -> Option<View> {
+        unsafe { View::from_raw(ffi::sk_scene_get_view(self.ptr)) }
+    }
+
+    #[must_use]
+    pub fn convert_point_from_view(&self, point: CGPoint) -> CGPoint {
+        CGPoint::new(
+            unsafe { ffi::sk_scene_convert_point_from_view_x(self.ptr, point.x, point.y) },
+            unsafe { ffi::sk_scene_convert_point_from_view_y(self.ptr, point.x, point.y) },
+        )
+    }
+
+    #[must_use]
+    pub fn convert_point_to_view(&self, point: CGPoint) -> CGPoint {
+        CGPoint::new(
+            unsafe { ffi::sk_scene_convert_point_to_view_x(self.ptr, point.x, point.y) },
+            unsafe { ffi::sk_scene_convert_point_to_view_y(self.ptr, point.x, point.y) },
+        )
     }
 }

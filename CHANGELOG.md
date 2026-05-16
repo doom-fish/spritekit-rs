@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-05-16
+
+### Added
+
+- Split the Rust FFI into per-area modules and matched it with per-area Swift bridge files using the retained-handle `@_cdecl` pattern from `screencapturekit-rs`
+- Expanded wrapper coverage across the requested SpriteKit logical areas: `SKScene`, `SKNode`, `SKAction`, `SKPhysicsBody`, `SKPhysicsWorld`, `SKPhysicsJoint`, `SKLabelNode`, `SKSpriteNode`, `SKView`, `SKConstraint`, `SKKeyframeSequence`, `SKEmitterNode`, `SKShader`, `SKAudioNode`, `SKVideoNode`, `SKLightNode`, and `SK3DNode`
+- Added focused examples `examples/02_scene_basics.rs` through `examples/18_three_d_node_basic.rs`
+- Added focused integration tests `tests/*_area.rs` with at least one test per requested logical area
+- Added `COVERAGE.md` documenting implemented, partial, and intentionally skipped areas
+
+### Changed
+
+- Linked the bridge against `AVFoundation` and `SceneKit` for the new media and `SK3DNode` wrappers
+- Updated crate metadata, README status, and release documentation for `0.2.0`
+
 ## [0.1.0] - 2025-01-01
 
 ### Added

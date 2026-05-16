@@ -13,6 +13,14 @@ public func sk_node_add_child(_ parentHandle: UnsafeMutableRawPointer?, _ childH
     parent.addChild(child)
 }
 
+@_cdecl("sk_node_move_to_parent")
+public func sk_node_move_to_parent(_ nodeHandle: UnsafeMutableRawPointer?, _ parentHandle: UnsafeMutableRawPointer?) {
+    guard let node: SKNode = skBorrow(nodeHandle),
+          let parent: SKNode = skBorrow(parentHandle)
+    else { return }
+    node.move(toParent: parent)
+}
+
 @_cdecl("sk_node_remove_from_parent")
 public func sk_node_remove_from_parent(_ nodeHandle: UnsafeMutableRawPointer?) {
     guard let node: SKNode = skBorrow(nodeHandle) else { return }
@@ -35,6 +43,54 @@ public func sk_node_copy_name(_ nodeHandle: UnsafeMutableRawPointer?) -> UnsafeM
 public func sk_node_set_name(_ nodeHandle: UnsafeMutableRawPointer?, _ name: UnsafePointer<CChar>?) {
     guard let node: SKNode = skBorrow(nodeHandle) else { return }
     node.name = name.map(String.init(cString:))
+}
+
+@_cdecl("sk_node_get_frame_x")
+public func sk_node_get_frame_x(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.frame.origin.x)
+}
+
+@_cdecl("sk_node_get_frame_y")
+public func sk_node_get_frame_y(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.frame.origin.y)
+}
+
+@_cdecl("sk_node_get_frame_w")
+public func sk_node_get_frame_w(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.frame.size.width)
+}
+
+@_cdecl("sk_node_get_frame_h")
+public func sk_node_get_frame_h(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.frame.size.height)
+}
+
+@_cdecl("sk_node_calculate_accumulated_frame_x")
+public func sk_node_calculate_accumulated_frame_x(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.calculateAccumulatedFrame().origin.x)
+}
+
+@_cdecl("sk_node_calculate_accumulated_frame_y")
+public func sk_node_calculate_accumulated_frame_y(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.calculateAccumulatedFrame().origin.y)
+}
+
+@_cdecl("sk_node_calculate_accumulated_frame_w")
+public func sk_node_calculate_accumulated_frame_w(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.calculateAccumulatedFrame().size.width)
+}
+
+@_cdecl("sk_node_calculate_accumulated_frame_h")
+public func sk_node_calculate_accumulated_frame_h(_ nodeHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return Double(node.calculateAccumulatedFrame().size.height)
 }
 
 @_cdecl("sk_node_get_position_x")
@@ -157,6 +213,24 @@ public func sk_node_set_speed(_ nodeHandle: UnsafeMutableRawPointer?, _ speed: D
     node.speed = CGFloat(speed)
 }
 
+@_cdecl("sk_node_get_user_interaction_enabled")
+public func sk_node_get_user_interaction_enabled(_ nodeHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return false }
+    return node.isUserInteractionEnabled
+}
+
+@_cdecl("sk_node_set_user_interaction_enabled")
+public func sk_node_set_user_interaction_enabled(_ nodeHandle: UnsafeMutableRawPointer?, _ enabled: Bool) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    node.isUserInteractionEnabled = enabled
+}
+
+@_cdecl("sk_node_get_children_count")
+public func sk_node_get_children_count(_ nodeHandle: UnsafeMutableRawPointer?) -> Int {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return node.children.count
+}
+
 @_cdecl("sk_node_get_physics_body")
 public func sk_node_get_physics_body(_ nodeHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
     guard let node: SKNode = skBorrow(nodeHandle), let body = node.physicsBody else { return nil }
@@ -170,6 +244,18 @@ public func sk_node_set_physics_body(_ nodeHandle: UnsafeMutableRawPointer?, _ b
     node.physicsBody = body
 }
 
+@_cdecl("sk_node_get_constraints_count")
+public func sk_node_get_constraints_count(_ nodeHandle: UnsafeMutableRawPointer?) -> Int {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
+    return node.constraints?.count ?? 0
+}
+
+@_cdecl("sk_node_set_constraints")
+public func sk_node_set_constraints(_ nodeHandle: UnsafeMutableRawPointer?, _ rawConstraints: UnsafeMutableRawPointer?, _ count: Int) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    node.constraints = skConstraints(from: rawConstraints, count: count)
+}
+
 @_cdecl("sk_node_run_action")
 public func sk_node_run_action(_ nodeHandle: UnsafeMutableRawPointer?, _ actionHandle: UnsafeMutableRawPointer?) {
     guard let node: SKNode = skBorrow(nodeHandle),
@@ -178,8 +264,20 @@ public func sk_node_run_action(_ nodeHandle: UnsafeMutableRawPointer?, _ actionH
     node.run(action)
 }
 
+@_cdecl("sk_node_has_actions")
+public func sk_node_has_actions(_ nodeHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return false }
+    return node.hasActions()
+}
+
 @_cdecl("sk_node_remove_all_actions")
 public func sk_node_remove_all_actions(_ nodeHandle: UnsafeMutableRawPointer?) {
     guard let node: SKNode = skBorrow(nodeHandle) else { return }
     node.removeAllActions()
+}
+
+@_cdecl("sk_node_contains_point")
+public func sk_node_contains_point(_ nodeHandle: UnsafeMutableRawPointer?, _ x: Double, _ y: Double) -> Bool {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return false }
+    return node.contains(CGPoint(x: x, y: y))
 }
