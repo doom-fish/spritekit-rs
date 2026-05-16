@@ -29,8 +29,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("failed to allocate render target texture")?;
 
     // Build a 128×128 scene with a black background.
-    let scene = Scene::with_size(CGSize::new(WIDTH_F, HEIGHT_F))
-        .ok_or("failed to create SKScene")?;
+    let scene =
+        Scene::with_size(CGSize::new(WIDTH_F, HEIGHT_F)).ok_or("failed to create SKScene")?;
     scene.set_background_color(Color::black());
     scene.set_scale_mode(SceneScaleMode::AspectFit);
     // Centre the coordinate origin.
