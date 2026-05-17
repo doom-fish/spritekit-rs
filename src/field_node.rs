@@ -67,7 +67,7 @@ impl FieldNode {
 
     pub fn set_direction(&self, direction: [f32; 3]) {
         unsafe {
-            ffi::sk_field_node_set_direction(self.ptr, direction[0], direction[1], direction[2])
+            ffi::sk_field_node_set_direction(self.ptr, direction[0], direction[1], direction[2]);
         };
     }
 

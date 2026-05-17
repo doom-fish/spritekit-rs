@@ -75,7 +75,7 @@ impl ShapeNode {
 
     pub fn set_stroke_color(&self, color: Color) {
         unsafe {
-            ffi::sk_shape_node_set_stroke_color(self.ptr, color.r, color.g, color.b, color.a)
+            ffi::sk_shape_node_set_stroke_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 

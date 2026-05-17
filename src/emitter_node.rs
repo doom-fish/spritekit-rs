@@ -85,7 +85,7 @@ impl EmitterNode {
 
     pub fn set_particle_color(&self, color: Color) {
         unsafe {
-            ffi::sk_emitter_node_set_particle_color(self.ptr, color.r, color.g, color.b, color.a)
+            ffi::sk_emitter_node_set_particle_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 

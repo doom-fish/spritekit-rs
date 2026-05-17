@@ -227,7 +227,7 @@ impl View {
                 self.ptr,
                 scene.as_ptr(),
                 transition.as_ptr(),
-            )
+            );
         };
     }
 

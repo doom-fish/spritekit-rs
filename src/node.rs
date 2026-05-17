@@ -172,7 +172,7 @@ pub trait NodeExt: AsNode {
 
     fn set_accessibility_element(&self, accessibility_element: bool) {
         unsafe {
-            ffi::sk_node_set_accessibility_element(self.as_node_ptr(), accessibility_element)
+            ffi::sk_node_set_accessibility_element(self.as_node_ptr(), accessibility_element);
         };
     }
 
@@ -196,7 +196,7 @@ pub trait NodeExt: AsNode {
 
     fn set_accessibility_enabled(&self, accessibility_enabled: bool) {
         unsafe {
-            ffi::sk_node_set_accessibility_enabled(self.as_node_ptr(), accessibility_enabled)
+            ffi::sk_node_set_accessibility_enabled(self.as_node_ptr(), accessibility_enabled);
         };
     }
 

@@ -32,13 +32,13 @@ impl LightNode {
 
     pub fn set_ambient_color(&self, color: Color) {
         unsafe {
-            ffi::sk_light_node_set_ambient_color(self.ptr, color.r, color.g, color.b, color.a)
+            ffi::sk_light_node_set_ambient_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 
     pub fn set_shadow_color(&self, color: Color) {
         unsafe {
-            ffi::sk_light_node_set_shadow_color(self.ptr, color.r, color.g, color.b, color.a)
+            ffi::sk_light_node_set_shadow_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 
