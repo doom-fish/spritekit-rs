@@ -1,5 +1,9 @@
+use core::ffi::c_void;
+use std::panic::{catch_unwind, AssertUnwindSafe};
+
 use apple_cf::cg::{CGPoint, CGSize};
 
+use crate::camera_node::CameraNode;
 use crate::ffi;
 use crate::node::AsNode;
 use crate::physics_world::PhysicsWorld;
@@ -7,6 +11,29 @@ use crate::private::handle_type;
 use crate::view::View;
 
 handle_type!(Scene);
+handle_type!(SceneDelegate);
+
+type SceneUpdateCallback = Box<dyn Fn(f64) + Send + Sync + 'static>;
+
+struct SceneDelegateContext {
+    update: Option<SceneUpdateCallback>,
+}
+
+extern "C" fn scene_delegate_update(context: *mut c_void, current_time: f64) {
+    let context = unsafe { &*(context.cast::<SceneDelegateContext>()) };
+    if let Some(callback) = &context.update {
+        let _ = catch_unwind(AssertUnwindSafe(|| callback(current_time)));
+    }
+}
+
+extern "C" fn scene_delegate_release(context: *mut c_void) {
+    if context.is_null() {
+        return;
+    }
+    unsafe {
+        drop(Box::from_raw(context.cast::<SceneDelegateContext>()));
+    }
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
@@ -32,6 +59,37 @@ impl SceneScaleMode {
 impl AsNode for Scene {
     fn as_node_ptr(&self) -> *mut core::ffi::c_void {
         self.ptr
+    }
+}
+
+impl SceneDelegate {
+    #[must_use]
+    pub fn new() -> Option<Self> {
+        let context = Box::new(SceneDelegateContext { update: None });
+        unsafe {
+            Self::from_raw(ffi::sk_scene_delegate_new(
+                Box::into_raw(context).cast(),
+                Some(scene_delegate_update),
+                Some(scene_delegate_release),
+            ))
+        }
+    }
+
+    #[must_use]
+    pub fn with_update<F>(update: F) -> Option<Self>
+    where
+        F: Fn(f64) + Send + Sync + 'static,
+    {
+        let context = Box::new(SceneDelegateContext {
+            update: Some(Box::new(update)),
+        });
+        unsafe {
+            Self::from_raw(ffi::sk_scene_delegate_new(
+                Box::into_raw(context).cast(),
+                Some(scene_delegate_update),
+                Some(scene_delegate_release),
+            ))
+        }
     }
 }
 
@@ -64,6 +122,34 @@ impl Scene {
 
     pub fn set_background_color(&self, color: crate::color::Color) {
         unsafe { ffi::sk_scene_set_background_color(self.ptr, color.r, color.g, color.b, color.a) };
+    }
+
+    #[must_use]
+    pub fn camera(&self) -> Option<CameraNode> {
+        unsafe { CameraNode::from_raw(ffi::sk_scene_get_camera(self.ptr)) }
+    }
+
+    pub fn set_camera(&self, camera: Option<&CameraNode>) {
+        unsafe {
+            ffi::sk_scene_set_camera(
+                self.ptr,
+                camera.map_or(core::ptr::null_mut(), CameraNode::as_ptr),
+            );
+        };
+    }
+
+    pub fn set_delegate(&self, delegate: Option<&SceneDelegate>) {
+        unsafe {
+            ffi::sk_scene_set_delegate(
+                self.ptr,
+                delegate.map_or(core::ptr::null_mut(), SceneDelegate::as_ptr),
+            );
+        };
+    }
+
+    #[must_use]
+    pub fn has_delegate(&self) -> bool {
+        unsafe { ffi::sk_scene_has_delegate(self.ptr) }
     }
 
     #[must_use]

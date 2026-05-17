@@ -32,4 +32,8 @@ extern "C" {
     pub fn sk_physics_joint_sliding_set_lower_distance_limit(joint: *mut c_void, value: f64);
     pub fn sk_physics_joint_sliding_get_upper_distance_limit(joint: *mut c_void) -> f64;
     pub fn sk_physics_joint_sliding_set_upper_distance_limit(joint: *mut c_void, value: f64);
+
+    pub fn sk_physics_joint_limit_new(body_a: *mut c_void, body_b: *mut c_void, anchor_a_x: f64, anchor_a_y: f64, anchor_b_x: f64, anchor_b_y: f64) -> *mut c_void;
+    pub fn sk_physics_joint_limit_get_max_length(joint: *mut c_void) -> f64;
+    pub fn sk_physics_joint_limit_set_max_length(joint: *mut c_void, value: f64);
 }

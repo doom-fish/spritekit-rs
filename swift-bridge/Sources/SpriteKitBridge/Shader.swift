@@ -46,6 +46,17 @@ public func sk_shader_get_float_uniform(_ shaderHandle: UnsafeMutableRawPointer?
     return true
 }
 
+@_cdecl("sk_shader_get_uniform_type")
+public func sk_shader_get_uniform_type(_ shaderHandle: UnsafeMutableRawPointer?, _ name: UnsafePointer<CChar>?, _ outValue: UnsafeMutablePointer<Int32>?) -> Bool {
+    guard let shader: SKShader = skBorrow(shaderHandle),
+          let name,
+          let outValue,
+          let uniform = shader.uniformNamed(String(cString: name))
+    else { return false }
+    outValue.pointee = Int32(uniform.uniformType.rawValue)
+    return true
+}
+
 @_cdecl("sk_shader_remove_uniform_named")
 public func sk_shader_remove_uniform_named(_ shaderHandle: UnsafeMutableRawPointer?, _ name: UnsafePointer<CChar>?) {
     guard let shader: SKShader = skBorrow(shaderHandle), let name else { return }

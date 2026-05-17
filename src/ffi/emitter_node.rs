@@ -8,6 +8,8 @@ extern "C" {
     pub fn sk_emitter_node_set_particle_texture(node: *mut c_void, texture: *mut c_void);
     pub fn sk_emitter_node_get_particle_blend_mode(node: *mut c_void) -> i32;
     pub fn sk_emitter_node_set_particle_blend_mode(node: *mut c_void, mode: i32);
+    pub fn sk_emitter_node_get_particle_render_order(node: *mut c_void) -> u64;
+    pub fn sk_emitter_node_set_particle_render_order(node: *mut c_void, order: u64);
     pub fn sk_emitter_node_set_particle_color(node: *mut c_void, r: f32, g: f32, b: f32, a: f32);
     pub fn sk_emitter_node_get_particle_position_x(node: *mut c_void) -> f64;
     pub fn sk_emitter_node_get_particle_position_y(node: *mut c_void) -> f64;

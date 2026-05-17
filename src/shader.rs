@@ -3,6 +3,38 @@ use crate::private::{cstring_from_str, handle_type};
 
 handle_type!(Shader);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[repr(i32)]
+pub enum UniformType {
+    #[default]
+    None = 0,
+    Float = 1,
+    FloatVector2 = 2,
+    FloatVector3 = 3,
+    FloatVector4 = 4,
+    FloatMatrix2 = 5,
+    FloatMatrix3 = 6,
+    FloatMatrix4 = 7,
+    Texture = 8,
+}
+
+impl UniformType {
+    #[must_use]
+    pub const fn from_raw(value: i32) -> Self {
+        match value {
+            1 => Self::Float,
+            2 => Self::FloatVector2,
+            3 => Self::FloatVector3,
+            4 => Self::FloatVector4,
+            5 => Self::FloatMatrix2,
+            6 => Self::FloatMatrix3,
+            7 => Self::FloatMatrix4,
+            8 => Self::Texture,
+            _ => Self::None,
+        }
+    }
+}
+
 impl Shader {
     #[must_use]
     pub fn new() -> Option<Self> {
@@ -49,6 +81,14 @@ impl Shader {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_shader_remove_uniform_named(self.ptr, name.as_ptr()) };
         }
+    }
+
+    #[must_use]
+    pub fn uniform_type_named(&self, name: &str) -> Option<UniformType> {
+        let name = cstring_from_str(name)?;
+        let mut value = 0;
+        let ok = unsafe { ffi::sk_shader_get_uniform_type(self.ptr, name.as_ptr(), &mut value) };
+        ok.then_some(UniformType::from_raw(value))
     }
 
     #[must_use]

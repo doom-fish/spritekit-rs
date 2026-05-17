@@ -38,9 +38,17 @@ extern "C" {
     pub fn sk_node_set_speed(node: *mut c_void, speed: f64);
     pub fn sk_node_get_user_interaction_enabled(node: *mut c_void) -> bool;
     pub fn sk_node_set_user_interaction_enabled(node: *mut c_void, enabled: bool);
+    pub fn sk_node_get_accessibility_element(node: *mut c_void) -> bool;
+    pub fn sk_node_set_accessibility_element(node: *mut c_void, accessibility_element: bool);
+    pub fn sk_node_copy_accessibility_label(node: *mut c_void) -> *mut c_char;
+    pub fn sk_node_set_accessibility_label(node: *mut c_void, label: *const c_char);
+    pub fn sk_node_get_accessibility_enabled(node: *mut c_void) -> bool;
+    pub fn sk_node_set_accessibility_enabled(node: *mut c_void, accessibility_enabled: bool);
     pub fn sk_node_get_children_count(node: *mut c_void) -> usize;
     pub fn sk_node_get_physics_body(node: *mut c_void) -> *mut c_void;
     pub fn sk_node_set_physics_body(node: *mut c_void, body: *mut c_void);
+    pub fn sk_node_get_reach_constraints(node: *mut c_void) -> *mut c_void;
+    pub fn sk_node_set_reach_constraints(node: *mut c_void, constraints: *mut c_void);
     pub fn sk_node_get_constraints_count(node: *mut c_void) -> usize;
     pub fn sk_node_set_constraints(node: *mut c_void, constraints: *mut c_void, count: usize);
     pub fn sk_node_run_action(node: *mut c_void, action: *mut c_void);

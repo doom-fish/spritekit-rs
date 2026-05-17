@@ -169,3 +169,23 @@ public func sk_physics_joint_sliding_set_upper_distance_limit(_ jointHandle: Uns
     guard let joint: SKPhysicsJointSliding = skBorrow(jointHandle) else { return }
     joint.upperDistanceLimit = CGFloat(value)
 }
+
+@_cdecl("sk_physics_joint_limit_new")
+public func sk_physics_joint_limit_new(_ bodyAHandle: UnsafeMutableRawPointer?, _ bodyBHandle: UnsafeMutableRawPointer?, _ anchorAX: Double, _ anchorAY: Double, _ anchorBX: Double, _ anchorBY: Double) -> UnsafeMutableRawPointer? {
+    guard let bodyA: SKPhysicsBody = skBorrow(bodyAHandle),
+          let bodyB: SKPhysicsBody = skBorrow(bodyBHandle)
+    else { return nil }
+    return skRetain(SKPhysicsJointLimit.joint(withBodyA: bodyA, bodyB: bodyB, anchorA: CGPoint(x: anchorAX, y: anchorAY), anchorB: CGPoint(x: anchorBX, y: anchorBY)))
+}
+
+@_cdecl("sk_physics_joint_limit_get_max_length")
+public func sk_physics_joint_limit_get_max_length(_ jointHandle: UnsafeMutableRawPointer?) -> Double {
+    guard let joint: SKPhysicsJointLimit = skBorrow(jointHandle) else { return 0 }
+    return Double(joint.maxLength)
+}
+
+@_cdecl("sk_physics_joint_limit_set_max_length")
+public func sk_physics_joint_limit_set_max_length(_ jointHandle: UnsafeMutableRawPointer?, _ value: Double) {
+    guard let joint: SKPhysicsJointLimit = skBorrow(jointHandle) else { return }
+    joint.maxLength = CGFloat(value)
+}

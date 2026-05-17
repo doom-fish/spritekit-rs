@@ -1,10 +1,10 @@
 # spritekit-rs coverage audit (vs MacOSX26.2.sdk)
 
 SDK_PUBLIC_SYMBOLS: 75
-VERIFIED: 35
-GAPS: 40
+VERIFIED: 75
+GAPS: 0
 EXEMPT: 0
-COVERAGE_PCT: 46.67%
+COVERAGE_PCT: 100.00%
 
 Audit notes:
 - Full macOS header pass across `SpriteKit.framework/Headers/*.h`.
@@ -16,85 +16,86 @@ Audit notes:
 ## 🟢 VERIFIED
 | Symbol | Kind | Header | Wrapped by |
 | --- | --- | --- | --- |
+| `NSEvent (SKNodeEvent)` | category | `SKNode.h` | `Event::{mouse_moved, location_in_node}` |
 | `SK3DNode` | interface | `SK3DNode.h` | `ThreeDNode` |
 | `SKAction` | interface | `SKAction.h` | `Action` |
+| `SKAction (MixerControl)` | category | `SKAction.h` | `Action::change_volume_to` |
+| `SKAction (NodeWithPhysicsBody)` | category | `SKAction.h` | `Action::{change_charge_to, apply_force}` |
+| `SKAction (PlaybackControl)` | category | `SKAction.h` | `Action::play` |
 | `SKAction (SKActions)` | category | `SKAction.h` | `Action::{move_*, rotate_*, scale_*, resize_*, fade_*, set_texture, animate_with_textures, wait, sequence, group, repeat_*}` |
+| `SKAction (SKAudioNode)` | category | `SKAudioNode.h` | `Action::stereo_pan_to` |
+| `SKAction (SKWarpable)` | category | `SKWarpGeometry.h` | `Action::{warp_to, animate_with_warps}` |
 | `SKActionTimingMode` | enum | `SKAction.h` | `ActionTimingMode` |
+| `SKAttribute` | interface | `SKAttribute.h` | `Attribute` |
+| `SKAttributeType` | enum | `SKAttribute.h` | `AttributeType` |
+| `SKAttributeValue` | interface | `SKAttribute.h` | `AttributeValue` |
 | `SKAudioNode` | interface | `SKAudioNode.h` | `AudioNode` |
 | `SKBlendMode` | enum | `SKNode.h` | `BlendMode` |
+| `SKCameraNode` | interface | `SKCameraNode.h` | `CameraNode + Scene::{camera, set_camera}` |
 | `SKConstraint` | interface | `SKConstraint.h` | `Constraint` |
+| `SKCropNode` | interface | `SKCropNode.h` | `CropNode` |
 | `SKEffectNode` | interface | `SKEffectNode.h` | `EffectNode` |
 | `SKEmitterNode` | interface | `SKEmitterNode.h` | `EmitterNode` |
+| `SKFieldNode` | interface | `SKFieldNode.h` | `FieldNode` |
 | `SKInterpolationMode` | enum | `SKKeyframeSequence.h` | `InterpolationMode` |
 | `SKKeyframeSequence` | interface | `SKKeyframeSequence.h` | `KeyframeSequence` |
 | `SKLabelHorizontalAlignmentMode` | enum | `SKLabelNode.h` | `HorizontalAlignmentMode` |
 | `SKLabelNode` | interface | `SKLabelNode.h` | `LabelNode` |
 | `SKLabelVerticalAlignmentMode` | enum | `SKLabelNode.h` | `VerticalAlignmentMode` |
 | `SKLightNode` | interface | `SKLightNode.h` | `LightNode` |
+| `SKMutableTexture` | interface | `SKMutableTexture.h` | `MutableTexture` |
 | `SKNode` | interface | `SKNode.h` | `Node + NodeExt` |
+| `SKNode (NSAccessibility)` | category | `SKNode+NSAccessibility.h` | `NodeExt::{is_accessibility_*, set_accessibility_*, accessibility_label}` |
+| `SKParticleRenderOrder` | enum | `SKEmitterNode.h` | `ParticleRenderOrder` |
 | `SKPhysicsBody` | interface | `SKPhysicsBody.h` | `PhysicsBody` |
+| `SKPhysicsContact` | interface | `SKPhysicsContact.h` | `PhysicsContact` |
+| `SKPhysicsContactDelegate` | protocol | `SKPhysicsWorld.h` | `PhysicsContactDelegate + PhysicsWorld::{set_contact_delegate, has_contact_delegate}` |
 | `SKPhysicsJoint` | interface | `SKPhysicsJoint.h` | `AsPhysicsJoint + PhysicsJointExt` |
 | `SKPhysicsJointFixed` | interface | `SKPhysicsJoint.h` | `PhysicsJointFixed` |
+| `SKPhysicsJointLimit` | interface | `SKPhysicsJoint.h` | `PhysicsJointLimit` |
 | `SKPhysicsJointPin` | interface | `SKPhysicsJoint.h` | `PhysicsJointPin` |
 | `SKPhysicsJointSliding` | interface | `SKPhysicsJoint.h` | `PhysicsJointSliding` |
 | `SKPhysicsJointSpring` | interface | `SKPhysicsJoint.h` | `PhysicsJointSpring` |
 | `SKPhysicsWorld` | interface | `SKPhysicsWorld.h` | `PhysicsWorld` |
 | `SKRange` | interface | `SKConstraint.h` | `ConstraintRange` |
+| `SKReachConstraints` | interface | `SKReachConstraints.h` | `ReachConstraints + NodeExt::{reach_constraints, set_reach_constraints}` |
+| `SKReferenceNode` | interface | `SKReferenceNode.h` | `ReferenceNode` |
+| `SKRegion` | interface | `SKRegion.h` | `Region` |
 | `SKRenderer` | interface | `SKRenderer.h` | `Renderer` |
 | `SKRepeatMode` | enum | `SKKeyframeSequence.h` | `RepeatMode` |
 | `SKScene` | interface | `SKScene.h` | `Scene` |
+| `SKSceneDelegate` | protocol | `SKScene.h` | `SceneDelegate + Scene::{set_delegate, has_delegate}` |
 | `SKSceneScaleMode` | enum | `SKScene.h` | `SceneScaleMode` |
 | `SKShader` | interface | `SKShader.h` | `Shader` |
+| `SKShapeNode` | interface | `SKShapeNode.h` | `ShapeNode` |
 | `SKSpriteNode` | interface | `SKSpriteNode.h` | `SpriteNode` |
 | `SKTexture` | interface | `SKTexture.h` | `Texture` |
+| `SKTextureAtlas` | interface | `SKTextureAtlas.h` | `TextureAtlas` |
 | `SKTextureFilteringMode` | enum | `SKTexture.h` | `TextureFilteringMode` |
+| `SKTileAdjacencyMask` | enum | `SKTileSet.h` | `TileAdjacencyMask` |
+| `SKTileDefinition` | interface | `SKTileDefinition.h` | `TileDefinition` |
+| `SKTileDefinitionRotation` | enum | `SKTileDefinition.h` | `TileDefinitionRotation` |
+| `SKTileGroup` | interface | `SKTileSet.h` | `TileGroup` |
+| `SKTileGroupRule` | interface | `SKTileSet.h` | `TileGroupRule` |
+| `SKTileMapNode` | interface | `SKTileMapNode.h` | `TileMapNode` |
+| `SKTileSet` | interface | `SKTileSet.h` | `TileSet` |
+| `SKTileSetType` | enum | `SKTileSet.h` | `TileSetType` |
+| `SKTransformNode` | interface | `SKTransformNode.h` | `TransformNode` |
+| `SKTransition` | interface | `SKTransition.h` | `Transition + View::present_scene_with_transition` |
+| `SKTransitionDirection` | enum | `SKTransition.h` | `TransitionDirection` |
 | `SKUniform` | interface | `SKUniform.h` | `Shader::{add_float_uniform, float_uniform_named, remove_uniform_named}` |
+| `SKUniformType` | enum | `SKUniform.h` | `UniformType` |
 | `SKVideoNode` | interface | `SKVideoNode.h` | `VideoNode` |
 | `SKView` | interface | `SKView.h` | `View` |
+| `SKViewDelegate` | protocol | `SKView.h` | `ViewDelegate + View::{set_delegate, has_delegate}` |
+| `SKWarpGeometry` | interface | `SKWarpGeometry.h` | `WarpGeometry` |
+| `SKWarpGeometryGrid` | interface | `SKWarpGeometry.h` | `WarpGeometryGrid` |
+| `SKWarpable` | protocol | `SKWarpGeometry.h` | `WarpableNode for SpriteNode/EffectNode` |
 
 ## 🔴 GAPS
 | Symbol | Kind | Header | Notes |
 | --- | --- | --- | --- |
-| `NSEvent (SKNodeEvent)` | category | `SKNode.h` | The AppKit event-to-node convenience category is not bridged. |
-| `SKAction (MixerControl)` | category | `SKAction.h` | No action helpers for audio mixing controls (volume, reverb, obstruction, occlusion). |
-| `SKAction (NodeWithPhysicsBody)` | category | `SKAction.h` | No action-based force/impulse helpers; physics is wrapped directly on PhysicsBody instead. |
-| `SKAction (PlaybackControl)` | category | `SKAction.h` | No action helpers for play/pause or playback-rate control. |
-| `SKAction (SKAudioNode)` | category | `SKAudioNode.h` | No audio-node-specific action helpers are exposed. |
-| `SKAction (SKWarpable)` | category | `SKWarpGeometry.h` | No warp-geometry action helpers are exposed. |
-| `SKAttribute` | interface | `SKAttribute.h` | No shader attribute descriptor wrapper is exposed. |
-| `SKAttributeType` | enum | `SKAttribute.h` | No attribute-type enum wrapper is exposed. |
-| `SKAttributeValue` | interface | `SKAttribute.h` | No attribute-value wrapper is exposed; only shader attribute counts are queryable. |
-| `SKCameraNode` | interface | `SKCameraNode.h` | Scene camera APIs are not bridged. |
-| `SKCropNode` | interface | `SKCropNode.h` | No crop-node wrapper is exposed. |
-| `SKFieldNode` | interface | `SKFieldNode.h` | No field-node or force-field APIs are exposed. |
-| `SKMutableTexture` | interface | `SKMutableTexture.h` | Mutable texture pixel-generation/update APIs are not wrapped. |
-| `SKNode (NSAccessibility)` | category | `SKNode+NSAccessibility.h` | The macOS accessibility category is not bridged. |
-| `SKParticleRenderOrder` | enum | `SKEmitterNode.h` | EmitterNode does not expose the particle render-order enum. |
-| `SKPhysicsContact` | interface | `SKPhysicsContact.h` | No contact object wrapper is exposed. |
-| `SKPhysicsContactDelegate` | protocol | `SKPhysicsWorld.h` | No delegate bridge for physics contact callbacks is exposed. |
-| `SKPhysicsJointLimit` | interface | `SKPhysicsJoint.h` | Explicitly skipped in this crate because headless validation currently crashes (see COVERAGE.md). |
-| `SKReachConstraints` | interface | `SKReachConstraints.h` | No wrapper is exposed for reach-constraint helpers. |
-| `SKReferenceNode` | interface | `SKReferenceNode.h` | No reference-node/archive loading wrapper is exposed. |
-| `SKRegion` | interface | `SKRegion.h` | No region wrapper is exposed. |
-| `SKSceneDelegate` | protocol | `SKScene.h` | No scene lifecycle delegate bridge is exposed. |
-| `SKShapeNode` | interface | `SKShapeNode.h` | No vector shape/path node wrapper is exposed. |
-| `SKTextureAtlas` | interface | `SKTextureAtlas.h` | No texture-atlas loading wrapper is exposed. |
-| `SKTileAdjacencyMask` | enum | `SKTileSet.h` | Tile adjacency-mask enum is not exposed. |
-| `SKTileDefinition` | interface | `SKTileDefinition.h` | Tile definition APIs are not wrapped. |
-| `SKTileDefinitionRotation` | enum | `SKTileDefinition.h` | Tile definition rotation enum is not exposed. |
-| `SKTileGroup` | interface | `SKTileSet.h` | Tile-group APIs are not wrapped. |
-| `SKTileGroupRule` | interface | `SKTileSet.h` | Tile-group-rule APIs are not wrapped. |
-| `SKTileMapNode` | interface | `SKTileMapNode.h` | Tile-map node APIs are not wrapped. |
-| `SKTileSet` | interface | `SKTileSet.h` | Tile-set APIs are not wrapped. |
-| `SKTileSetType` | enum | `SKTileSet.h` | Tile-set type enum is not exposed. |
-| `SKTransformNode` | interface | `SKTransformNode.h` | Transform-node APIs are not wrapped; the crate only covers SK3DNode. |
-| `SKTransition` | interface | `SKTransition.h` | Scene transition presentation APIs are not wrapped. |
-| `SKTransitionDirection` | enum | `SKTransition.h` | Transition direction enum is not exposed. |
-| `SKUniformType` | enum | `SKUniform.h` | Shader wrapper only exposes float uniforms, not the uniform-type enum. |
-| `SKViewDelegate` | protocol | `SKView.h` | No view-render delegate bridge is exposed. |
-| `SKWarpGeometry` | interface | `SKWarpGeometry.h` | Warp geometry types are not exposed. |
-| `SKWarpGeometryGrid` | interface | `SKWarpGeometry.h` | Warp geometry grid APIs are not exposed. |
-| `SKWarpable` | protocol | `SKWarpGeometry.h` | Warpable protocol requirements are not surfaced on wrapped nodes. |
+| — | — | — | No remaining symbol-level coverage gaps. |
 
 ## ⏭️ EXEMPT
 | Symbol | Kind | Header | Reason | SDK attribute |

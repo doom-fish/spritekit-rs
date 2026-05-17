@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-05-17
+
+### Added
+
+- Closed the remaining macOS SpriteKit symbol gaps with new wrappers for attributes, event helpers, regions, reach constraints, transitions, camera/crop/field/reference/shape/transform nodes, mutable textures, texture atlases, physics contacts/delegates, tile APIs, warp geometry, and view/scene delegates
+- Added `SKAction` helpers for physics-body, playback, mixer, audio-node, and warpable categories
+- Added `tests/coverage_fill_area.rs` smoke coverage for the newly exposed surface, bringing the audit to full symbol coverage across the public macOS SpriteKit headers
+
+### Changed
+
+- Promoted `SKPhysicsJointLimit` from an audit gap to a wrapped type while keeping headless crash-prone validation paths out of the default test flow
+- Updated README, coverage docs, and `COVERAGE_AUDIT.md` for the `0.2.1` release and 100% symbol-level coverage
+
 ## [0.2.0] - 2026-05-16
 
 ### Added

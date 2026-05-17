@@ -2,7 +2,7 @@
 
 Safe Rust bindings for Apple's [SpriteKit](https://developer.apple.com/documentation/spritekit) framework on macOS.
 
-> **Status:** v0.2.0 expands the bridge to 17 SpriteKit logical areas using the `screencapturekit-rs` handle-based pattern. The crate now covers scenes, nodes, actions, physics bodies/world/joints, label/sprite/view/constraint/keyframe/emitter/shader/audio/video/light/3D nodes, effect nodes, and offline rendering through `SKRenderer` into Metal textures.
+> **Status:** v0.2.1 closes the remaining macOS SpriteKit header gaps and brings the crate to 100% symbol-level coverage in [`COVERAGE_AUDIT.md`](COVERAGE_AUDIT.md), while keeping the same retained-handle `screencapturekit-rs` bridge pattern.
 
 ## Quick start
 
@@ -60,12 +60,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Highlights
 
 - Bridge architecture follows the `screencapturekit-rs` pattern: per-area Rust modules, per-area Swift bridge files, `@_cdecl` exports, retained opaque handles, and explicit `sk_release` cleanup.
-- Scene graph coverage includes `SKScene`, `SKNode`, `SKSpriteNode`, `SKLabelNode`, `SKEffectNode`, `SKLightNode`, and `SK3DNode`, plus shared `NodeExt` helpers for hierarchy, transforms, actions, physics bodies, and constraints.
-- Animation and simulation coverage includes `SKAction`, `SKPhysicsBody`, `SKPhysicsWorld`, headless-safe `SKPhysicsJoint` wrappers (`pin`, `spring`, `fixed`, `sliding`), `SKConstraint`/`SKRange`, and `SKKeyframeSequence`.
-- Rendering and assets coverage includes `SKTexture`, `SKShader`, `SKEmitterNode`, `SKView`, and offline `SKRenderer` rendering into `apple-metal` textures.
+- Scene graph coverage now spans `SKScene`, `SKNode`, `SKCameraNode`, `SKCropNode`, `SKShapeNode`, `SKTransformNode`, `SKSpriteNode`, `SKLabelNode`, `SKEffectNode`, `SKLightNode`, `SKFieldNode`, `SKReferenceNode`, and `SK3DNode`, plus shared `NodeExt` helpers for hierarchy, transforms, accessibility, actions, physics bodies, and reach constraints.
+- Animation and simulation coverage includes `SKAction` plus the physics-body, playback, mixer, audio-node, and warpable categories, `SKPhysicsBody`, `SKPhysicsWorld`, `SKPhysicsContact`/delegate bridging, `SKPhysicsJoint` wrappers including `SKPhysicsJointLimit`, `SKConstraint`/`SKRange`, and `SKKeyframeSequence`.
+- Rendering and asset coverage includes `SKTexture`, `SKMutableTexture`, `SKTextureAtlas`, `SKShader`, `SKAttribute`, `SKAttributeValue`, `SKTransition`, tile-map/tile-set APIs, warp geometry, `SKView`, and offline `SKRenderer` rendering into `apple-metal` textures.
 - Media coverage includes `SKAudioNode` and `SKVideoNode` with asset-free AVFoundation-backed constructors for examples/tests.
-- The repository now includes 18 numbered examples under `examples/` and 17 focused integration tests under `tests/`, with at least one example and one test per requested logical area.
-- Detailed area-by-area status, including intentionally skipped APIs, lives in [`COVERAGE.md`](COVERAGE.md).
+- The repository now includes 18 numbered examples under `examples/` and 18 focused integration tests under `tests/`, with dedicated smoke coverage for the newly added symbol surface.
+- Detailed logical-area status lives in [`COVERAGE.md`](COVERAGE.md), and the full header audit lives in [`COVERAGE_AUDIT.md`](COVERAGE_AUDIT.md).
 
 ## Examples, tests, and coverage
 
@@ -77,12 +77,12 @@ cargo run --example 18_three_d_node_basic
 ```
 
 - `examples/01_*.rs` through `examples/18_*.rs` provide headless smoke coverage for the renderer plus every requested `SpriteKit` logical area.
-- `tests/*_area.rs` exercise the same surfaces under `cargo test`.
-- [`COVERAGE.md`](COVERAGE.md) records which logical areas are fully wrapped, partially wrapped, or intentionally skipped.
+- `tests/*_area.rs`, including `tests/coverage_fill_area.rs`, exercise the same surfaces under `cargo test`.
+- [`COVERAGE.md`](COVERAGE.md) records logical-area status, while [`COVERAGE_AUDIT.md`](COVERAGE_AUDIT.md) records the 100% symbol-level header audit.
 
 ## Coverage notes
 
-- `SKPhysicsJointLimit` and headless `SKPhysicsWorld.addJoint/removeJoint` flows are intentionally omitted because `PhysicsKit` crashed during direct validation; `pin`, `spring`, `fixed`, and `sliding` joints are covered.
+- `SKPhysicsJointLimit` is now wrapped, but headless `SKPhysicsWorld.addJoint/removeJoint` flows still remain out of scope because `PhysicsKit` was unstable during direct validation.
 - `SKAudioNode` / `SKVideoNode` currently use default AVFoundation-backed constructors so examples and tests stay asset-free and deterministic.
 
 ## License

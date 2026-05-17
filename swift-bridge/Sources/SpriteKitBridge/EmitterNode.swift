@@ -42,6 +42,18 @@ public func sk_emitter_node_set_particle_blend_mode(_ nodeHandle: UnsafeMutableR
     node.particleBlendMode = skBlendMode(mode)
 }
 
+@_cdecl("sk_emitter_node_get_particle_render_order")
+public func sk_emitter_node_get_particle_render_order(_ nodeHandle: UnsafeMutableRawPointer?) -> UInt64 {
+    guard let node: SKEmitterNode = skBorrow(nodeHandle) else { return 0 }
+    return UInt64(node.particleRenderOrder.rawValue)
+}
+
+@_cdecl("sk_emitter_node_set_particle_render_order")
+public func sk_emitter_node_set_particle_render_order(_ nodeHandle: UnsafeMutableRawPointer?, _ order: UInt64) {
+    guard let node: SKEmitterNode = skBorrow(nodeHandle) else { return }
+    node.particleRenderOrder = SKParticleRenderOrder(rawValue: UInt(order)) ?? .oldestLast
+}
+
 @_cdecl("sk_emitter_node_set_particle_color")
 public func sk_emitter_node_set_particle_color(_ nodeHandle: UnsafeMutableRawPointer?, _ r: Float, _ g: Float, _ b: Float, _ a: Float) {
     guard let node: SKEmitterNode = skBorrow(nodeHandle) else { return }

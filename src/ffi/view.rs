@@ -28,7 +28,15 @@ extern "C" {
     pub fn sk_view_set_preferred_frames_per_second(view: *mut c_void, fps: isize);
     pub fn sk_view_get_disable_depth_stencil_buffer(view: *mut c_void) -> bool;
     pub fn sk_view_set_disable_depth_stencil_buffer(view: *mut c_void, disable: bool);
+    pub fn sk_view_delegate_new(
+        context: *mut c_void,
+        should_render: Option<extern "C" fn(*mut c_void, f64) -> bool>,
+        release_context: Option<extern "C" fn(*mut c_void)>,
+    ) -> *mut c_void;
+    pub fn sk_view_set_delegate(view: *mut c_void, delegate: *mut c_void);
+    pub fn sk_view_has_delegate(view: *mut c_void) -> bool;
     pub fn sk_view_present_scene(view: *mut c_void, scene: *mut c_void);
+    pub fn sk_view_present_scene_with_transition(view: *mut c_void, scene: *mut c_void, transition: *mut c_void);
     pub fn sk_view_get_scene(view: *mut c_void) -> *mut c_void;
     pub fn sk_view_texture_from_node(view: *mut c_void, node: *mut c_void) -> *mut c_void;
 }

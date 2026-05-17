@@ -1,5 +1,9 @@
 import SpriteKit
 
+private func skWarps(from rawWarps: UnsafeMutableRawPointer?, count: Int) -> [SKWarpGeometry] {
+    skHandles(from: rawWarps, count: count)
+}
+
 @_cdecl("sk_action_move_by")
 public func sk_action_move_by(_ dx: Double, _ dy: Double, _ duration: Double) -> UnsafeMutableRawPointer? {
     skRetain(SKAction.moveBy(x: CGFloat(dx), y: CGFloat(dy), duration: duration))
@@ -107,6 +111,52 @@ public func sk_action_repeat(_ actionHandle: UnsafeMutableRawPointer?, _ count: 
 public func sk_action_repeat_forever(_ actionHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
     guard let action: SKAction = skBorrow(actionHandle) else { return nil }
     return skRetain(SKAction.repeatForever(action))
+}
+
+@_cdecl("sk_action_change_charge_to")
+public func sk_action_change_charge_to(_ value: Float, _ duration: Double) -> UnsafeMutableRawPointer? {
+    skRetain(SKAction.changeCharge(to: value, duration: duration))
+}
+
+@_cdecl("sk_action_apply_force")
+public func sk_action_apply_force(_ dx: Double, _ dy: Double, _ duration: Double) -> UnsafeMutableRawPointer? {
+    skRetain(SKAction.applyForce(CGVector(dx: dx, dy: dy), duration: duration))
+}
+
+@_cdecl("sk_action_play")
+public func sk_action_play() -> UnsafeMutableRawPointer? {
+    skRetain(SKAction.play())
+}
+
+@_cdecl("sk_action_change_volume_to")
+public func sk_action_change_volume_to(_ value: Float, _ duration: Double) -> UnsafeMutableRawPointer? {
+    skRetain(SKAction.changeVolume(to: value, duration: duration))
+}
+
+@_cdecl("sk_action_stereo_pan_to")
+public func sk_action_stereo_pan_to(_ value: Float, _ duration: Double) -> UnsafeMutableRawPointer? {
+    skRetain(SKAction.stereoPan(to: value, duration: duration))
+}
+
+@_cdecl("sk_action_warp_to")
+public func sk_action_warp_to(_ warpHandle: UnsafeMutableRawPointer?, _ duration: Double) -> UnsafeMutableRawPointer? {
+    guard let warp: SKWarpGeometry = skBorrow(warpHandle),
+          let action = SKAction.warp(to: warp, duration: duration)
+    else { return nil }
+    return skRetain(action)
+}
+
+@_cdecl("sk_action_animate_with_warps")
+public func sk_action_animate_with_warps(_ rawWarps: UnsafeMutableRawPointer?, _ times: UnsafePointer<Double>?, _ count: Int) -> UnsafeMutableRawPointer? {
+    guard let times else { return nil }
+    let warps = skWarps(from: rawWarps, count: count)
+    var swiftTimes: [NSNumber] = []
+    swiftTimes.reserveCapacity(count)
+    for index in 0..<count {
+        swiftTimes.append(NSNumber(value: times[index]))
+    }
+    guard let action = SKAction.animate(withWarps: warps, times: swiftTimes) else { return nil }
+    return skRetain(action)
 }
 
 @_cdecl("sk_action_get_duration")

@@ -9,6 +9,26 @@ use crate::texture::Texture;
 
 handle_type!(EmitterNode);
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+#[repr(u64)]
+pub enum ParticleRenderOrder {
+    #[default]
+    OldestLast = 0,
+    OldestFirst = 1,
+    DontCare = 2,
+}
+
+impl ParticleRenderOrder {
+    #[must_use]
+    pub const fn from_raw(value: u64) -> Self {
+        match value {
+            1 => Self::OldestFirst,
+            2 => Self::DontCare,
+            _ => Self::OldestLast,
+        }
+    }
+}
+
 impl AsNode for EmitterNode {
     fn as_node_ptr(&self) -> *mut core::ffi::c_void {
         self.ptr
@@ -50,6 +70,15 @@ impl EmitterNode {
 
     pub fn set_particle_blend_mode(&self, mode: BlendMode) {
         unsafe { ffi::sk_emitter_node_set_particle_blend_mode(self.ptr, mode as i32) };
+    }
+
+    #[must_use]
+    pub fn particle_render_order(&self) -> ParticleRenderOrder {
+        ParticleRenderOrder::from_raw(unsafe { ffi::sk_emitter_node_get_particle_render_order(self.ptr) })
+    }
+
+    pub fn set_particle_render_order(&self, order: ParticleRenderOrder) {
+        unsafe { ffi::sk_emitter_node_set_particle_render_order(self.ptr, order as u64) };
     }
 
     pub fn set_particle_color(&self, color: Color) {

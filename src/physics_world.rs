@@ -2,6 +2,7 @@ use apple_cf::cg::{CGPoint, CGRect, CGVector};
 
 use crate::ffi;
 use crate::physics_body::PhysicsBody;
+use crate::physics_contact::PhysicsContactDelegate;
 use crate::private::handle_type;
 
 handle_type!(PhysicsWorld);
@@ -49,5 +50,19 @@ impl PhysicsWorld {
     #[must_use]
     pub fn body_along_ray(&self, start: CGPoint, end: CGPoint) -> Option<PhysicsBody> {
         unsafe { PhysicsBody::from_raw(ffi::sk_physics_world_body_along_ray(self.ptr, start.x, start.y, end.x, end.y)) }
+    }
+
+    pub fn set_contact_delegate(&self, delegate: Option<&PhysicsContactDelegate>) {
+        unsafe {
+            ffi::sk_physics_world_set_contact_delegate(
+                self.ptr,
+                delegate.map_or(core::ptr::null_mut(), PhysicsContactDelegate::as_ptr),
+            );
+        };
+    }
+
+    #[must_use]
+    pub fn has_contact_delegate(&self) -> bool {
+        unsafe { ffi::sk_physics_world_has_contact_delegate(self.ptr) }
     }
 }

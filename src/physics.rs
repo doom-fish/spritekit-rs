@@ -1,7 +1,8 @@
 pub use crate::physics_body::PhysicsBody;
+pub use crate::physics_contact::{PhysicsContact, PhysicsContactDelegate};
 pub use crate::physics_joint::{
-    AsPhysicsJoint, PhysicsJointExt, PhysicsJointFixed, PhysicsJointPin, PhysicsJointSliding,
-    PhysicsJointSpring,
+    AsPhysicsJoint, PhysicsJointExt, PhysicsJointFixed, PhysicsJointLimit, PhysicsJointPin,
+    PhysicsJointSliding, PhysicsJointSpring,
 };
 pub use crate::physics_world::PhysicsWorld;
 

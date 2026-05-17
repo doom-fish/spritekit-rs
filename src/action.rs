@@ -1,10 +1,11 @@
 use core::ffi::c_void;
 
-use apple_cf::cg::{CGPoint, CGSize};
+use apple_cf::cg::{CGPoint, CGSize, CGVector};
 
 use crate::ffi;
 use crate::private::handle_type;
 use crate::texture::Texture;
+use crate::warp::AsWarpGeometry;
 
 handle_type!(Action);
 
@@ -158,6 +159,50 @@ impl Action {
     #[must_use]
     pub fn repeat_forever(action: &Self) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_repeat_forever(action.as_ptr())) }
+    }
+
+    #[must_use]
+    pub fn change_charge_to(value: f32, duration: f64) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_change_charge_to(value, duration)) }
+    }
+
+    #[must_use]
+    pub fn apply_force(force: CGVector, duration: f64) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_apply_force(force.dx, force.dy, duration)) }
+    }
+
+    #[must_use]
+    pub fn play() -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_play()) }
+    }
+
+    #[must_use]
+    pub fn change_volume_to(value: f32, duration: f64) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_change_volume_to(value, duration)) }
+    }
+
+    #[must_use]
+    pub fn stereo_pan_to(value: f32, duration: f64) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_stereo_pan_to(value, duration)) }
+    }
+
+    #[must_use]
+    pub fn warp_to<W: AsWarpGeometry>(warp: &W, duration: f64) -> Option<Self> {
+        unsafe { Self::from_raw(ffi::sk_action_warp_to(warp.as_warp_geometry_ptr(), duration)) }
+    }
+
+    #[must_use]
+    pub fn animate_with_warps<W: AsWarpGeometry>(warps: &[&W], times: &[f64]) -> Option<Self> {
+        if warps.len() != times.len() {
+            return None;
+        }
+        let mut raw_warps: Vec<*mut c_void> = warps.iter().map(|warp| warp.as_warp_geometry_ptr()).collect();
+        let warps_ptr = if raw_warps.is_empty() {
+            core::ptr::null_mut()
+        } else {
+            raw_warps.as_mut_ptr().cast()
+        };
+        unsafe { Self::from_raw(ffi::sk_action_animate_with_warps(warps_ptr, times.as_ptr(), warps.len())) }
     }
 
     #[must_use]

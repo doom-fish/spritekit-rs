@@ -1,6 +1,29 @@
 import AppKit
 import SpriteKit
 
+public typealias ViewShouldRenderCallback = @convention(c) (UnsafeMutableRawPointer?, Double) -> Bool
+public typealias ViewReleaseCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
+
+private final class ViewDelegateBridge: NSObject, SKViewDelegate {
+    private let context: UnsafeMutableRawPointer?
+    private let shouldRenderCallback: ViewShouldRenderCallback?
+    private let releaseCallback: ViewReleaseCallback?
+
+    init(context: UnsafeMutableRawPointer?, shouldRenderCallback: ViewShouldRenderCallback?, releaseCallback: ViewReleaseCallback?) {
+        self.context = context
+        self.shouldRenderCallback = shouldRenderCallback
+        self.releaseCallback = releaseCallback
+    }
+
+    deinit {
+        releaseCallback?(context)
+    }
+
+    func view(_ view: SKView, shouldRenderAtTime time: TimeInterval) -> Bool {
+        shouldRenderCallback?(context, time) ?? true
+    }
+}
+
 @_cdecl("sk_view_new_with_frame")
 public func sk_view_new_with_frame(_ x: Double, _ y: Double, _ width: Double, _ height: Double) -> UnsafeMutableRawPointer? {
     skRetain(SKView(frame: CGRect(x: x, y: y, width: width, height: height)))
@@ -162,11 +185,42 @@ public func sk_view_set_disable_depth_stencil_buffer(_ viewHandle: UnsafeMutable
     view.disableDepthStencilBuffer = disable
 }
 
+@_cdecl("sk_view_delegate_new")
+public func sk_view_delegate_new(
+    _ context: UnsafeMutableRawPointer?,
+    _ shouldRender: ViewShouldRenderCallback?,
+    _ releaseContext: ViewReleaseCallback?
+) -> UnsafeMutableRawPointer? {
+    skRetain(ViewDelegateBridge(context: context, shouldRenderCallback: shouldRender, releaseCallback: releaseContext))
+}
+
+@_cdecl("sk_view_set_delegate")
+public func sk_view_set_delegate(_ viewHandle: UnsafeMutableRawPointer?, _ delegateHandle: UnsafeMutableRawPointer?) {
+    guard let view: SKView = skBorrow(viewHandle) else { return }
+    let delegate: ViewDelegateBridge? = skBorrow(delegateHandle)
+    view.delegate = delegate
+}
+
+@_cdecl("sk_view_has_delegate")
+public func sk_view_has_delegate(_ viewHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let view: SKView = skBorrow(viewHandle) else { return false }
+    return view.delegate != nil
+}
+
 @_cdecl("sk_view_present_scene")
 public func sk_view_present_scene(_ viewHandle: UnsafeMutableRawPointer?, _ sceneHandle: UnsafeMutableRawPointer?) {
     guard let view: SKView = skBorrow(viewHandle) else { return }
     let scene: SKScene? = skBorrow(sceneHandle)
     view.presentScene(scene)
+}
+
+@_cdecl("sk_view_present_scene_with_transition")
+public func sk_view_present_scene_with_transition(_ viewHandle: UnsafeMutableRawPointer?, _ sceneHandle: UnsafeMutableRawPointer?, _ transitionHandle: UnsafeMutableRawPointer?) {
+    guard let view: SKView = skBorrow(viewHandle),
+          let scene: SKScene = skBorrow(sceneHandle),
+          let transition: SKTransition = skBorrow(transitionHandle)
+    else { return }
+    view.presentScene(scene, transition: transition)
 }
 
 @_cdecl("sk_view_get_scene")

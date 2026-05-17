@@ -30,6 +30,7 @@ handle_type!(PhysicsJointPin);
 handle_type!(PhysicsJointSpring);
 handle_type!(PhysicsJointFixed);
 handle_type!(PhysicsJointSliding);
+handle_type!(PhysicsJointLimit);
 
 impl AsPhysicsJoint for PhysicsJointPin {
     fn as_joint_ptr(&self) -> *mut core::ffi::c_void {
@@ -50,6 +51,12 @@ impl AsPhysicsJoint for PhysicsJointFixed {
 }
 
 impl AsPhysicsJoint for PhysicsJointSliding {
+    fn as_joint_ptr(&self) -> *mut core::ffi::c_void {
+        self.ptr
+    }
+}
+
+impl AsPhysicsJoint for PhysicsJointLimit {
     fn as_joint_ptr(&self) -> *mut core::ffi::c_void {
         self.ptr
     }
@@ -212,5 +219,35 @@ impl PhysicsJointSliding {
 
     pub fn set_upper_distance_limit(&self, value: f64) {
         unsafe { ffi::sk_physics_joint_sliding_set_upper_distance_limit(self.ptr, value) };
+    }
+}
+
+impl PhysicsJointLimit {
+    #[must_use]
+    pub fn new(
+        body_a: &PhysicsBody,
+        body_b: &PhysicsBody,
+        anchor_a: CGPoint,
+        anchor_b: CGPoint,
+    ) -> Option<Self> {
+        unsafe {
+            Self::from_raw(ffi::sk_physics_joint_limit_new(
+                body_a.as_ptr(),
+                body_b.as_ptr(),
+                anchor_a.x,
+                anchor_a.y,
+                anchor_b.x,
+                anchor_b.y,
+            ))
+        }
+    }
+
+    #[must_use]
+    pub fn max_length(&self) -> f64 {
+        unsafe { ffi::sk_physics_joint_limit_get_max_length(self.ptr) }
+    }
+
+    pub fn set_max_length(&self, value: f64) {
+        unsafe { ffi::sk_physics_joint_limit_set_max_length(self.ptr, value) };
     }
 }

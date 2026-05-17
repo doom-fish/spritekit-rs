@@ -225,6 +225,42 @@ public func sk_node_set_user_interaction_enabled(_ nodeHandle: UnsafeMutableRawP
     node.isUserInteractionEnabled = enabled
 }
 
+@_cdecl("sk_node_get_accessibility_element")
+public func sk_node_get_accessibility_element(_ nodeHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return false }
+    return node.isAccessibilityElement
+}
+
+@_cdecl("sk_node_set_accessibility_element")
+public func sk_node_set_accessibility_element(_ nodeHandle: UnsafeMutableRawPointer?, _ accessibilityElement: Bool) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    node.isAccessibilityElement = accessibilityElement
+}
+
+@_cdecl("sk_node_copy_accessibility_label")
+public func sk_node_copy_accessibility_label(_ nodeHandle: UnsafeMutableRawPointer?) -> UnsafeMutablePointer<CChar>? {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return nil }
+    return skDup(node.accessibilityLabel)
+}
+
+@_cdecl("sk_node_set_accessibility_label")
+public func sk_node_set_accessibility_label(_ nodeHandle: UnsafeMutableRawPointer?, _ label: UnsafePointer<CChar>?) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    node.accessibilityLabel = label.map(String.init(cString:))
+}
+
+@_cdecl("sk_node_get_accessibility_enabled")
+public func sk_node_get_accessibility_enabled(_ nodeHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return false }
+    return node.isAccessibilityEnabled
+}
+
+@_cdecl("sk_node_set_accessibility_enabled")
+public func sk_node_set_accessibility_enabled(_ nodeHandle: UnsafeMutableRawPointer?, _ accessibilityEnabled: Bool) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    node.isAccessibilityEnabled = accessibilityEnabled
+}
+
 @_cdecl("sk_node_get_children_count")
 public func sk_node_get_children_count(_ nodeHandle: UnsafeMutableRawPointer?) -> Int {
     guard let node: SKNode = skBorrow(nodeHandle) else { return 0 }
@@ -242,6 +278,21 @@ public func sk_node_set_physics_body(_ nodeHandle: UnsafeMutableRawPointer?, _ b
     guard let node: SKNode = skBorrow(nodeHandle) else { return }
     let body: SKPhysicsBody? = skBorrow(bodyHandle)
     node.physicsBody = body
+}
+
+@_cdecl("sk_node_get_reach_constraints")
+public func sk_node_get_reach_constraints(_ nodeHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+    guard let node: SKNode = skBorrow(nodeHandle),
+          let constraints = node.reachConstraints
+    else { return nil }
+    return skRetain(constraints)
+}
+
+@_cdecl("sk_node_set_reach_constraints")
+public func sk_node_set_reach_constraints(_ nodeHandle: UnsafeMutableRawPointer?, _ constraintsHandle: UnsafeMutableRawPointer?) {
+    guard let node: SKNode = skBorrow(nodeHandle) else { return }
+    let constraints: SKReachConstraints? = skBorrow(constraintsHandle)
+    node.reachConstraints = constraints
 }
 
 @_cdecl("sk_node_get_constraints_count")

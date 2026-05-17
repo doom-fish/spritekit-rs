@@ -5,6 +5,7 @@ use crate::constraint::Constraint;
 use crate::ffi;
 use crate::physics_body::PhysicsBody;
 use crate::private::{cstring_from_str, handle_type};
+use crate::reach_constraints::ReachConstraints;
 
 handle_type!(Node);
 
@@ -165,6 +166,35 @@ pub trait NodeExt: AsNode {
     }
 
     #[must_use]
+    fn is_accessibility_element(&self) -> bool {
+        unsafe { ffi::sk_node_get_accessibility_element(self.as_node_ptr()) }
+    }
+
+    fn set_accessibility_element(&self, accessibility_element: bool) {
+        unsafe { ffi::sk_node_set_accessibility_element(self.as_node_ptr(), accessibility_element) };
+    }
+
+    #[must_use]
+    fn accessibility_label(&self) -> Option<String> {
+        unsafe { crate::error::take_string(ffi::sk_node_copy_accessibility_label(self.as_node_ptr())) }
+    }
+
+    fn set_accessibility_label(&self, label: &str) {
+        if let Some(label) = cstring_from_str(label) {
+            unsafe { ffi::sk_node_set_accessibility_label(self.as_node_ptr(), label.as_ptr()) };
+        }
+    }
+
+    #[must_use]
+    fn is_accessibility_enabled(&self) -> bool {
+        unsafe { ffi::sk_node_get_accessibility_enabled(self.as_node_ptr()) }
+    }
+
+    fn set_accessibility_enabled(&self, accessibility_enabled: bool) {
+        unsafe { ffi::sk_node_set_accessibility_enabled(self.as_node_ptr(), accessibility_enabled) };
+    }
+
+    #[must_use]
     fn children_count(&self) -> usize {
         unsafe { ffi::sk_node_get_children_count(self.as_node_ptr()) }
     }
@@ -179,6 +209,20 @@ pub trait NodeExt: AsNode {
             ffi::sk_node_set_physics_body(
                 self.as_node_ptr(),
                 body.map_or(core::ptr::null_mut(), PhysicsBody::as_ptr),
+            );
+        };
+    }
+
+    #[must_use]
+    fn reach_constraints(&self) -> Option<ReachConstraints> {
+        unsafe { ReachConstraints::from_raw(ffi::sk_node_get_reach_constraints(self.as_node_ptr())) }
+    }
+
+    fn set_reach_constraints(&self, constraints: Option<&ReachConstraints>) {
+        unsafe {
+            ffi::sk_node_set_reach_constraints(
+                self.as_node_ptr(),
+                constraints.map_or(core::ptr::null_mut(), ReachConstraints::as_ptr),
             );
         };
     }

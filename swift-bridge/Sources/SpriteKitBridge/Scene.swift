@@ -1,5 +1,28 @@
 import SpriteKit
 
+public typealias SceneUpdateCallback = @convention(c) (UnsafeMutableRawPointer?, Double) -> Void
+public typealias SceneReleaseCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
+
+private final class SceneDelegateBridge: NSObject, SKSceneDelegate {
+    private let context: UnsafeMutableRawPointer?
+    private let updateCallback: SceneUpdateCallback?
+    private let releaseCallback: SceneReleaseCallback?
+
+    init(context: UnsafeMutableRawPointer?, updateCallback: SceneUpdateCallback?, releaseCallback: SceneReleaseCallback?) {
+        self.context = context
+        self.updateCallback = updateCallback
+        self.releaseCallback = releaseCallback
+    }
+
+    deinit {
+        releaseCallback?(context)
+    }
+
+    func update(_ currentTime: TimeInterval, for scene: SKScene) {
+        updateCallback?(context, currentTime)
+    }
+}
+
 @_cdecl("sk_scene_new_with_size")
 public func sk_scene_new_with_size(_ width: Double, _ height: Double) -> UnsafeMutableRawPointer? {
     skRetain(SKScene(size: CGSize(width: width, height: height)))
@@ -42,6 +65,43 @@ public func sk_scene_set_background_color(
 ) {
     guard let scene: SKScene = skBorrow(sceneHandle) else { return }
     scene.backgroundColor = skMakeColor(r: r, g: g, b: b, a: a)
+}
+
+@_cdecl("sk_scene_get_camera")
+public func sk_scene_get_camera(_ sceneHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
+    guard let scene: SKScene = skBorrow(sceneHandle),
+          let camera = scene.camera
+    else { return nil }
+    return skRetain(camera)
+}
+
+@_cdecl("sk_scene_set_camera")
+public func sk_scene_set_camera(_ sceneHandle: UnsafeMutableRawPointer?, _ cameraHandle: UnsafeMutableRawPointer?) {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return }
+    let camera: SKCameraNode? = skBorrow(cameraHandle)
+    scene.camera = camera
+}
+
+@_cdecl("sk_scene_delegate_new")
+public func sk_scene_delegate_new(
+    _ context: UnsafeMutableRawPointer?,
+    _ update: SceneUpdateCallback?,
+    _ releaseContext: SceneReleaseCallback?
+) -> UnsafeMutableRawPointer? {
+    skRetain(SceneDelegateBridge(context: context, updateCallback: update, releaseCallback: releaseContext))
+}
+
+@_cdecl("sk_scene_set_delegate")
+public func sk_scene_set_delegate(_ sceneHandle: UnsafeMutableRawPointer?, _ delegateHandle: UnsafeMutableRawPointer?) {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return }
+    let delegate: SceneDelegateBridge? = skBorrow(delegateHandle)
+    scene.delegate = delegate
+}
+
+@_cdecl("sk_scene_has_delegate")
+public func sk_scene_has_delegate(_ sceneHandle: UnsafeMutableRawPointer?) -> Bool {
+    guard let scene: SKScene = skBorrow(sceneHandle) else { return false }
+    return scene.delegate != nil
 }
 
 @_cdecl("sk_scene_get_anchor_x")
