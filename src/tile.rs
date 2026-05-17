@@ -116,17 +116,14 @@ impl TileAdjacencyMask {
         Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0,
     );
     pub const UPPER_RIGHT_EDGE: Self = Self(Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0);
-    pub const RIGHT_EDGE: Self = Self(
-        Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0 | Self::UP.0,
-    );
+    pub const RIGHT_EDGE: Self =
+        Self(Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0 | Self::UP.0);
     pub const LOWER_RIGHT_EDGE: Self = Self(Self::LEFT.0 | Self::UPPER_LEFT.0 | Self::UP.0);
-    pub const DOWN_EDGE: Self = Self(
-        Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0,
-    );
+    pub const DOWN_EDGE: Self =
+        Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0);
     pub const LOWER_LEFT_EDGE: Self = Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0);
-    pub const LEFT_EDGE: Self = Self(
-        Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0,
-    );
+    pub const LEFT_EDGE: Self =
+        Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0);
     pub const UPPER_LEFT_EDGE: Self = Self(Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0);
     pub const UPPER_RIGHT_CORNER: Self = Self(
         Self::UP.0
@@ -294,7 +291,13 @@ impl TileGroupRule {
         } else {
             raw.as_mut_ptr().cast()
         };
-        unsafe { Self::from_raw(ffi::sk_tile_group_rule_new(adjacency.bits(), raw_ptr, raw.len())) }
+        unsafe {
+            Self::from_raw(ffi::sk_tile_group_rule_new(
+                adjacency.bits(),
+                raw_ptr,
+                raw.len(),
+            ))
+        }
     }
 
     #[must_use]
@@ -321,7 +324,11 @@ impl TileGroupRule {
 impl TileGroup {
     #[must_use]
     pub fn with_tile_definition(tile_definition: &TileDefinition) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_tile_group_new_with_tile_definition(tile_definition.as_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_tile_group_new_with_tile_definition(
+                tile_definition.as_ptr(),
+            ))
+        }
     }
 
     #[must_use]
@@ -365,14 +372,23 @@ impl TileSet {
     }
 
     #[must_use]
-    pub fn with_tile_groups_type(tile_groups: &[&TileGroup], tile_set_type: TileSetType) -> Option<Self> {
+    pub fn with_tile_groups_type(
+        tile_groups: &[&TileGroup],
+        tile_set_type: TileSetType,
+    ) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = tile_groups.iter().map(|group| group.as_ptr()).collect();
         let raw_ptr = if raw.is_empty() {
             core::ptr::null_mut()
         } else {
             raw.as_mut_ptr().cast()
         };
-        unsafe { Self::from_raw(ffi::sk_tile_set_new_with_type(raw_ptr, raw.len(), tile_set_type as u64)) }
+        unsafe {
+            Self::from_raw(ffi::sk_tile_set_new_with_type(
+                raw_ptr,
+                raw.len(),
+                tile_set_type as u64,
+            ))
+        }
     }
 
     #[must_use]
@@ -437,7 +453,13 @@ impl TileMapNode {
     }
 
     #[must_use]
-    pub fn with_fill(tile_set: &TileSet, columns: usize, rows: usize, tile_size: CGSize, tile_group: &TileGroup) -> Option<Self> {
+    pub fn with_fill(
+        tile_set: &TileSet,
+        columns: usize,
+        rows: usize,
+        tile_size: CGSize,
+        tile_group: &TileGroup,
+    ) -> Option<Self> {
         unsafe {
             Self::from_raw(ffi::sk_tile_map_node_new_with_fill(
                 tile_set.as_ptr(),
@@ -533,11 +555,15 @@ impl TileMapNode {
 
     #[must_use]
     pub fn tile_column_index_from_position(&self, position: CGPoint) -> usize {
-        unsafe { ffi::sk_tile_map_node_tile_column_index_from_position(self.ptr, position.x, position.y) }
+        unsafe {
+            ffi::sk_tile_map_node_tile_column_index_from_position(self.ptr, position.x, position.y)
+        }
     }
 
     #[must_use]
     pub fn tile_row_index_from_position(&self, position: CGPoint) -> usize {
-        unsafe { ffi::sk_tile_map_node_tile_row_index_from_position(self.ptr, position.x, position.y) }
+        unsafe {
+            ffi::sk_tile_map_node_tile_row_index_from_position(self.ptr, position.x, position.y)
+        }
     }
 }

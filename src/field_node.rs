@@ -24,7 +24,13 @@ impl FieldNode {
 
     #[must_use]
     pub fn linear_gravity(direction: [f32; 3]) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_field_node_linear_gravity(direction[0], direction[1], direction[2])) }
+        unsafe {
+            Self::from_raw(ffi::sk_field_node_linear_gravity(
+                direction[0],
+                direction[1],
+                direction[2],
+            ))
+        }
     }
 
     #[must_use]
@@ -60,7 +66,9 @@ impl FieldNode {
     }
 
     pub fn set_direction(&self, direction: [f32; 3]) {
-        unsafe { ffi::sk_field_node_set_direction(self.ptr, direction[0], direction[1], direction[2]) };
+        unsafe {
+            ffi::sk_field_node_set_direction(self.ptr, direction[0], direction[1], direction[2])
+        };
     }
 
     #[must_use]

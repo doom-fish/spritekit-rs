@@ -21,10 +21,9 @@ struct ViewDelegateContext {
 
 extern "C" fn view_delegate_should_render(context: *mut c_void, time: f64) -> bool {
     let context = unsafe { &*(context.cast::<ViewDelegateContext>()) };
-    context
-        .should_render
-        .as_ref()
-        .map_or(true, |callback| catch_unwind(AssertUnwindSafe(|| callback(time))).unwrap_or(true))
+    context.should_render.as_ref().map_or(true, |callback| {
+        catch_unwind(AssertUnwindSafe(|| callback(time))).unwrap_or(true)
+    })
 }
 
 extern "C" fn view_delegate_release(context: *mut c_void) {
@@ -223,7 +222,13 @@ impl View {
     }
 
     pub fn present_scene_with_transition(&self, scene: &Scene, transition: &Transition) {
-        unsafe { ffi::sk_view_present_scene_with_transition(self.ptr, scene.as_ptr(), transition.as_ptr()) };
+        unsafe {
+            ffi::sk_view_present_scene_with_transition(
+                self.ptr,
+                scene.as_ptr(),
+                transition.as_ptr(),
+            )
+        };
     }
 
     #[must_use]

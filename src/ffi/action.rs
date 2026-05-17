@@ -15,7 +15,11 @@ extern "C" {
     pub fn sk_action_hide() -> *mut c_void;
     pub fn sk_action_unhide() -> *mut c_void;
     pub fn sk_action_set_texture(texture: *mut c_void) -> *mut c_void;
-    pub fn sk_action_animate_with_textures(textures: *mut c_void, count: usize, time_per_frame: f64) -> *mut c_void;
+    pub fn sk_action_animate_with_textures(
+        textures: *mut c_void,
+        count: usize,
+        time_per_frame: f64,
+    ) -> *mut c_void;
     pub fn sk_action_wait(duration: f64) -> *mut c_void;
     pub fn sk_action_sequence(actions: *mut c_void, count: usize) -> *mut c_void;
     pub fn sk_action_group(actions: *mut c_void, count: usize) -> *mut c_void;
@@ -27,7 +31,11 @@ extern "C" {
     pub fn sk_action_change_volume_to(value: f32, duration: f64) -> *mut c_void;
     pub fn sk_action_stereo_pan_to(value: f32, duration: f64) -> *mut c_void;
     pub fn sk_action_warp_to(warp: *mut c_void, duration: f64) -> *mut c_void;
-    pub fn sk_action_animate_with_warps(warps: *mut c_void, times: *const f64, count: usize) -> *mut c_void;
+    pub fn sk_action_animate_with_warps(
+        warps: *mut c_void,
+        times: *const f64,
+        count: usize,
+    ) -> *mut c_void;
     pub fn sk_action_get_duration(action: *mut c_void) -> f64;
     pub fn sk_action_set_duration(action: *mut c_void, duration: f64);
     pub fn sk_action_get_timing_mode(action: *mut c_void) -> i32;

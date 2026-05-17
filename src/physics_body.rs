@@ -1,6 +1,6 @@
 use core::ffi::c_void;
 
-use apple_cf::cg::{CGPoint, CGRect, CGVector, CGSize};
+use apple_cf::cg::{CGPoint, CGRect, CGSize, CGVector};
 
 use crate::ffi;
 use crate::private::handle_type;
@@ -16,7 +16,11 @@ impl PhysicsBody {
 
     #[must_use]
     pub fn circle_at(radius: f64, center: CGPoint) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_physics_body_circle_center(radius, center.x, center.y)) }
+        unsafe {
+            Self::from_raw(ffi::sk_physics_body_circle_center(
+                radius, center.x, center.y,
+            ))
+        }
     }
 
     #[must_use]
@@ -50,7 +54,13 @@ impl PhysicsBody {
 
     #[must_use]
     pub fn from_texture(texture: &Texture, width: f64, height: f64) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_physics_body_texture(texture.as_ptr(), width, height)) }
+        unsafe {
+            Self::from_raw(ffi::sk_physics_body_texture(
+                texture.as_ptr(),
+                width,
+                height,
+            ))
+        }
     }
 
     #[must_use]
@@ -250,11 +260,7 @@ impl PhysicsBody {
     pub fn apply_force_at_point(&self, force: CGVector, point: CGPoint) {
         unsafe {
             ffi::sk_physics_body_apply_force_at_point(
-                self.ptr,
-                force.dx,
-                force.dy,
-                point.x,
-                point.y,
+                self.ptr, force.dx, force.dy, point.x, point.y,
             );
         };
     }
@@ -270,11 +276,7 @@ impl PhysicsBody {
     pub fn apply_impulse_at_point(&self, impulse: CGVector, point: CGPoint) {
         unsafe {
             ffi::sk_physics_body_apply_impulse_at_point(
-                self.ptr,
-                impulse.dx,
-                impulse.dy,
-                point.x,
-                point.y,
+                self.ptr, impulse.dx, impulse.dy, point.x, point.y,
             );
         };
     }

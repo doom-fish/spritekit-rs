@@ -188,7 +188,12 @@ impl Action {
 
     #[must_use]
     pub fn warp_to<W: AsWarpGeometry>(warp: &W, duration: f64) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_action_warp_to(warp.as_warp_geometry_ptr(), duration)) }
+        unsafe {
+            Self::from_raw(ffi::sk_action_warp_to(
+                warp.as_warp_geometry_ptr(),
+                duration,
+            ))
+        }
     }
 
     #[must_use]
@@ -196,13 +201,22 @@ impl Action {
         if warps.len() != times.len() {
             return None;
         }
-        let mut raw_warps: Vec<*mut c_void> = warps.iter().map(|warp| warp.as_warp_geometry_ptr()).collect();
+        let mut raw_warps: Vec<*mut c_void> = warps
+            .iter()
+            .map(|warp| warp.as_warp_geometry_ptr())
+            .collect();
         let warps_ptr = if raw_warps.is_empty() {
             core::ptr::null_mut()
         } else {
             raw_warps.as_mut_ptr().cast()
         };
-        unsafe { Self::from_raw(ffi::sk_action_animate_with_warps(warps_ptr, times.as_ptr(), warps.len())) }
+        unsafe {
+            Self::from_raw(ffi::sk_action_animate_with_warps(
+                warps_ptr,
+                times.as_ptr(),
+                warps.len(),
+            ))
+        }
     }
 
     #[must_use]

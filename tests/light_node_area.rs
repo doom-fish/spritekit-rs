@@ -1,4 +1,4 @@
-use spritekit::{LightNode, Color};
+use spritekit::{Color, LightNode};
 
 #[test]
 fn light_node_round_trips_core_properties() {

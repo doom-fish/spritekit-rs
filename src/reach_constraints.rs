@@ -6,7 +6,12 @@ handle_type!(ReachConstraints);
 impl ReachConstraints {
     #[must_use]
     pub fn new(lower_angle_limit: f64, upper_angle_limit: f64) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_reach_constraints_new(lower_angle_limit, upper_angle_limit)) }
+        unsafe {
+            Self::from_raw(ffi::sk_reach_constraints_new(
+                lower_angle_limit,
+                upper_angle_limit,
+            ))
+        }
     }
 
     #[must_use]

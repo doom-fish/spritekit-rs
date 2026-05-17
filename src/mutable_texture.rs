@@ -8,7 +8,12 @@ handle_type!(MutableTexture);
 impl MutableTexture {
     #[must_use]
     pub fn with_size(size: CGSize) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_mutable_texture_new_with_size(size.width, size.height)) }
+        unsafe {
+            Self::from_raw(ffi::sk_mutable_texture_new_with_size(
+                size.width,
+                size.height,
+            ))
+        }
     }
 
     #[must_use]
@@ -24,9 +29,8 @@ impl MutableTexture {
 
     #[must_use]
     pub fn size(&self) -> CGSize {
-        CGSize::new(
-            unsafe { ffi::sk_texture_get_size_w(self.ptr) },
-            unsafe { ffi::sk_texture_get_size_h(self.ptr) },
-        )
+        CGSize::new(unsafe { ffi::sk_texture_get_size_w(self.ptr) }, unsafe {
+            ffi::sk_texture_get_size_h(self.ptr)
+        })
     }
 }

@@ -28,10 +28,9 @@ impl VideoNode {
 
     #[must_use]
     pub fn size(&self) -> CGSize {
-        CGSize::new(
-            unsafe { ffi::sk_video_node_get_size_w(self.ptr) },
-            unsafe { ffi::sk_video_node_get_size_h(self.ptr) },
-        )
+        CGSize::new(unsafe { ffi::sk_video_node_get_size_w(self.ptr) }, unsafe {
+            ffi::sk_video_node_get_size_h(self.ptr)
+        })
     }
 
     pub fn set_size(&self, size: CGSize) {

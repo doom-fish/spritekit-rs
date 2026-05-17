@@ -31,7 +31,11 @@ impl PhysicsWorld {
 
     #[must_use]
     pub fn body_at_point(&self, point: CGPoint) -> Option<PhysicsBody> {
-        unsafe { PhysicsBody::from_raw(ffi::sk_physics_world_body_at_point(self.ptr, point.x, point.y)) }
+        unsafe {
+            PhysicsBody::from_raw(ffi::sk_physics_world_body_at_point(
+                self.ptr, point.x, point.y,
+            ))
+        }
     }
 
     #[must_use]
@@ -49,7 +53,11 @@ impl PhysicsWorld {
 
     #[must_use]
     pub fn body_along_ray(&self, start: CGPoint, end: CGPoint) -> Option<PhysicsBody> {
-        unsafe { PhysicsBody::from_raw(ffi::sk_physics_world_body_along_ray(self.ptr, start.x, start.y, end.x, end.y)) }
+        unsafe {
+            PhysicsBody::from_raw(ffi::sk_physics_world_body_along_ray(
+                self.ptr, start.x, start.y, end.x, end.y,
+            ))
+        }
     }
 
     pub fn set_contact_delegate(&self, delegate: Option<&PhysicsContactDelegate>) {

@@ -74,7 +74,9 @@ impl EmitterNode {
 
     #[must_use]
     pub fn particle_render_order(&self) -> ParticleRenderOrder {
-        ParticleRenderOrder::from_raw(unsafe { ffi::sk_emitter_node_get_particle_render_order(self.ptr) })
+        ParticleRenderOrder::from_raw(unsafe {
+            ffi::sk_emitter_node_get_particle_render_order(self.ptr)
+        })
     }
 
     pub fn set_particle_render_order(&self, order: ParticleRenderOrder) {
@@ -82,7 +84,9 @@ impl EmitterNode {
     }
 
     pub fn set_particle_color(&self, color: Color) {
-        unsafe { ffi::sk_emitter_node_set_particle_color(self.ptr, color.r, color.g, color.b, color.a) };
+        unsafe {
+            ffi::sk_emitter_node_set_particle_color(self.ptr, color.r, color.g, color.b, color.a)
+        };
     }
 
     #[must_use]

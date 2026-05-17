@@ -101,10 +101,9 @@ impl Scene {
 
     #[must_use]
     pub fn size(&self) -> CGSize {
-        CGSize::new(
-            unsafe { ffi::sk_scene_get_size_w(self.ptr) },
-            unsafe { ffi::sk_scene_get_size_h(self.ptr) },
-        )
+        CGSize::new(unsafe { ffi::sk_scene_get_size_w(self.ptr) }, unsafe {
+            ffi::sk_scene_get_size_h(self.ptr)
+        })
     }
 
     pub fn set_size(&self, size: CGSize) {
@@ -154,10 +153,9 @@ impl Scene {
 
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
-        CGPoint::new(
-            unsafe { ffi::sk_scene_get_anchor_x(self.ptr) },
-            unsafe { ffi::sk_scene_get_anchor_y(self.ptr) },
-        )
+        CGPoint::new(unsafe { ffi::sk_scene_get_anchor_x(self.ptr) }, unsafe {
+            ffi::sk_scene_get_anchor_y(self.ptr)
+        })
     }
 
     pub fn set_anchor_point(&self, anchor: CGPoint) {

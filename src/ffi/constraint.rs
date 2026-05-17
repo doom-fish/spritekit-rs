@@ -17,11 +17,21 @@ extern "C" {
     pub fn sk_constraint_position_xy(x_range: *mut c_void, y_range: *mut c_void) -> *mut c_void;
     pub fn sk_constraint_distance_to_node(range: *mut c_void, node: *mut c_void) -> *mut c_void;
     pub fn sk_constraint_distance_to_point(range: *mut c_void, x: f64, y: f64) -> *mut c_void;
-    pub fn sk_constraint_distance_to_point_in_node(range: *mut c_void, x: f64, y: f64, node: *mut c_void) -> *mut c_void;
+    pub fn sk_constraint_distance_to_point_in_node(
+        range: *mut c_void,
+        x: f64,
+        y: f64,
+        node: *mut c_void,
+    ) -> *mut c_void;
     pub fn sk_constraint_z_rotation(range: *mut c_void) -> *mut c_void;
     pub fn sk_constraint_orient_to_node(node: *mut c_void, offset: *mut c_void) -> *mut c_void;
     pub fn sk_constraint_orient_to_point(x: f64, y: f64, offset: *mut c_void) -> *mut c_void;
-    pub fn sk_constraint_orient_to_point_in_node(x: f64, y: f64, node: *mut c_void, offset: *mut c_void) -> *mut c_void;
+    pub fn sk_constraint_orient_to_point_in_node(
+        x: f64,
+        y: f64,
+        node: *mut c_void,
+        offset: *mut c_void,
+    ) -> *mut c_void;
     pub fn sk_constraint_get_enabled(constraint: *mut c_void) -> bool;
     pub fn sk_constraint_set_enabled(constraint: *mut c_void, enabled: bool);
     pub fn sk_constraint_get_reference_node(constraint: *mut c_void) -> *mut c_void;

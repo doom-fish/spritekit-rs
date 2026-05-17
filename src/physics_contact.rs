@@ -17,7 +17,10 @@ struct PhysicsContactDelegateContext {
     did_end: Option<ContactCallback>,
 }
 
-extern "C" fn physics_contact_delegate_did_begin(context: *mut c_void, contact_handle: *mut c_void) {
+extern "C" fn physics_contact_delegate_did_begin(
+    context: *mut c_void,
+    contact_handle: *mut c_void,
+) {
     let context = unsafe { &*(context.cast::<PhysicsContactDelegateContext>()) };
     let Some(callback) = &context.did_begin else {
         if !contact_handle.is_null() {
@@ -48,7 +51,9 @@ extern "C" fn physics_contact_delegate_release(context: *mut c_void) {
         return;
     }
     unsafe {
-        drop(Box::from_raw(context.cast::<PhysicsContactDelegateContext>()));
+        drop(Box::from_raw(
+            context.cast::<PhysicsContactDelegateContext>(),
+        ));
     }
 }
 

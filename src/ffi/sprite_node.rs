@@ -2,7 +2,14 @@ use core::ffi::{c_char, c_void};
 
 extern "C" {
     pub fn sk_sprite_node_new_with_texture(texture: *mut c_void) -> *mut c_void;
-    pub fn sk_sprite_node_new_with_color(r: f32, g: f32, b: f32, a: f32, width: f64, height: f64) -> *mut c_void;
+    pub fn sk_sprite_node_new_with_color(
+        r: f32,
+        g: f32,
+        b: f32,
+        a: f32,
+        width: f64,
+        height: f64,
+    ) -> *mut c_void;
     pub fn sk_sprite_node_new_image_named(name: *const c_char) -> *mut c_void;
     pub fn sk_sprite_node_get_texture(node: *mut c_void) -> *mut c_void;
     pub fn sk_sprite_node_set_texture(node: *mut c_void, texture: *mut c_void);
@@ -30,7 +37,13 @@ extern "C" {
     pub fn sk_sprite_node_get_center_rect_y(node: *mut c_void) -> f64;
     pub fn sk_sprite_node_get_center_rect_w(node: *mut c_void) -> f64;
     pub fn sk_sprite_node_get_center_rect_h(node: *mut c_void) -> f64;
-    pub fn sk_sprite_node_set_center_rect(node: *mut c_void, x: f64, y: f64, width: f64, height: f64);
+    pub fn sk_sprite_node_set_center_rect(
+        node: *mut c_void,
+        x: f64,
+        y: f64,
+        width: f64,
+        height: f64,
+    );
     pub fn sk_sprite_node_get_shader(node: *mut c_void) -> *mut c_void;
     pub fn sk_sprite_node_set_shader(node: *mut c_void, shader: *mut c_void);
 }

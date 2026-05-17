@@ -171,12 +171,16 @@ pub trait NodeExt: AsNode {
     }
 
     fn set_accessibility_element(&self, accessibility_element: bool) {
-        unsafe { ffi::sk_node_set_accessibility_element(self.as_node_ptr(), accessibility_element) };
+        unsafe {
+            ffi::sk_node_set_accessibility_element(self.as_node_ptr(), accessibility_element)
+        };
     }
 
     #[must_use]
     fn accessibility_label(&self) -> Option<String> {
-        unsafe { crate::error::take_string(ffi::sk_node_copy_accessibility_label(self.as_node_ptr())) }
+        unsafe {
+            crate::error::take_string(ffi::sk_node_copy_accessibility_label(self.as_node_ptr()))
+        }
     }
 
     fn set_accessibility_label(&self, label: &str) {
@@ -191,7 +195,9 @@ pub trait NodeExt: AsNode {
     }
 
     fn set_accessibility_enabled(&self, accessibility_enabled: bool) {
-        unsafe { ffi::sk_node_set_accessibility_enabled(self.as_node_ptr(), accessibility_enabled) };
+        unsafe {
+            ffi::sk_node_set_accessibility_enabled(self.as_node_ptr(), accessibility_enabled)
+        };
     }
 
     #[must_use]
@@ -215,7 +221,9 @@ pub trait NodeExt: AsNode {
 
     #[must_use]
     fn reach_constraints(&self) -> Option<ReachConstraints> {
-        unsafe { ReachConstraints::from_raw(ffi::sk_node_get_reach_constraints(self.as_node_ptr())) }
+        unsafe {
+            ReachConstraints::from_raw(ffi::sk_node_get_reach_constraints(self.as_node_ptr()))
+        }
     }
 
     fn set_reach_constraints(&self, constraints: Option<&ReachConstraints>) {
@@ -233,8 +241,10 @@ pub trait NodeExt: AsNode {
     }
 
     fn set_constraints(&self, constraints: &[&Constraint]) {
-        let mut raw: Vec<*mut core::ffi::c_void> =
-            constraints.iter().map(|constraint| constraint.as_ptr()).collect();
+        let mut raw: Vec<*mut core::ffi::c_void> = constraints
+            .iter()
+            .map(|constraint| constraint.as_ptr())
+            .collect();
         let raw_ptr = if raw.is_empty() {
             core::ptr::null_mut()
         } else {

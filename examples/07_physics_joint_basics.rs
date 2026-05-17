@@ -1,4 +1,7 @@
-use spritekit::{CGPoint, CGVector, PhysicsBody, PhysicsJointExt, PhysicsJointFixed, PhysicsJointPin, PhysicsJointSliding, PhysicsJointSpring};
+use spritekit::{
+    CGPoint, CGVector, PhysicsBody, PhysicsJointExt, PhysicsJointFixed, PhysicsJointPin,
+    PhysicsJointSliding, PhysicsJointSpring,
+};
 
 fn main() {
     let body_a = PhysicsBody::circle(8.0).expect("body a");
@@ -21,7 +24,8 @@ fn main() {
     spring.set_damping(0.75);
     spring.set_frequency(4.0);
 
-    let _fixed = PhysicsJointFixed::new(&body_a, &body_b, CGPoint::new(0.0, 0.0)).expect("fixed joint");
+    let _fixed =
+        PhysicsJointFixed::new(&body_a, &body_b, CGPoint::new(0.0, 0.0)).expect("fixed joint");
     let sliding = PhysicsJointSliding::new(
         &body_a,
         &body_b,

@@ -70,17 +70,33 @@ impl Constraint {
 
     #[must_use]
     pub fn position_xy(x_range: &ConstraintRange, y_range: &ConstraintRange) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_constraint_position_xy(x_range.as_ptr(), y_range.as_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_constraint_position_xy(
+                x_range.as_ptr(),
+                y_range.as_ptr(),
+            ))
+        }
     }
 
     #[must_use]
     pub fn distance_to_node<N: AsNode>(range: &ConstraintRange, node: &N) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_constraint_distance_to_node(range.as_ptr(), node.as_node_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_constraint_distance_to_node(
+                range.as_ptr(),
+                node.as_node_ptr(),
+            ))
+        }
     }
 
     #[must_use]
     pub fn distance_to_point(range: &ConstraintRange, point: CGPoint) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_constraint_distance_to_point(range.as_ptr(), point.x, point.y)) }
+        unsafe {
+            Self::from_raw(ffi::sk_constraint_distance_to_point(
+                range.as_ptr(),
+                point.x,
+                point.y,
+            ))
+        }
     }
 
     #[must_use]
@@ -106,12 +122,23 @@ impl Constraint {
 
     #[must_use]
     pub fn orient_to_node<N: AsNode>(node: &N, offset: &ConstraintRange) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_constraint_orient_to_node(node.as_node_ptr(), offset.as_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_constraint_orient_to_node(
+                node.as_node_ptr(),
+                offset.as_ptr(),
+            ))
+        }
     }
 
     #[must_use]
     pub fn orient_to_point(point: CGPoint, offset: &ConstraintRange) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_constraint_orient_to_point(point.x, point.y, offset.as_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_constraint_orient_to_point(
+                point.x,
+                point.y,
+                offset.as_ptr(),
+            ))
+        }
     }
 
     #[must_use]

@@ -49,10 +49,22 @@ extern "C" {
     pub fn sk_physics_body_get_angular_velocity(body: *mut c_void) -> f64;
     pub fn sk_physics_body_set_angular_velocity(body: *mut c_void, velocity: f64);
     pub fn sk_physics_body_apply_force(body: *mut c_void, dx: f64, dy: f64);
-    pub fn sk_physics_body_apply_force_at_point(body: *mut c_void, force_dx: f64, force_dy: f64, point_x: f64, point_y: f64);
+    pub fn sk_physics_body_apply_force_at_point(
+        body: *mut c_void,
+        force_dx: f64,
+        force_dy: f64,
+        point_x: f64,
+        point_y: f64,
+    );
     pub fn sk_physics_body_apply_torque(body: *mut c_void, torque: f64);
     pub fn sk_physics_body_apply_impulse(body: *mut c_void, dx: f64, dy: f64);
-    pub fn sk_physics_body_apply_impulse_at_point(body: *mut c_void, impulse_dx: f64, impulse_dy: f64, point_x: f64, point_y: f64);
+    pub fn sk_physics_body_apply_impulse_at_point(
+        body: *mut c_void,
+        impulse_dx: f64,
+        impulse_dy: f64,
+        point_x: f64,
+        point_y: f64,
+    );
     pub fn sk_physics_body_apply_angular_impulse(body: *mut c_void, impulse: f64);
     pub fn sk_physics_body_all_contacted_bodies_count(body: *mut c_void) -> usize;
 }

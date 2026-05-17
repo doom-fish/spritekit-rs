@@ -1,4 +1,4 @@
-use spritekit::{CGPoint, CGVector, CGSize, BlendMode, EmitterNode, Texture};
+use spritekit::{BlendMode, CGPoint, CGSize, CGVector, EmitterNode, Texture};
 
 fn main() {
     let emitter = EmitterNode::new().expect("emitter");

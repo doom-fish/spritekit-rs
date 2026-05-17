@@ -15,7 +15,12 @@ impl AsNode for ThreeDNode {
 impl ThreeDNode {
     #[must_use]
     pub fn with_viewport_size(size: CGSize) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_3d_node_new_with_viewport_size(size.width, size.height)) }
+        unsafe {
+            Self::from_raw(ffi::sk_3d_node_new_with_viewport_size(
+                size.width,
+                size.height,
+            ))
+        }
     }
 
     #[must_use]

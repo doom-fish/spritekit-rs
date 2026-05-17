@@ -1,12 +1,12 @@
 use spritekit::{
-    Action, Attribute, AttributeType, AttributeValue, CameraNode, Color, CropNode, EffectNode,
-    EmitterNode, Event, FieldNode, MutableTexture, Node, NodeExt, ParticleRenderOrder,
-    PhysicsBody, PhysicsContact, PhysicsContactDelegate, PhysicsJointLimit, ReachConstraints,
-    ReferenceNode, Region, Scene, SceneDelegate, Shader, ShapeNode, SpriteNode, Texture,
-    TextureAtlas, TileAdjacencyMask, TileDefinition, TileDefinitionRotation, TileGroup,
-    TileGroupRule, TileMapNode, TileSet, TileSetType, TransformNode, Transition,
-    TransitionDirection, UniformType, View, ViewDelegate, WarpGeometryGrid, WarpableNode,
-    CGPoint, CGRect, CGSize, CGVector,
+    Action, Attribute, AttributeType, AttributeValue, CGPoint, CGRect, CGSize, CGVector,
+    CameraNode, Color, CropNode, EffectNode, EmitterNode, Event, FieldNode, MutableTexture, Node,
+    NodeExt, ParticleRenderOrder, PhysicsBody, PhysicsContact, PhysicsContactDelegate,
+    PhysicsJointLimit, ReachConstraints, ReferenceNode, Region, Scene, SceneDelegate, Shader,
+    ShapeNode, SpriteNode, Texture, TextureAtlas, TileAdjacencyMask, TileDefinition,
+    TileDefinitionRotation, TileGroup, TileGroupRule, TileMapNode, TileSet, TileSetType,
+    TransformNode, Transition, TransitionDirection, UniformType, View, ViewDelegate,
+    WarpGeometryGrid, WarpableNode,
 };
 
 #[test]
@@ -82,7 +82,8 @@ fn delegates_camera_and_transitions_smoke() {
     assert!(scene.has_delegate());
 
     let _unused_view_delegate = ViewDelegate::new().expect("view delegate");
-    let view_delegate = ViewDelegate::with_should_render(|_| true).expect("view delegate with callback");
+    let view_delegate =
+        ViewDelegate::with_should_render(|_| true).expect("view delegate with callback");
     view.set_delegate(Some(&view_delegate));
     assert!(view.has_delegate());
 
@@ -129,15 +130,23 @@ fn advanced_nodes_and_shader_smoke() {
     let shader = Shader::new().expect("shader");
     shader.add_float_uniform("u_time", 0.5);
     assert_eq!(shader.uniform_count(), 1);
-    assert_eq!(shader.uniform_type_named("u_time"), Some(UniformType::Float));
+    assert_eq!(
+        shader.uniform_type_named("u_time"),
+        Some(UniformType::Float)
+    );
 
     let emitter = EmitterNode::new().expect("emitter");
     emitter.set_particle_render_order(ParticleRenderOrder::DontCare);
-    assert_eq!(emitter.particle_render_order(), ParticleRenderOrder::DontCare);
+    assert_eq!(
+        emitter.particle_render_order(),
+        ParticleRenderOrder::DontCare
+    );
 
     let _ = TextureAtlas::named("MissingAtlas");
     let _ = ReferenceNode::with_file_named("missing-reference.sks");
-    if let Some(reference) = ReferenceNode::with_url_path("/Users/perjohansson/dev/spritekit-rs/missing-reference.sks") {
+    if let Some(reference) =
+        ReferenceNode::with_url_path("/Users/perjohansson/dev/spritekit-rs/missing-reference.sks")
+    {
         reference.resolve_reference_node();
     }
 }
@@ -176,8 +185,8 @@ fn tiles_warps_and_action_categories_smoke() {
     assert_eq!(tile_set.tile_set_type(), TileSetType::Grid);
     assert!(tile_set.default_tile_group().is_some());
 
-    let map = TileMapNode::with_fill(&tile_set, 2, 2, CGSize::new(16.0, 16.0), &group)
-        .expect("tile map");
+    let map =
+        TileMapNode::with_fill(&tile_set, 2, 2, CGSize::new(16.0, 16.0), &group).expect("tile map");
     assert_eq!(map.number_of_columns(), 2);
     assert_eq!(map.number_of_rows(), 2);
     map.set_tile_size(CGSize::new(16.0, 16.0));

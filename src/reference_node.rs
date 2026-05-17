@@ -14,7 +14,11 @@ impl ReferenceNode {
     #[must_use]
     pub fn with_file_named(file_name: &str) -> Option<Self> {
         let file_name = cstring_from_str(file_name)?;
-        unsafe { Self::from_raw(ffi::sk_reference_node_new_with_file_named(file_name.as_ptr())) }
+        unsafe {
+            Self::from_raw(ffi::sk_reference_node_new_with_file_named(
+                file_name.as_ptr(),
+            ))
+        }
     }
 
     #[must_use]

@@ -39,7 +39,11 @@ impl Transition {
 
     #[must_use]
     pub fn fade_with_color(color: Color, duration: f64) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_transition_fade_with_color(color.r, color.g, color.b, color.a, duration)) }
+        unsafe {
+            Self::from_raw(ffi::sk_transition_fade_with_color(
+                color.r, color.g, color.b, color.a, duration,
+            ))
+        }
     }
 
     #[must_use]

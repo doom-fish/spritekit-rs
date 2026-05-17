@@ -47,7 +47,12 @@ impl WarpGeometryGrid {
     }
 
     #[must_use]
-    pub fn with_positions(columns: usize, rows: usize, source_positions: &[CGPoint], dest_positions: &[CGPoint]) -> Option<Self> {
+    pub fn with_positions(
+        columns: usize,
+        rows: usize,
+        source_positions: &[CGPoint],
+        dest_positions: &[CGPoint],
+    ) -> Option<Self> {
         let expected = (columns + 1) * (rows + 1);
         if source_positions.len() != expected || dest_positions.len() != expected {
             return None;
@@ -102,7 +107,13 @@ impl WarpGeometryGrid {
             return None;
         }
         let source = pack_positions(source_positions);
-        unsafe { Self::from_raw(ffi::sk_warp_geometry_grid_replacing_source_positions(self.ptr, source.as_ptr(), source_positions.len())) }
+        unsafe {
+            Self::from_raw(ffi::sk_warp_geometry_grid_replacing_source_positions(
+                self.ptr,
+                source.as_ptr(),
+                source_positions.len(),
+            ))
+        }
     }
 
     #[must_use]
@@ -111,7 +122,13 @@ impl WarpGeometryGrid {
             return None;
         }
         let dest = pack_positions(dest_positions);
-        unsafe { Self::from_raw(ffi::sk_warp_geometry_grid_replacing_dest_positions(self.ptr, dest.as_ptr(), dest_positions.len())) }
+        unsafe {
+            Self::from_raw(ffi::sk_warp_geometry_grid_replacing_dest_positions(
+                self.ptr,
+                dest.as_ptr(),
+                dest_positions.len(),
+            ))
+        }
     }
 }
 
@@ -121,7 +138,9 @@ pub trait WarpableNode {
 
     #[must_use]
     fn warp_geometry(&self) -> Option<WarpGeometry> {
-        unsafe { WarpGeometry::from_raw(ffi::sk_warpable_get_warp_geometry(self.as_warpable_ptr())) }
+        unsafe {
+            WarpGeometry::from_raw(ffi::sk_warpable_get_warp_geometry(self.as_warpable_ptr()))
+        }
     }
 
     fn set_warp_geometry<W: AsWarpGeometry>(&self, warp: Option<&W>) {

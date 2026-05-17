@@ -1,4 +1,4 @@
-use spritekit::{CGPoint, CGSize, BlendMode, EmitterNode, Texture};
+use spritekit::{BlendMode, CGPoint, CGSize, EmitterNode, Texture};
 
 #[test]
 fn emitter_node_round_trips_particle_state() {

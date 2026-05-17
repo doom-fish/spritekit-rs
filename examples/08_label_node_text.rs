@@ -14,7 +14,10 @@ fn main() {
     assert!((label.font_size() - 24.0).abs() < f64::EPSILON);
     assert_eq!(label.number_of_lines(), 2);
     assert_eq!(label.vertical_alignment_mode(), VerticalAlignmentMode::Top);
-    assert_eq!(label.horizontal_alignment_mode(), HorizontalAlignmentMode::Left);
+    assert_eq!(
+        label.horizontal_alignment_mode(),
+        HorizontalAlignmentMode::Left
+    );
 
     println!("label node text ok");
 }

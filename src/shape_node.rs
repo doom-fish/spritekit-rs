@@ -16,12 +16,24 @@ impl AsNode for ShapeNode {
 impl ShapeNode {
     #[must_use]
     pub fn with_rect(rect: CGRect) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_shape_node_new_with_rect(rect.x, rect.y, rect.width, rect.height)) }
+        unsafe {
+            Self::from_raw(ffi::sk_shape_node_new_with_rect(
+                rect.x,
+                rect.y,
+                rect.width,
+                rect.height,
+            ))
+        }
     }
 
     #[must_use]
     pub fn with_rect_of_size(size: CGSize) -> Option<Self> {
-        unsafe { Self::from_raw(ffi::sk_shape_node_new_with_rect_of_size(size.width, size.height)) }
+        unsafe {
+            Self::from_raw(ffi::sk_shape_node_new_with_rect_of_size(
+                size.width,
+                size.height,
+            ))
+        }
     }
 
     #[must_use]
@@ -62,7 +74,9 @@ impl ShapeNode {
     }
 
     pub fn set_stroke_color(&self, color: Color) {
-        unsafe { ffi::sk_shape_node_set_stroke_color(self.ptr, color.r, color.g, color.b, color.a) };
+        unsafe {
+            ffi::sk_shape_node_set_stroke_color(self.ptr, color.r, color.g, color.b, color.a)
+        };
     }
 
     pub fn set_fill_color(&self, color: Color) {

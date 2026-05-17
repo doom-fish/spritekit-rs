@@ -1,4 +1,7 @@
-use spritekit::{CGPoint, CGVector, PhysicsBody, PhysicsJointExt, PhysicsJointPin, PhysicsJointSliding, PhysicsJointSpring};
+use spritekit::{
+    CGPoint, CGVector, PhysicsBody, PhysicsJointExt, PhysicsJointPin, PhysicsJointSliding,
+    PhysicsJointSpring,
+};
 
 #[test]
 fn physics_joints_expose_basic_properties() {
