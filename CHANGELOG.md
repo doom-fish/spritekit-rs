@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-05-18
+
+### Changed
+
+- Added `// SAFETY:` comments to all FFI unsafe blocks for improved audibility and correctness documentation
+
 ## [0.2.1] - 2026-05-17
 
 ### Added

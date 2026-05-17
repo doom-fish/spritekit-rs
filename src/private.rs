@@ -21,6 +21,9 @@ macro_rules! handle_type {
         impl Drop for $name {
             fn drop(&mut self) {
                 if self.owned && !self.ptr.is_null() {
+                    // SAFETY: The ptr is guaranteed to be a valid SpriteKit object reference
+                    // that was created by from_raw(). Since owned=true, we own the reference
+                    // and it's safe to release. The Swift bridge's sk_release is thread-safe.
                     unsafe { crate::ffi::sk_release(self.ptr) };
                     self.ptr = core::ptr::null_mut();
                 }
