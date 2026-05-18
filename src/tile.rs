@@ -14,6 +14,7 @@ handle_type!(TileGroup);
 handle_type!(TileSet);
 handle_type!(TileMapNode);
 
+/// Enum for `SKTileDefinitionRotation`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(u64)]
 pub enum TileDefinitionRotation {
@@ -25,6 +26,7 @@ pub enum TileDefinitionRotation {
 }
 
 impl TileDefinitionRotation {
+    /// Converts a raw value from `SKTileDefinitionRotation`.
     #[must_use]
     pub const fn from_raw(value: u64) -> Self {
         match value {
@@ -36,6 +38,7 @@ impl TileDefinitionRotation {
     }
 }
 
+/// Enum for `SKTileSetType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(u64)]
 pub enum TileSetType {
@@ -47,6 +50,7 @@ pub enum TileSetType {
 }
 
 impl TileSetType {
+    /// Converts a raw value from `SKTileSetType`.
     #[must_use]
     pub const fn from_raw(value: u64) -> Self {
         match value {
@@ -58,19 +62,30 @@ impl TileSetType {
     }
 }
 
+/// Wrapper type for `SKTileAdjacencyMask`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub struct TileAdjacencyMask(pub u64);
 
 impl TileAdjacencyMask {
+    /// Empty constant for `SKTileAdjacencyMask`.
     pub const NONE: Self = Self(0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UP: Self = Self(1 << 0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_RIGHT: Self = Self(1 << 1);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const RIGHT: Self = Self(1 << 2);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_RIGHT: Self = Self(1 << 3);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const DOWN: Self = Self(1 << 4);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_LEFT: Self = Self(1 << 5);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LEFT: Self = Self(1 << 6);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_LEFT: Self = Self(1 << 7);
+    /// Full-mask constant for `SKTileAdjacencyMask`.
     pub const ALL: Self = Self(
         Self::UP.0
             | Self::UPPER_RIGHT.0
@@ -82,12 +97,19 @@ impl TileAdjacencyMask {
             | Self::UPPER_LEFT.0,
     );
 
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_UP: Self = Self(1 << 0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_UPPER_RIGHT: Self = Self(1 << 1);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_LOWER_RIGHT: Self = Self(1 << 2);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_DOWN: Self = Self(1 << 3);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_LOWER_LEFT: Self = Self(1 << 4);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_UPPER_LEFT: Self = Self(1 << 5);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_FLAT_ALL: Self = Self(
         Self::HEX_FLAT_UP.0
             | Self::HEX_FLAT_UPPER_RIGHT.0
@@ -97,12 +119,19 @@ impl TileAdjacencyMask {
             | Self::HEX_FLAT_UPPER_LEFT.0,
     );
 
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_UPPER_LEFT: Self = Self(1 << 0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_UPPER_RIGHT: Self = Self(1 << 1);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_RIGHT: Self = Self(1 << 2);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_LOWER_RIGHT: Self = Self(1 << 3);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_LOWER_LEFT: Self = Self(1 << 4);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_LEFT: Self = Self(1 << 5);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const HEX_POINTY_ALL: Self = Self(
         Self::HEX_POINTY_UPPER_LEFT.0
             | Self::HEX_POINTY_UPPER_RIGHT.0
@@ -112,19 +141,28 @@ impl TileAdjacencyMask {
             | Self::HEX_POINTY_LEFT.0,
     );
 
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UP_EDGE: Self = Self(
         Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0,
     );
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_RIGHT_EDGE: Self = Self(Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const RIGHT_EDGE: Self =
         Self(Self::DOWN.0 | Self::LOWER_LEFT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0 | Self::UP.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_RIGHT_EDGE: Self = Self(Self::LEFT.0 | Self::UPPER_LEFT.0 | Self::UP.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const DOWN_EDGE: Self =
         Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LEFT.0 | Self::UPPER_LEFT.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_LEFT_EDGE: Self = Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LEFT_EDGE: Self =
         Self(Self::UP.0 | Self::UPPER_RIGHT.0 | Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_LEFT_EDGE: Self = Self(Self::RIGHT.0 | Self::LOWER_RIGHT.0 | Self::DOWN.0);
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_RIGHT_CORNER: Self = Self(
         Self::UP.0
             | Self::UPPER_RIGHT.0
@@ -134,6 +172,7 @@ impl TileAdjacencyMask {
             | Self::LEFT.0
             | Self::UPPER_LEFT.0,
     );
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_RIGHT_CORNER: Self = Self(
         Self::UP.0
             | Self::UPPER_RIGHT.0
@@ -143,6 +182,7 @@ impl TileAdjacencyMask {
             | Self::LOWER_LEFT.0
             | Self::LEFT.0,
     );
+    /// Constant for `SKTileAdjacencyMask`.
     pub const LOWER_LEFT_CORNER: Self = Self(
         Self::UP.0
             | Self::RIGHT.0
@@ -152,6 +192,7 @@ impl TileAdjacencyMask {
             | Self::LEFT.0
             | Self::UPPER_LEFT.0,
     );
+    /// Constant for `SKTileAdjacencyMask`.
     pub const UPPER_LEFT_CORNER: Self = Self(
         Self::UP.0
             | Self::UPPER_RIGHT.0
@@ -162,6 +203,7 @@ impl TileAdjacencyMask {
             | Self::UPPER_LEFT.0,
     );
 
+    /// Returns raw bits for `SKTileAdjacencyMask`.
     #[must_use]
     pub const fn bits(self) -> u64 {
         self.0
@@ -203,11 +245,13 @@ impl AsNode for TileMapNode {
 }
 
 impl TileDefinition {
+    /// Wraps `SKTileDefinition`.
     #[must_use]
     pub fn with_texture(texture: &Texture) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_tile_definition_new_with_texture(texture.as_ptr())) }
     }
 
+    /// Wraps `SKTileDefinition`.
     #[must_use]
     pub fn with_texture_size(texture: &Texture, size: CGSize) -> Option<Self> {
         unsafe {
@@ -219,17 +263,20 @@ impl TileDefinition {
         }
     }
 
+    /// Returns a property exposed by `SKTileDefinition`.
     #[must_use]
     pub fn name(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_tile_definition_copy_name(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_name(&self, name: &str) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_tile_definition_set_name(self.ptr, name.as_ptr()) };
         }
     }
 
+    /// Returns a property exposed by `SKTileDefinition`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         CGSize::new(
@@ -238,48 +285,58 @@ impl TileDefinition {
         )
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_size(&self, size: CGSize) {
         unsafe { ffi::sk_tile_definition_set_size(self.ptr, size.width, size.height) };
     }
 
+    /// Returns a property exposed by `SKTileDefinition`.
     #[must_use]
     pub fn placement_weight(&self) -> u64 {
         unsafe { ffi::sk_tile_definition_get_placement_weight(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_placement_weight(&self, weight: u64) {
         unsafe { ffi::sk_tile_definition_set_placement_weight(self.ptr, weight) };
     }
 
+    /// Returns a property exposed by `SKTileDefinition`.
     #[must_use]
     pub fn rotation(&self) -> TileDefinitionRotation {
         TileDefinitionRotation::from_raw(unsafe { ffi::sk_tile_definition_get_rotation(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_rotation(&self, rotation: TileDefinitionRotation) {
         unsafe { ffi::sk_tile_definition_set_rotation(self.ptr, rotation as u64) };
     }
 
+    /// Wraps `SKTileDefinition`.
     #[must_use]
     pub fn flip_vertically(&self) -> bool {
         unsafe { ffi::sk_tile_definition_get_flip_vertically(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_flip_vertically(&self, flip: bool) {
         unsafe { ffi::sk_tile_definition_set_flip_vertically(self.ptr, flip) };
     }
 
+    /// Wraps `SKTileDefinition`.
     #[must_use]
     pub fn flip_horizontally(&self) -> bool {
         unsafe { ffi::sk_tile_definition_get_flip_horizontally(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKTileDefinition`.
     pub fn set_flip_horizontally(&self, flip: bool) {
         unsafe { ffi::sk_tile_definition_set_flip_horizontally(self.ptr, flip) };
     }
 }
 
 impl TileGroupRule {
+    /// Wraps `SKTileGroupRule`.
     #[must_use]
     pub fn new(adjacency: TileAdjacencyMask, tile_definitions: &[&TileDefinition]) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = tile_definitions
@@ -300,20 +357,24 @@ impl TileGroupRule {
         }
     }
 
+    /// Wraps `SKTileGroupRule`.
     #[must_use]
     pub fn adjacency(&self) -> TileAdjacencyMask {
         TileAdjacencyMask(unsafe { ffi::sk_tile_group_rule_get_adjacency(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKTileGroupRule`.
     pub fn set_adjacency(&self, adjacency: TileAdjacencyMask) {
         unsafe { ffi::sk_tile_group_rule_set_adjacency(self.ptr, adjacency.bits()) };
     }
 
+    /// Returns a property exposed by `SKTileGroupRule`.
     #[must_use]
     pub fn name(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_tile_group_rule_copy_name(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileGroupRule`.
     pub fn set_name(&self, name: &str) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_tile_group_rule_set_name(self.ptr, name.as_ptr()) };
@@ -322,6 +383,7 @@ impl TileGroupRule {
 }
 
 impl TileGroup {
+    /// Wraps `SKTileGroup`.
     #[must_use]
     pub fn with_tile_definition(tile_definition: &TileDefinition) -> Option<Self> {
         unsafe {
@@ -331,6 +393,7 @@ impl TileGroup {
         }
     }
 
+    /// Wraps `SKTileGroup`.
     #[must_use]
     pub fn with_rules(rules: &[&TileGroupRule]) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = rules.iter().map(|rule| rule.as_ptr()).collect();
@@ -342,16 +405,19 @@ impl TileGroup {
         unsafe { Self::from_raw(ffi::sk_tile_group_new_with_rules(raw_ptr, raw.len())) }
     }
 
+    /// Wraps `SKTileGroup`.
     #[must_use]
     pub fn empty() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_tile_group_empty()) }
     }
 
+    /// Returns a property exposed by `SKTileGroup`.
     #[must_use]
     pub fn name(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_tile_group_copy_name(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileGroup`.
     pub fn set_name(&self, name: &str) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_tile_group_set_name(self.ptr, name.as_ptr()) };
@@ -360,6 +426,7 @@ impl TileGroup {
 }
 
 impl TileSet {
+    /// Wraps `SKTileSet`.
     #[must_use]
     pub fn with_tile_groups(tile_groups: &[&TileGroup]) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = tile_groups.iter().map(|group| group.as_ptr()).collect();
@@ -371,6 +438,7 @@ impl TileSet {
         unsafe { Self::from_raw(ffi::sk_tile_set_new(raw_ptr, raw.len())) }
     }
 
+    /// Wraps `SKTileSet`.
     #[must_use]
     pub fn with_tile_groups_type(
         tile_groups: &[&TileGroup],
@@ -391,31 +459,37 @@ impl TileSet {
         }
     }
 
+    /// Returns a property exposed by `SKTileSet`.
     #[must_use]
     pub fn name(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_tile_set_copy_name(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileSet`.
     pub fn set_name(&self, name: &str) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_tile_set_set_name(self.ptr, name.as_ptr()) };
         }
     }
 
+    /// Returns a property exposed by `SKTileSet`.
     #[must_use]
     pub fn tile_set_type(&self) -> TileSetType {
         TileSetType::from_raw(unsafe { ffi::sk_tile_set_get_type(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKTileSet`.
     pub fn set_tile_set_type(&self, tile_set_type: TileSetType) {
         unsafe { ffi::sk_tile_set_set_type(self.ptr, tile_set_type as u64) };
     }
 
+    /// Returns a property exposed by `SKTileSet`.
     #[must_use]
     pub fn default_tile_group(&self) -> Option<TileGroup> {
         unsafe { TileGroup::from_raw(ffi::sk_tile_set_get_default_tile_group(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileSet`.
     pub fn set_default_tile_group(&self, tile_group: Option<&TileGroup>) {
         unsafe {
             ffi::sk_tile_set_set_default_tile_group(
@@ -425,6 +499,7 @@ impl TileSet {
         };
     }
 
+    /// Wraps `SKTileSet`.
     #[must_use]
     pub fn default_tile_size(&self) -> CGSize {
         CGSize::new(
@@ -433,12 +508,14 @@ impl TileSet {
         )
     }
 
+    /// Sets a property exposed by `SKTileSet`.
     pub fn set_default_tile_size(&self, size: CGSize) {
         unsafe { ffi::sk_tile_set_set_default_tile_size(self.ptr, size.width, size.height) };
     }
 }
 
 impl TileMapNode {
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn new(tile_set: &TileSet, columns: usize, rows: usize, tile_size: CGSize) -> Option<Self> {
         unsafe {
@@ -452,6 +529,7 @@ impl TileMapNode {
         }
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn with_fill(
         tile_set: &TileSet,
@@ -472,16 +550,19 @@ impl TileMapNode {
         }
     }
 
+    /// Returns a property exposed by `SKTileMapNode`.
     #[must_use]
     pub fn number_of_columns(&self) -> usize {
         unsafe { ffi::sk_tile_map_node_get_number_of_columns(self.ptr) }
     }
 
+    /// Returns a property exposed by `SKTileMapNode`.
     #[must_use]
     pub fn number_of_rows(&self) -> usize {
         unsafe { ffi::sk_tile_map_node_get_number_of_rows(self.ptr) }
     }
 
+    /// Returns a property exposed by `SKTileMapNode`.
     #[must_use]
     pub fn tile_size(&self) -> CGSize {
         CGSize::new(
@@ -490,10 +571,12 @@ impl TileMapNode {
         )
     }
 
+    /// Sets a property exposed by `SKTileMapNode`.
     pub fn set_tile_size(&self, size: CGSize) {
         unsafe { ffi::sk_tile_map_node_set_tile_size(self.ptr, size.width, size.height) };
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn map_size(&self) -> CGSize {
         CGSize::new(
@@ -502,15 +585,18 @@ impl TileMapNode {
         )
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn tile_set(&self) -> Option<TileSet> {
         unsafe { TileSet::from_raw(ffi::sk_tile_map_node_get_tile_set(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKTileMapNode`.
     pub fn set_tile_set(&self, tile_set: &TileSet) {
         unsafe { ffi::sk_tile_map_node_set_tile_set(self.ptr, tile_set.as_ptr()) };
     }
 
+    /// Wraps `SKTileMapNode`.
     pub fn fill_with_tile_group(&self, tile_group: Option<&TileGroup>) {
         unsafe {
             ffi::sk_tile_map_node_fill_with_tile_group(
@@ -520,11 +606,13 @@ impl TileMapNode {
         };
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn tile_group_at(&self, column: usize, row: usize) -> Option<TileGroup> {
         unsafe { TileGroup::from_raw(ffi::sk_tile_map_node_get_tile_group(self.ptr, column, row)) }
     }
 
+    /// Sets a property exposed by `SKTileMapNode`.
     pub fn set_tile_group(&self, tile_group: Option<&TileGroup>, column: usize, row: usize) {
         unsafe {
             ffi::sk_tile_map_node_set_tile_group(
@@ -536,6 +624,7 @@ impl TileMapNode {
         };
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn tile_definition_at(&self, column: usize, row: usize) -> Option<TileDefinition> {
         unsafe {
@@ -545,6 +634,7 @@ impl TileMapNode {
         }
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn center_of_tile_at(&self, column: usize, row: usize) -> CGPoint {
         CGPoint::new(
@@ -553,6 +643,7 @@ impl TileMapNode {
         )
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn tile_column_index_from_position(&self, position: CGPoint) -> usize {
         unsafe {
@@ -560,6 +651,7 @@ impl TileMapNode {
         }
     }
 
+    /// Wraps `SKTileMapNode`.
     #[must_use]
     pub fn tile_row_index_from_position(&self, position: CGPoint) -> usize {
         unsafe {

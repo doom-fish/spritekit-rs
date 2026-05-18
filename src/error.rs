@@ -2,12 +2,14 @@ use std::error::Error;
 use std::ffi::CStr;
 use std::fmt;
 
+/// Wrapper type for `SpriteKit`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpriteKitError {
     message: String,
 }
 
 impl SpriteKitError {
+    /// Wraps `SpriteKit`.
     #[must_use]
     pub fn new(message: impl Into<String>) -> Self {
         Self {
@@ -24,6 +26,11 @@ impl fmt::Display for SpriteKitError {
 
 impl Error for SpriteKitError {}
 
+/// Wraps `SpriteKit` bridge failures.
+///
+/// # Safety
+///
+/// Follow the safety contract required by the underlying `SpriteKit` bridge failures API.
 pub(crate) unsafe fn take_string(ptr: *mut libc::c_char) -> Option<String> {
     if ptr.is_null() {
         return None;

@@ -1,58 +1,112 @@
 use core::ffi::{c_char, c_void};
 
 extern "C" {
+    /// Wraps `SKNode`.
     pub fn sk_node_new() -> *mut c_void;
+    /// Wraps `SKNode`.
     pub fn sk_node_add_child(parent: *mut c_void, child: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_move_to_parent(node: *mut c_void, parent: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_remove_from_parent(node: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_remove_all_children(node: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_copy_name(node: *mut c_void) -> *mut c_char;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_name(node: *mut c_void, name: *const c_char);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_frame_x(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_frame_y(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_frame_w(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_frame_h(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_calculate_accumulated_frame_x(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_calculate_accumulated_frame_y(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_calculate_accumulated_frame_w(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_calculate_accumulated_frame_h(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_position_x(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_position_y(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_position(node: *mut c_void, x: f64, y: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_z_position(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_z_position(node: *mut c_void, z: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_z_rotation(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_z_rotation(node: *mut c_void, rotation: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_x_scale(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_x_scale(node: *mut c_void, scale: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_y_scale(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_y_scale(node: *mut c_void, scale: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_set_scale(node: *mut c_void, scale: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_alpha(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_alpha(node: *mut c_void, alpha: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_hidden(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_hidden(node: *mut c_void, hidden: bool);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_paused(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_paused(node: *mut c_void, paused: bool);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_speed(node: *mut c_void) -> f64;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_speed(node: *mut c_void, speed: f64);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_user_interaction_enabled(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_user_interaction_enabled(node: *mut c_void, enabled: bool);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_accessibility_element(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_accessibility_element(node: *mut c_void, accessibility_element: bool);
+    /// Wraps `SKNode`.
     pub fn sk_node_copy_accessibility_label(node: *mut c_void) -> *mut c_char;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_accessibility_label(node: *mut c_void, label: *const c_char);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_accessibility_enabled(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_accessibility_enabled(node: *mut c_void, accessibility_enabled: bool);
+    /// Returns a property exposed by `SKNode`.
     pub fn sk_node_get_children_count(node: *mut c_void) -> usize;
+    /// Wraps `SKNode`.
     pub fn sk_node_get_physics_body(node: *mut c_void) -> *mut c_void;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_physics_body(node: *mut c_void, body: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_get_reach_constraints(node: *mut c_void) -> *mut c_void;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_reach_constraints(node: *mut c_void, constraints: *mut c_void);
+    /// Returns a property exposed by `SKNode`.
     pub fn sk_node_get_constraints_count(node: *mut c_void) -> usize;
+    /// Wraps `SKNode`.
     pub fn sk_node_set_constraints(node: *mut c_void, constraints: *mut c_void, count: usize);
+    /// Wraps `SKNode`.
     pub fn sk_node_run_action(node: *mut c_void, action: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_has_actions(node: *mut c_void) -> bool;
+    /// Wraps `SKNode`.
     pub fn sk_node_remove_all_actions(node: *mut c_void);
+    /// Wraps `SKNode`.
     pub fn sk_node_contains_point(node: *mut c_void, x: f64, y: f64) -> bool;
 }

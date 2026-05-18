@@ -3,6 +3,7 @@ use crate::private::{cstring_from_str, handle_type};
 
 handle_type!(Shader);
 
+/// Enum for `SKUniformType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(i32)]
 pub enum UniformType {
@@ -19,6 +20,7 @@ pub enum UniformType {
 }
 
 impl UniformType {
+    /// Converts a raw value from `SKUniformType`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {
@@ -36,39 +38,46 @@ impl UniformType {
 }
 
 impl Shader {
+    /// Wraps `SKShader`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_shader_new()) }
     }
 
+    /// Wraps `SKShader`.
     #[must_use]
     pub fn with_source(source: &str) -> Option<Self> {
         let source = cstring_from_str(source)?;
         unsafe { Self::from_raw(ffi::sk_shader_new_with_source(source.as_ptr())) }
     }
 
+    /// Wraps `SKShader`.
     #[must_use]
     pub fn source(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_shader_copy_source(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKShader`.
     pub fn set_source(&self, source: &str) {
         if let Some(source) = cstring_from_str(source) {
             unsafe { ffi::sk_shader_set_source(self.ptr, source.as_ptr()) };
         }
     }
 
+    /// Returns a property exposed by `SKShader`.
     #[must_use]
     pub fn uniform_count(&self) -> usize {
         unsafe { ffi::sk_shader_uniform_count(self.ptr) }
     }
 
+    /// Wraps `SKShader`.
     pub fn add_float_uniform(&self, name: &str, value: f32) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_shader_add_float_uniform(self.ptr, name.as_ptr(), value) };
         }
     }
 
+    /// Wraps `SKShader`.
     #[must_use]
     pub fn float_uniform_named(&self, name: &str) -> Option<f32> {
         let name = cstring_from_str(name)?;
@@ -77,12 +86,14 @@ impl Shader {
         ok.then_some(value)
     }
 
+    /// Wraps `SKShader`.
     pub fn remove_uniform_named(&self, name: &str) {
         if let Some(name) = cstring_from_str(name) {
             unsafe { ffi::sk_shader_remove_uniform_named(self.ptr, name.as_ptr()) };
         }
     }
 
+    /// Wraps `SKShader`.
     #[must_use]
     pub fn uniform_type_named(&self, name: &str) -> Option<UniformType> {
         let name = cstring_from_str(name)?;
@@ -91,6 +102,7 @@ impl Shader {
         ok.then_some(UniformType::from_raw(value))
     }
 
+    /// Returns a property exposed by `SKShader`.
     #[must_use]
     pub fn attribute_count(&self) -> usize {
         unsafe { ffi::sk_shader_attribute_count(self.ptr) }

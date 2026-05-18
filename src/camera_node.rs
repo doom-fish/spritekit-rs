@@ -11,16 +11,19 @@ impl AsNode for CameraNode {
 }
 
 impl CameraNode {
+    /// Wraps `SKCameraNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_camera_node_new()) }
     }
 
+    /// Returns a property exposed by `SKCameraNode`.
     #[must_use]
     pub fn contains_node<N: AsNode>(&self, node: &N) -> bool {
         unsafe { ffi::sk_camera_node_contains_node(self.ptr, node.as_node_ptr()) }
     }
 
+    /// Returns a property exposed by `SKCameraNode`.
     #[must_use]
     pub fn contained_node_count(&self) -> usize {
         unsafe { ffi::sk_camera_node_get_contained_node_count(self.ptr) }

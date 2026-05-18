@@ -35,6 +35,7 @@ extern "C" fn scene_delegate_release(context: *mut c_void) {
     }
 }
 
+/// Enum for `SKSceneScaleMode`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum SceneScaleMode {
@@ -45,6 +46,7 @@ pub enum SceneScaleMode {
 }
 
 impl SceneScaleMode {
+    /// Converts a raw value from `SKSceneScaleMode`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {
@@ -63,6 +65,7 @@ impl AsNode for Scene {
 }
 
 impl SceneDelegate {
+    /// Wraps `SKSceneDelegate`.
     #[must_use]
     pub fn new() -> Option<Self> {
         let context = Box::new(SceneDelegateContext { update: None });
@@ -75,6 +78,7 @@ impl SceneDelegate {
         }
     }
 
+    /// Wraps `SKSceneDelegate`.
     #[must_use]
     pub fn with_update<F>(update: F) -> Option<Self>
     where
@@ -94,11 +98,13 @@ impl SceneDelegate {
 }
 
 impl Scene {
+    /// Wraps `SKScene`.
     #[must_use]
     pub fn with_size(size: CGSize) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_scene_new_with_size(size.width, size.height)) }
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         CGSize::new(unsafe { ffi::sk_scene_get_size_w(self.ptr) }, unsafe {
@@ -106,28 +112,34 @@ impl Scene {
         })
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_size(&self, size: CGSize) {
         unsafe { ffi::sk_scene_set_size(self.ptr, size.width, size.height) };
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn scale_mode(&self) -> SceneScaleMode {
         SceneScaleMode::from_raw(unsafe { ffi::sk_scene_get_scale_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_scale_mode(&self, mode: SceneScaleMode) {
         unsafe { ffi::sk_scene_set_scale_mode(self.ptr, mode as i32) };
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_background_color(&self, color: crate::color::Color) {
         unsafe { ffi::sk_scene_set_background_color(self.ptr, color.r, color.g, color.b, color.a) };
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn camera(&self) -> Option<CameraNode> {
         unsafe { CameraNode::from_raw(ffi::sk_scene_get_camera(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_camera(&self, camera: Option<&CameraNode>) {
         unsafe {
             ffi::sk_scene_set_camera(
@@ -137,6 +149,7 @@ impl Scene {
         };
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_delegate(&self, delegate: Option<&SceneDelegate>) {
         unsafe {
             ffi::sk_scene_set_delegate(
@@ -146,11 +159,13 @@ impl Scene {
         };
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn has_delegate(&self) -> bool {
         unsafe { ffi::sk_scene_has_delegate(self.ptr) }
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
         CGPoint::new(unsafe { ffi::sk_scene_get_anchor_x(self.ptr) }, unsafe {
@@ -158,20 +173,24 @@ impl Scene {
         })
     }
 
+    /// Sets a property exposed by `SKScene`.
     pub fn set_anchor_point(&self, anchor: CGPoint) {
         unsafe { ffi::sk_scene_set_anchor_point(self.ptr, anchor.x, anchor.y) };
     }
 
+    /// Wraps `SKScene`.
     #[must_use]
     pub fn physics_world(&self) -> PhysicsWorld {
         unsafe { PhysicsWorld::from_raw_unchecked(ffi::sk_scene_physics_world(self.ptr)) }
     }
 
+    /// Returns a property exposed by `SKScene`.
     #[must_use]
     pub fn view(&self) -> Option<View> {
         unsafe { View::from_raw(ffi::sk_scene_get_view(self.ptr)) }
     }
 
+    /// Wraps `SKScene`.
     #[must_use]
     pub fn convert_point_from_view(&self, point: CGPoint) -> CGPoint {
         CGPoint::new(
@@ -180,6 +199,7 @@ impl Scene {
         )
     }
 
+    /// Wraps `SKScene`.
     #[must_use]
     pub fn convert_point_to_view(&self, point: CGPoint) -> CGPoint {
         CGPoint::new(

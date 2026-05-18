@@ -4,6 +4,7 @@ use crate::private::{cstring_from_str, handle_type};
 handle_type!(Attribute);
 handle_type!(AttributeValue);
 
+/// Enum for `SKAttributeType`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(i32)]
 pub enum AttributeType {
@@ -20,6 +21,7 @@ pub enum AttributeType {
 }
 
 impl AttributeType {
+    /// Converts a raw value from `SKAttributeType`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {
@@ -37,17 +39,20 @@ impl AttributeType {
 }
 
 impl Attribute {
+    /// Wraps `SKAttribute`.
     #[must_use]
     pub fn new(name: &str, attribute_type: AttributeType) -> Option<Self> {
         let name = cstring_from_str(name)?;
         unsafe { Self::from_raw(ffi::sk_attribute_new(name.as_ptr(), attribute_type as i32)) }
     }
 
+    /// Returns a property exposed by `SKAttribute`.
     #[must_use]
     pub fn name(&self) -> Option<String> {
         unsafe { crate::error::take_string(ffi::sk_attribute_copy_name(self.ptr)) }
     }
 
+    /// Wraps `SKAttribute`.
     #[must_use]
     pub fn attribute_type(&self) -> AttributeType {
         AttributeType::from_raw(unsafe { ffi::sk_attribute_get_type(self.ptr) })
@@ -55,16 +60,19 @@ impl Attribute {
 }
 
 impl AttributeValue {
+    /// Wraps `SKAttributeValue`.
     #[must_use]
     pub fn with_float(value: f32) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_attribute_value_new_with_float(value)) }
     }
 
+    /// Wraps `SKAttributeValue`.
     #[must_use]
     pub fn float_value(&self) -> f32 {
         unsafe { ffi::sk_attribute_value_get_float(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKAttributeValue`.
     pub fn set_float_value(&self, value: f32) {
         unsafe { ffi::sk_attribute_value_set_float(self.ptr, value) };
     }

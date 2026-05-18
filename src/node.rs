@@ -9,6 +9,7 @@ use crate::reach_constraints::ReachConstraints;
 
 handle_type!(Node);
 
+/// Trait for `SKNode`.
 pub trait AsNode {
     #[doc(hidden)]
     fn as_node_ptr(&self) -> *mut core::ffi::c_void;
@@ -20,6 +21,7 @@ impl AsNode for Node {
     }
 }
 
+/// Trait for `SKNode`.
 pub trait NodeExt: AsNode {
     fn add_child<C: AsNode>(&self, child: &C) {
         unsafe { ffi::sk_node_add_child(self.as_node_ptr(), child.as_node_ptr()) };
@@ -279,6 +281,7 @@ pub trait NodeExt: AsNode {
 impl<T: AsNode> NodeExt for T {}
 
 impl Node {
+    /// Wraps `SKNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_node_new()) }

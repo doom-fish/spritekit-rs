@@ -8,6 +8,7 @@ use crate::private::handle_type;
 handle_type!(PhysicsWorld);
 
 impl PhysicsWorld {
+    /// Returns a property exposed by `SKPhysicsWorld`.
     #[must_use]
     pub fn gravity(&self) -> CGVector {
         CGVector::new(
@@ -16,19 +17,23 @@ impl PhysicsWorld {
         )
     }
 
+    /// Sets a property exposed by `SKPhysicsWorld`.
     pub fn set_gravity(&self, gravity: CGVector) {
         unsafe { ffi::sk_physics_world_set_gravity(self.ptr, gravity.dx, gravity.dy) };
     }
 
+    /// Returns a property exposed by `SKPhysicsWorld`.
     #[must_use]
     pub fn speed(&self) -> f64 {
         unsafe { ffi::sk_physics_world_get_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKPhysicsWorld`.
     pub fn set_speed(&self, speed: f64) {
         unsafe { ffi::sk_physics_world_set_speed(self.ptr, speed) };
     }
 
+    /// Wraps `SKPhysicsWorld`.
     #[must_use]
     pub fn body_at_point(&self, point: CGPoint) -> Option<PhysicsBody> {
         unsafe {
@@ -38,6 +43,7 @@ impl PhysicsWorld {
         }
     }
 
+    /// Wraps `SKPhysicsWorld`.
     #[must_use]
     pub fn body_in_rect(&self, rect: CGRect) -> Option<PhysicsBody> {
         unsafe {
@@ -51,6 +57,7 @@ impl PhysicsWorld {
         }
     }
 
+    /// Wraps `SKPhysicsWorld`.
     #[must_use]
     pub fn body_along_ray(&self, start: CGPoint, end: CGPoint) -> Option<PhysicsBody> {
         unsafe {
@@ -60,6 +67,7 @@ impl PhysicsWorld {
         }
     }
 
+    /// Sets a property exposed by `SKPhysicsWorld`.
     pub fn set_contact_delegate(&self, delegate: Option<&PhysicsContactDelegate>) {
         unsafe {
             ffi::sk_physics_world_set_contact_delegate(
@@ -69,6 +77,7 @@ impl PhysicsWorld {
         };
     }
 
+    /// Returns a property exposed by `SKPhysicsWorld`.
     #[must_use]
     pub fn has_contact_delegate(&self) -> bool {
         unsafe { ffi::sk_physics_world_has_contact_delegate(self.ptr) }

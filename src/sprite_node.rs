@@ -16,6 +16,7 @@ impl AsNode for SpriteNode {
 }
 
 impl SpriteNode {
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn with_texture(texture: Option<&Texture>) -> Option<Self> {
         unsafe {
@@ -25,6 +26,7 @@ impl SpriteNode {
         }
     }
 
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn with_color(color: Color, size: CGSize) -> Option<Self> {
         unsafe {
@@ -39,17 +41,20 @@ impl SpriteNode {
         }
     }
 
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn image_named(name: &str) -> Option<Self> {
         let name = cstring_from_str(name)?;
         unsafe { Self::from_raw(ffi::sk_sprite_node_new_image_named(name.as_ptr())) }
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn texture(&self) -> Option<Texture> {
         unsafe { Texture::from_raw(ffi::sk_sprite_node_get_texture(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_texture(&self, texture: Option<&Texture>) {
         unsafe {
             ffi::sk_sprite_node_set_texture(
@@ -59,11 +64,13 @@ impl SpriteNode {
         };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn normal_texture(&self) -> Option<Texture> {
         unsafe { Texture::from_raw(ffi::sk_sprite_node_get_normal_texture(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_normal_texture(&self, texture: Option<&Texture>) {
         unsafe {
             ffi::sk_sprite_node_set_normal_texture(
@@ -73,6 +80,7 @@ impl SpriteNode {
         };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         CGSize::new(
@@ -81,14 +89,17 @@ impl SpriteNode {
         )
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_size(&self, size: CGSize) {
         unsafe { ffi::sk_sprite_node_set_size(self.ptr, size.width, size.height) };
     }
 
+    /// Wraps `SKSpriteNode`.
     pub fn scale_to_size(&self, size: CGSize) {
         unsafe { ffi::sk_sprite_node_scale_to_size(self.ptr, size.width, size.height) };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
         CGPoint::new(
@@ -97,59 +108,72 @@ impl SpriteNode {
         )
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_anchor_point(&self, anchor: CGPoint) {
         unsafe { ffi::sk_sprite_node_set_anchor_point(self.ptr, anchor.x, anchor.y) };
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_color(&self, color: Color) {
         unsafe { ffi::sk_sprite_node_set_color(self.ptr, color.r, color.g, color.b, color.a) };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn color_blend_factor(&self) -> f64 {
         unsafe { ffi::sk_sprite_node_get_color_blend_factor(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_color_blend_factor(&self, factor: f64) {
         unsafe { ffi::sk_sprite_node_set_color_blend_factor(self.ptr, factor) };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn blend_mode(&self) -> crate::physics::BlendMode {
         crate::physics::BlendMode::from_raw(unsafe { ffi::sk_sprite_node_get_blend_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_blend_mode(&self, mode: crate::physics::BlendMode) {
         unsafe { ffi::sk_sprite_node_set_blend_mode(self.ptr, mode as i32) };
     }
 
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn lighting_bitmask(&self) -> u32 {
         unsafe { ffi::sk_sprite_node_get_lighting_bitmask(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_lighting_bitmask(&self, mask: u32) {
         unsafe { ffi::sk_sprite_node_set_lighting_bitmask(self.ptr, mask) };
     }
 
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn shadow_cast_bitmask(&self) -> u32 {
         unsafe { ffi::sk_sprite_node_get_shadow_cast_bitmask(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_shadow_cast_bitmask(&self, mask: u32) {
         unsafe { ffi::sk_sprite_node_set_shadow_cast_bitmask(self.ptr, mask) };
     }
 
+    /// Wraps `SKSpriteNode`.
     #[must_use]
     pub fn shadowed_bitmask(&self) -> u32 {
         unsafe { ffi::sk_sprite_node_get_shadowed_bitmask(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_shadowed_bitmask(&self, mask: u32) {
         unsafe { ffi::sk_sprite_node_set_shadowed_bitmask(self.ptr, mask) };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn center_rect(&self) -> CGRect {
         CGRect::new(
@@ -160,17 +184,20 @@ impl SpriteNode {
         )
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_center_rect(&self, rect: CGRect) {
         unsafe {
             ffi::sk_sprite_node_set_center_rect(self.ptr, rect.x, rect.y, rect.width, rect.height);
         };
     }
 
+    /// Returns a property exposed by `SKSpriteNode`.
     #[must_use]
     pub fn shader(&self) -> Option<Shader> {
         unsafe { Shader::from_raw(ffi::sk_sprite_node_get_shader(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_shader(&self, shader: Option<&Shader>) {
         unsafe {
             ffi::sk_sprite_node_set_shader(

@@ -7,11 +7,13 @@ use crate::private::handle_type;
 handle_type!(Event);
 
 impl Event {
+    /// Wraps `NSEvent`.
     #[must_use]
     pub fn mouse_moved(location: CGPoint) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_event_mouse_moved(location.x, location.y)) }
     }
 
+    /// Wraps `NSEvent`.
     #[must_use]
     pub fn location_in_node<N: AsNode>(&self, node: &N) -> CGPoint {
         CGPoint::new(

@@ -10,6 +10,7 @@ use crate::scene::Scene;
 handle_type!(RenderPassDescriptor);
 handle_type!(Renderer);
 
+/// Enum for `SKRenderer`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum LoadAction {
@@ -18,6 +19,7 @@ pub enum LoadAction {
     Clear = 2,
 }
 
+/// Enum for `SKRenderer`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(i32)]
 pub enum StoreAction {
@@ -33,6 +35,7 @@ impl RenderPassDescriptor {
         Self::for_texture_with_actions(texture, clear_color, LoadAction::Clear, StoreAction::Store)
     }
 
+    /// Wraps `SKRenderPassDescriptor`.
     #[must_use]
     pub fn for_texture_with_actions(
         texture: &MetalTexture,
@@ -68,6 +71,7 @@ impl Renderer {
         unsafe { Self::from_raw(ffi::sk_renderer_new(device.as_ptr())) }
     }
 
+    /// Sets a property exposed by `SKRenderer`.
     pub fn set_scene(&self, scene: Option<&Scene>) {
         // SAFETY: sk_renderer_set_scene is a Swift FFI function that accepts a valid
         // SKRenderer pointer (self.ptr) and an optional SKScene pointer. Both are guaranteed

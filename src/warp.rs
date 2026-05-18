@@ -8,6 +8,7 @@ use crate::sprite_node::SpriteNode;
 handle_type!(WarpGeometry);
 handle_type!(WarpGeometryGrid);
 
+/// Trait for `SKWarpGeometry`.
 pub trait AsWarpGeometry {
     #[doc(hidden)]
     fn as_warp_geometry_ptr(&self) -> *mut core::ffi::c_void;
@@ -36,16 +37,19 @@ fn pack_positions(points: &[CGPoint]) -> Vec<f32> {
 }
 
 impl WarpGeometryGrid {
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn grid() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_warp_geometry_grid()) }
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn with_dimensions(columns: usize, rows: usize) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_warp_geometry_grid_with_dimensions(columns, rows)) }
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn with_positions(
         columns: usize,
@@ -70,21 +74,25 @@ impl WarpGeometryGrid {
         }
     }
 
+    /// Returns a property exposed by `SKWarpGeometryGrid`.
     #[must_use]
     pub fn number_of_columns(&self) -> usize {
         unsafe { ffi::sk_warp_geometry_grid_get_number_of_columns(self.ptr) }
     }
 
+    /// Returns a property exposed by `SKWarpGeometryGrid`.
     #[must_use]
     pub fn number_of_rows(&self) -> usize {
         unsafe { ffi::sk_warp_geometry_grid_get_number_of_rows(self.ptr) }
     }
 
+    /// Returns a property exposed by `SKWarpGeometryGrid`.
     #[must_use]
     pub fn vertex_count(&self) -> usize {
         unsafe { ffi::sk_warp_geometry_grid_get_vertex_count(self.ptr) }
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn source_position_at(&self, index: usize) -> CGPoint {
         CGPoint::new(
@@ -93,6 +101,7 @@ impl WarpGeometryGrid {
         )
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn dest_position_at(&self, index: usize) -> CGPoint {
         CGPoint::new(
@@ -101,6 +110,7 @@ impl WarpGeometryGrid {
         )
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn replacing_source_positions(&self, source_positions: &[CGPoint]) -> Option<Self> {
         if source_positions.len() != self.vertex_count() {
@@ -116,6 +126,7 @@ impl WarpGeometryGrid {
         }
     }
 
+    /// Wraps `SKWarpGeometryGrid`.
     #[must_use]
     pub fn replacing_dest_positions(&self, dest_positions: &[CGPoint]) -> Option<Self> {
         if dest_positions.len() != self.vertex_count() {
@@ -132,6 +143,7 @@ impl WarpGeometryGrid {
     }
 }
 
+/// Trait for `SKWarpable`.
 pub trait WarpableNode {
     #[doc(hidden)]
     fn as_warpable_ptr(&self) -> *mut core::ffi::c_void;

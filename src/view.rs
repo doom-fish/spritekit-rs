@@ -36,6 +36,7 @@ extern "C" fn view_delegate_release(context: *mut c_void) {
 }
 
 impl ViewDelegate {
+    /// Wraps `SKViewDelegate`.
     #[must_use]
     pub fn new() -> Option<Self> {
         let context = Box::new(ViewDelegateContext {
@@ -50,6 +51,7 @@ impl ViewDelegate {
         }
     }
 
+    /// Wraps `SKViewDelegate`.
     #[must_use]
     pub fn with_should_render<F>(should_render: F) -> Option<Self>
     where
@@ -69,6 +71,7 @@ impl ViewDelegate {
 }
 
 impl View {
+    /// Wraps `SKView`.
     #[must_use]
     pub fn with_frame(frame: CGRect) -> Option<Self> {
         unsafe {
@@ -81,123 +84,150 @@ impl View {
         }
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn is_paused(&self) -> bool {
         unsafe { ffi::sk_view_get_paused(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_paused(&self, paused: bool) {
         unsafe { ffi::sk_view_set_paused(self.ptr, paused) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_fps(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_fps(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_fps(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_fps(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_draw_count(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_draw_count(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_draw_count(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_draw_count(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_node_count(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_node_count(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_node_count(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_node_count(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_quad_count(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_quad_count(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_quad_count(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_quad_count(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_physics(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_physics(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_physics(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_physics(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn shows_fields(&self) -> bool {
         unsafe { ffi::sk_view_get_shows_fields(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_shows_fields(&self, shows: bool) {
         unsafe { ffi::sk_view_set_shows_fields(self.ptr, shows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn is_asynchronous(&self) -> bool {
         unsafe { ffi::sk_view_get_asynchronous(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_asynchronous(&self, asynchronous: bool) {
         unsafe { ffi::sk_view_set_asynchronous(self.ptr, asynchronous) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn allows_transparency(&self) -> bool {
         unsafe { ffi::sk_view_get_allows_transparency(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_allows_transparency(&self, allows: bool) {
         unsafe { ffi::sk_view_set_allows_transparency(self.ptr, allows) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn ignores_sibling_order(&self) -> bool {
         unsafe { ffi::sk_view_get_ignores_sibling_order(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_ignores_sibling_order(&self, ignores: bool) {
         unsafe { ffi::sk_view_set_ignores_sibling_order(self.ptr, ignores) };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn should_cull_non_visible_nodes(&self) -> bool {
         unsafe { ffi::sk_view_get_should_cull_non_visible_nodes(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_should_cull_non_visible_nodes(&self, should_cull: bool) {
         unsafe { ffi::sk_view_set_should_cull_non_visible_nodes(self.ptr, should_cull) };
     }
 
+    /// Wraps `SKView`.
     #[must_use]
     pub fn preferred_frames_per_second(&self) -> isize {
         unsafe { ffi::sk_view_get_preferred_frames_per_second(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_preferred_frames_per_second(&self, fps: isize) {
         unsafe { ffi::sk_view_set_preferred_frames_per_second(self.ptr, fps) };
     }
 
+    /// Wraps `SKView`.
     #[must_use]
     pub fn disable_depth_stencil_buffer(&self) -> bool {
         unsafe { ffi::sk_view_get_disable_depth_stencil_buffer(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_disable_depth_stencil_buffer(&self, disable: bool) {
         unsafe { ffi::sk_view_set_disable_depth_stencil_buffer(self.ptr, disable) };
     }
 
+    /// Sets a property exposed by `SKView`.
     pub fn set_delegate(&self, delegate: Option<&ViewDelegate>) {
         unsafe {
             ffi::sk_view_set_delegate(
@@ -207,11 +237,13 @@ impl View {
         };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn has_delegate(&self) -> bool {
         unsafe { ffi::sk_view_has_delegate(self.ptr) }
     }
 
+    /// Wraps `SKView`.
     pub fn present_scene(&self, scene: Option<&Scene>) {
         unsafe {
             ffi::sk_view_present_scene(
@@ -221,6 +253,7 @@ impl View {
         };
     }
 
+    /// Wraps `SKView`.
     pub fn present_scene_with_transition(&self, scene: &Scene, transition: &Transition) {
         unsafe {
             ffi::sk_view_present_scene_with_transition(
@@ -231,11 +264,13 @@ impl View {
         };
     }
 
+    /// Returns a property exposed by `SKView`.
     #[must_use]
     pub fn scene(&self) -> Option<Scene> {
         unsafe { Scene::from_raw(ffi::sk_view_get_scene(self.ptr)) }
     }
 
+    /// Wraps `SKView`.
     #[must_use]
     pub fn texture_from_node<N: AsNode>(&self, node: &N) -> Option<Texture> {
         unsafe { Texture::from_raw(ffi::sk_view_texture_from_node(self.ptr, node.as_node_ptr())) }

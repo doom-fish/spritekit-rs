@@ -11,16 +11,19 @@ impl AsNode for CropNode {
 }
 
 impl CropNode {
+    /// Wraps `SKCropNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_crop_node_new()) }
     }
 
+    /// Returns a property exposed by `SKCropNode`.
     #[must_use]
     pub fn mask_node(&self) -> Option<Node> {
         unsafe { Node::from_raw(ffi::sk_crop_node_get_mask_node(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKCropNode`.
     pub fn set_mask_node<N: AsNode>(&self, node: Option<&N>) {
         unsafe {
             ffi::sk_crop_node_set_mask_node(

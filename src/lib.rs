@@ -6,45 +6,85 @@
 
 mod private;
 
+/// Module for `SKAction`.
 pub mod action;
+/// Module for `SKAttribute`, `SKAttributeType`, and `SKAttributeValue`.
 pub mod attribute;
+/// Module for `SKAudioNode`.
 pub mod audio_node;
+/// Module for `SKCameraNode`.
 pub mod camera_node;
+/// Module for `SKColor`.
 pub mod color;
+/// Module for `SKConstraint` and `SKRange`.
 pub mod constraint;
+/// Module for `SKCropNode`.
 pub mod crop_node;
+/// Module for `SKEffectNode`.
 pub mod effect_node;
+/// Module for `SKEmitterNode`.
 pub mod emitter_node;
+/// Module for `SpriteKit` bridge failures.
 pub mod error;
+/// Module for `NSEvent` in `SpriteKit` input handling.
 pub mod event;
+/// Module for `SpriteKit` bridge symbols.
 pub mod ffi;
+/// Module for `SKFieldNode`.
 pub mod field_node;
+/// Module for `SKKeyframeSequence`, `SKInterpolationMode`, and `SKRepeatMode`.
 pub mod keyframe;
+/// Module for `SKLabelNode`, `SKLabelHorizontalAlignmentMode`, and `SKLabelVerticalAlignmentMode`.
 pub mod label_node;
+/// Module for `SKLightNode`.
 pub mod light_node;
+/// Module for `SKMutableTexture`.
 pub mod mutable_texture;
+/// Module for `SKNode`.
 pub mod node;
+/// Module for `SKPhysicsBody`, `SKPhysicsContact`, `SKPhysicsJoint`, `SKPhysicsWorld`, and `SKBlendMode`.
 pub mod physics;
+/// Module for `SKPhysicsBody`.
 pub mod physics_body;
+/// Module for `SKPhysicsContact`.
 pub mod physics_contact;
+/// Module for `SKPhysicsJointPin`, `SKPhysicsJointSpring`, `SKPhysicsJointFixed`, `SKPhysicsJointSliding`, and `SKPhysicsJointLimit`.
 pub mod physics_joint;
+/// Module for `SKPhysicsWorld`.
 pub mod physics_world;
+/// Module for `SKReachConstraints`.
 pub mod reach_constraints;
+/// Module for `SKReferenceNode`.
 pub mod reference_node;
+/// Module for `SKRegion`.
 pub mod region;
+/// Module for `SKRenderer` and `SKRenderPassDescriptor`.
 pub mod renderer;
+/// Module for `SKScene` and `SKSceneScaleMode`.
 pub mod scene;
+/// Module for `SKShader` and `SKUniformType`.
 pub mod shader;
+/// Module for `SKShapeNode`.
 pub mod shape_node;
+/// Module for `SKSpriteNode`.
 pub mod sprite_node;
+/// Module for `SKTexture` and `SKTextureFilteringMode`.
 pub mod texture;
+/// Module for `SKTextureAtlas`.
 pub mod texture_atlas;
+/// Module for `SK3DNode`.
 pub mod three_d_node;
+/// Module for `SpriteKit` tile APIs such as `SKTileDefinition`, `SKTileGroupRule`, `SKTileGroup`, `SKTileSet`, `SKTileMapNode`, and `SKTileAdjacencyMask`.
 pub mod tile;
+/// Module for `SKTransformNode`.
 pub mod transform_node;
+/// Module for `SKTransition` and `SKTransitionDirection`.
 pub mod transition;
+/// Module for `SKVideoNode`.
 pub mod video_node;
+/// Module for `SKView` and `SKViewDelegate`.
 pub mod view;
+/// Module for `SKWarpGeometry`, `SKWarpGeometryGrid`, and `SKWarpable`.
 pub mod warp;
 
 pub use action::{Action, ActionTimingMode};
@@ -92,6 +132,7 @@ pub use warp::{AsWarpGeometry, WarpGeometry, WarpGeometryGrid, WarpableNode};
 
 pub use apple_cf::cg::{CGPoint, CGRect, CGSize, CGVector};
 
+/// Module for common `SpriteKit` wrapper imports.
 pub mod prelude {
     pub use crate::{
         read_texture_bytes, Action, ActionTimingMode, AsWarpGeometry, Attribute, AttributeType,

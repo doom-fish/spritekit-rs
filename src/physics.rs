@@ -22,6 +22,7 @@ pub enum BlendMode {
 }
 
 impl BlendMode {
+    /// Converts a raw value from `SKBlendMode`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {

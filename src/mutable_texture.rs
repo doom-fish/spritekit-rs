@@ -6,6 +6,7 @@ use crate::private::handle_type;
 handle_type!(MutableTexture);
 
 impl MutableTexture {
+    /// Wraps `SKMutableTexture`.
     #[must_use]
     pub fn with_size(size: CGSize) -> Option<Self> {
         unsafe {
@@ -16,6 +17,7 @@ impl MutableTexture {
         }
     }
 
+    /// Wraps `SKMutableTexture`.
     #[must_use]
     pub fn with_size_pixel_format(size: CGSize, pixel_format: i32) -> Option<Self> {
         unsafe {
@@ -27,6 +29,7 @@ impl MutableTexture {
         }
     }
 
+    /// Returns a property exposed by `SKMutableTexture`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         CGSize::new(unsafe { ffi::sk_texture_get_size_w(self.ptr) }, unsafe {

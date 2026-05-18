@@ -12,34 +12,41 @@ impl AsNode for EffectNode {
 }
 
 impl EffectNode {
+    /// Wraps `SKEffectNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_effect_node_new()) }
     }
 
+    /// Returns a property exposed by `SKEffectNode`.
     #[must_use]
     pub fn should_enable_effects(&self) -> bool {
         unsafe { ffi::sk_effect_node_get_should_enable_effects(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEffectNode`.
     pub fn set_should_enable_effects(&self, enable: bool) {
         unsafe { ffi::sk_effect_node_set_should_enable_effects(self.ptr, enable) };
     }
 
+    /// Returns a property exposed by `SKEffectNode`.
     #[must_use]
     pub fn should_rasterize(&self) -> bool {
         unsafe { ffi::sk_effect_node_get_should_rasterize(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEffectNode`.
     pub fn set_should_rasterize(&self, rasterize: bool) {
         unsafe { ffi::sk_effect_node_set_should_rasterize(self.ptr, rasterize) };
     }
 
+    /// Returns a property exposed by `SKEffectNode`.
     #[must_use]
     pub fn blend_mode(&self) -> BlendMode {
         BlendMode::from_raw(unsafe { ffi::sk_effect_node_get_blend_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKEffectNode`.
     pub fn set_blend_mode(&self, mode: BlendMode) {
         unsafe { ffi::sk_effect_node_set_blend_mode(self.ptr, mode as i32) };
     }

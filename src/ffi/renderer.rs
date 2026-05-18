@@ -1,6 +1,7 @@
 use core::ffi::c_void;
 
 extern "C" {
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_render_pass_descriptor_new_for_texture(
         texture: *mut c_void,
         clear_r: f64,
@@ -10,9 +11,13 @@ extern "C" {
         load_action: i32,
         store_action: i32,
     ) -> *mut c_void;
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_renderer_new(device: *mut c_void) -> *mut c_void;
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_renderer_set_scene(renderer: *mut c_void, scene: *mut c_void);
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_renderer_update_at_time(renderer: *mut c_void, time: f64);
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_renderer_render(
         renderer: *mut c_void,
         vp_x: f64,
@@ -22,6 +27,7 @@ extern "C" {
         command_buffer: *mut c_void,
         pass_descriptor: *mut c_void,
     );
+    /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_texture_copy_bytes(
         texture: *mut c_void,
         out_bytes: *mut c_void,

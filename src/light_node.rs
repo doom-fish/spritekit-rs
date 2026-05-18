@@ -12,50 +12,60 @@ impl AsNode for LightNode {
 }
 
 impl LightNode {
+    /// Wraps `SKLightNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_light_node_new()) }
     }
 
+    /// Returns a property exposed by `SKLightNode`.
     #[must_use]
     pub fn is_enabled(&self) -> bool {
         unsafe { ffi::sk_light_node_get_enabled(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_enabled(&self, enabled: bool) {
         unsafe { ffi::sk_light_node_set_enabled(self.ptr, enabled) };
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_light_color(&self, color: Color) {
         unsafe { ffi::sk_light_node_set_light_color(self.ptr, color.r, color.g, color.b, color.a) };
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_ambient_color(&self, color: Color) {
         unsafe {
             ffi::sk_light_node_set_ambient_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_shadow_color(&self, color: Color) {
         unsafe {
             ffi::sk_light_node_set_shadow_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 
+    /// Returns a property exposed by `SKLightNode`.
     #[must_use]
     pub fn falloff(&self) -> f64 {
         unsafe { ffi::sk_light_node_get_falloff(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_falloff(&self, falloff: f64) {
         unsafe { ffi::sk_light_node_set_falloff(self.ptr, falloff) };
     }
 
+    /// Wraps `SKLightNode`.
     #[must_use]
     pub fn category_bitmask(&self) -> u32 {
         unsafe { ffi::sk_light_node_get_category_bitmask(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKLightNode`.
     pub fn set_category_bitmask(&self, mask: u32) {
         unsafe { ffi::sk_light_node_set_category_bitmask(self.ptr, mask) };
     }

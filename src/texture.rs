@@ -14,6 +14,7 @@ pub enum TextureFilteringMode {
 }
 
 impl TextureFilteringMode {
+    /// Converts a raw value from `SKTextureFilteringMode`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {
@@ -75,6 +76,7 @@ impl Texture {
         }
     }
 
+    /// Returns a property exposed by `SKTexture`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         let w = unsafe { ffi::sk_texture_get_size_w(self.ptr) };
@@ -82,20 +84,24 @@ impl Texture {
         CGSize::new(w, h)
     }
 
+    /// Returns a property exposed by `SKTexture`.
     #[must_use]
     pub fn filtering_mode(&self) -> TextureFilteringMode {
         TextureFilteringMode::from_raw(unsafe { ffi::sk_texture_get_filtering_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKTexture`.
     pub fn set_filtering_mode(&self, mode: TextureFilteringMode) {
         unsafe { ffi::sk_texture_set_filtering_mode(self.ptr, mode as i32) };
     }
 
+    /// Returns a property exposed by `SKTexture`.
     #[must_use]
     pub fn uses_mipmaps(&self) -> bool {
         unsafe { ffi::sk_texture_get_uses_mipmaps(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKTexture`.
     pub fn set_uses_mipmaps(&self, uses: bool) {
         unsafe { ffi::sk_texture_set_uses_mipmaps(self.ptr, uses) };
     }

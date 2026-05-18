@@ -13,19 +13,23 @@ impl AsNode for VideoNode {
 }
 
 impl VideoNode {
+    /// Wraps `SKVideoNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_video_node_new()) }
     }
 
+    /// Wraps `SKVideoNode`.
     pub fn play(&self) {
         unsafe { ffi::sk_video_node_play(self.ptr) };
     }
 
+    /// Wraps `SKVideoNode`.
     pub fn pause(&self) {
         unsafe { ffi::sk_video_node_pause(self.ptr) };
     }
 
+    /// Returns a property exposed by `SKVideoNode`.
     #[must_use]
     pub fn size(&self) -> CGSize {
         CGSize::new(unsafe { ffi::sk_video_node_get_size_w(self.ptr) }, unsafe {
@@ -33,10 +37,12 @@ impl VideoNode {
         })
     }
 
+    /// Sets a property exposed by `SKVideoNode`.
     pub fn set_size(&self, size: CGSize) {
         unsafe { ffi::sk_video_node_set_size(self.ptr, size.width, size.height) };
     }
 
+    /// Returns a property exposed by `SKVideoNode`.
     #[must_use]
     pub fn anchor_point(&self) -> CGPoint {
         CGPoint::new(
@@ -45,6 +51,7 @@ impl VideoNode {
         )
     }
 
+    /// Sets a property exposed by `SKVideoNode`.
     pub fn set_anchor_point(&self, anchor: CGPoint) {
         unsafe { ffi::sk_video_node_set_anchor_point(self.ptr, anchor.x, anchor.y) };
     }

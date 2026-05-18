@@ -11,6 +11,7 @@ impl AsNode for ReferenceNode {
 }
 
 impl ReferenceNode {
+    /// Wraps `SKReferenceNode`.
     #[must_use]
     pub fn with_file_named(file_name: &str) -> Option<Self> {
         let file_name = cstring_from_str(file_name)?;
@@ -21,12 +22,14 @@ impl ReferenceNode {
         }
     }
 
+    /// Wraps `SKReferenceNode`.
     #[must_use]
     pub fn with_url_path(path: &str) -> Option<Self> {
         let path = cstring_from_str(path)?;
         unsafe { Self::from_raw(ffi::sk_reference_node_new_with_url_path(path.as_ptr())) }
     }
 
+    /// Wraps `SKReferenceNode`.
     pub fn resolve_reference_node(&self) {
         unsafe { ffi::sk_reference_node_resolve(self.ptr) };
     }

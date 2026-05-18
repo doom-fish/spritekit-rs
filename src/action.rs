@@ -9,6 +9,7 @@ use crate::warp::AsWarpGeometry;
 
 handle_type!(Action);
 
+/// Enum for `SKActionTimingMode`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(i32)]
 pub enum ActionTimingMode {
@@ -20,6 +21,7 @@ pub enum ActionTimingMode {
 }
 
 impl ActionTimingMode {
+    /// Converts a raw value from `SKActionTimingMode`.
     #[must_use]
     pub const fn from_raw(value: i32) -> Self {
         match value {
@@ -32,81 +34,97 @@ impl ActionTimingMode {
 }
 
 impl Action {
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn move_by(dx: f64, dy: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_move_by(dx, dy, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn move_to(position: CGPoint, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_move_to(position.x, position.y, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn rotate_by(angle: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_rotate_by(angle, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn rotate_to(angle: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_rotate_to(angle, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn scale_by(scale: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_scale_by(scale, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn scale_to(scale: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_scale_to(scale, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn resize_to(width: f64, height: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_resize_to(width, height, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn scale_to_size(size: CGSize, duration: f64) -> Option<Self> {
         Self::resize_to(size.width, size.height, duration)
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn fade_in(duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_fade_in(duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn fade_out(duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_fade_out(duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn fade_to(alpha: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_fade_to(alpha, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn fade_alpha_by(alpha: f64, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_fade_alpha_by(alpha, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn hide() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_hide()) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn unhide() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_unhide()) }
     }
 
+    /// Sets a property exposed by `SKAction`.
     #[must_use]
     pub fn set_texture(texture: &Texture) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_set_texture(texture.as_ptr())) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn animate_with_textures(textures: &[&Texture], time_per_frame: f64) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = textures.iter().map(|texture| texture.as_ptr()).collect();
@@ -124,11 +142,13 @@ impl Action {
         }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn wait(duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_wait(duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn sequence(actions: &[&Self]) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = actions.iter().map(|action| action.as_ptr()).collect();
@@ -140,6 +160,7 @@ impl Action {
         unsafe { Self::from_raw(ffi::sk_action_sequence(raw_ptr, raw.len())) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn group(actions: &[&Self]) -> Option<Self> {
         let mut raw: Vec<*mut c_void> = actions.iter().map(|action| action.as_ptr()).collect();
@@ -151,41 +172,49 @@ impl Action {
         unsafe { Self::from_raw(ffi::sk_action_group(raw_ptr, raw.len())) }
     }
 
+    /// Returns a property exposed by `SKAction`.
     #[must_use]
     pub fn repeat_count(action: &Self, count: usize) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_repeat(action.as_ptr(), count)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn repeat_forever(action: &Self) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_repeat_forever(action.as_ptr())) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn change_charge_to(value: f32, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_change_charge_to(value, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn apply_force(force: CGVector, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_apply_force(force.dx, force.dy, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn play() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_play()) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn change_volume_to(value: f32, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_change_volume_to(value, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn stereo_pan_to(value: f32, duration: f64) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_stereo_pan_to(value, duration)) }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn warp_to<W: AsWarpGeometry>(warp: &W, duration: f64) -> Option<Self> {
         unsafe {
@@ -196,6 +225,7 @@ impl Action {
         }
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn animate_with_warps<W: AsWarpGeometry>(warps: &[&W], times: &[f64]) -> Option<Self> {
         if warps.len() != times.len() {
@@ -219,33 +249,40 @@ impl Action {
         }
     }
 
+    /// Returns a property exposed by `SKAction`.
     #[must_use]
     pub fn duration(&self) -> f64 {
         unsafe { ffi::sk_action_get_duration(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKAction`.
     pub fn set_duration(&self, duration: f64) {
         unsafe { ffi::sk_action_set_duration(self.ptr, duration) };
     }
 
+    /// Returns a property exposed by `SKAction`.
     #[must_use]
     pub fn timing_mode(&self) -> ActionTimingMode {
         ActionTimingMode::from_raw(unsafe { ffi::sk_action_get_timing_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKAction`.
     pub fn set_timing_mode(&self, mode: ActionTimingMode) {
         unsafe { ffi::sk_action_set_timing_mode(self.ptr, mode as i32) };
     }
 
+    /// Returns a property exposed by `SKAction`.
     #[must_use]
     pub fn speed(&self) -> f64 {
         unsafe { ffi::sk_action_get_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKAction`.
     pub fn set_speed(&self, speed: f64) {
         unsafe { ffi::sk_action_set_speed(self.ptr, speed) };
     }
 
+    /// Wraps `SKAction`.
     #[must_use]
     pub fn reversed(&self) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_reversed(self.ptr)) }

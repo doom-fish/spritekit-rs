@@ -9,6 +9,7 @@ use crate::texture::Texture;
 
 handle_type!(EmitterNode);
 
+/// Enum for `SKParticleRenderOrder`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 #[repr(u64)]
 pub enum ParticleRenderOrder {
@@ -19,6 +20,7 @@ pub enum ParticleRenderOrder {
 }
 
 impl ParticleRenderOrder {
+    /// Converts a raw value from `SKParticleRenderOrder`.
     #[must_use]
     pub const fn from_raw(value: u64) -> Self {
         match value {
@@ -36,24 +38,29 @@ impl AsNode for EmitterNode {
 }
 
 impl EmitterNode {
+    /// Wraps `SKEmitterNode`.
     #[must_use]
     pub fn new() -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_emitter_node_new()) }
     }
 
+    /// Wraps `SKEmitterNode`.
     pub fn advance_simulation_time(&self, seconds: f64) {
         unsafe { ffi::sk_emitter_node_advance_simulation_time(self.ptr, seconds) };
     }
 
+    /// Wraps `SKEmitterNode`.
     pub fn reset_simulation(&self) {
         unsafe { ffi::sk_emitter_node_reset_simulation(self.ptr) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_texture(&self) -> Option<Texture> {
         unsafe { Texture::from_raw(ffi::sk_emitter_node_get_particle_texture(self.ptr)) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_texture(&self, texture: Option<&Texture>) {
         unsafe {
             ffi::sk_emitter_node_set_particle_texture(
@@ -63,15 +70,18 @@ impl EmitterNode {
         };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_blend_mode(&self) -> BlendMode {
         BlendMode::from_raw(unsafe { ffi::sk_emitter_node_get_particle_blend_mode(self.ptr) })
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_blend_mode(&self, mode: BlendMode) {
         unsafe { ffi::sk_emitter_node_set_particle_blend_mode(self.ptr, mode as i32) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_render_order(&self) -> ParticleRenderOrder {
         ParticleRenderOrder::from_raw(unsafe {
@@ -79,16 +89,19 @@ impl EmitterNode {
         })
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_render_order(&self, order: ParticleRenderOrder) {
         unsafe { ffi::sk_emitter_node_set_particle_render_order(self.ptr, order as u64) };
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_color(&self, color: Color) {
         unsafe {
             ffi::sk_emitter_node_set_particle_color(self.ptr, color.r, color.g, color.b, color.a);
         };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_position(&self) -> CGPoint {
         CGPoint::new(
@@ -97,10 +110,12 @@ impl EmitterNode {
         )
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_position(&self, position: CGPoint) {
         unsafe { ffi::sk_emitter_node_set_particle_position(self.ptr, position.x, position.y) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_position_range(&self) -> CGVector {
         CGVector::new(
@@ -109,127 +124,155 @@ impl EmitterNode {
         )
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_position_range(&self, range: CGVector) {
         unsafe { ffi::sk_emitter_node_set_particle_position_range(self.ptr, range.dx, range.dy) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_speed(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_speed(&self, speed: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_speed(self.ptr, speed) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_speed_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_speed_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_speed_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_speed_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn emission_angle(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_emission_angle(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_emission_angle(&self, angle: f64) {
         unsafe { ffi::sk_emitter_node_set_emission_angle(self.ptr, angle) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn emission_angle_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_emission_angle_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_emission_angle_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_emission_angle_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn x_acceleration(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_x_acceleration(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_x_acceleration(&self, acceleration: f64) {
         unsafe { ffi::sk_emitter_node_set_x_acceleration(self.ptr, acceleration) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn y_acceleration(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_y_acceleration(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_y_acceleration(&self, acceleration: f64) {
         unsafe { ffi::sk_emitter_node_set_y_acceleration(self.ptr, acceleration) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_birth_rate(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_birth_rate(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_birth_rate(&self, birth_rate: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_birth_rate(self.ptr, birth_rate) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn num_particles_to_emit(&self) -> usize {
         unsafe { ffi::sk_emitter_node_get_num_particles_to_emit(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_num_particles_to_emit(&self, count: usize) {
         unsafe { ffi::sk_emitter_node_set_num_particles_to_emit(self.ptr, count) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_lifetime(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_lifetime(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_lifetime(&self, lifetime: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_lifetime(self.ptr, lifetime) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_lifetime_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_lifetime_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_lifetime_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_lifetime_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_rotation(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_rotation(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_rotation(&self, rotation: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_rotation(self.ptr, rotation) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_rotation_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_rotation_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_rotation_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_rotation_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_rotation_speed(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_rotation_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_rotation_speed(&self, speed: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_rotation_speed(self.ptr, speed) };
     }
 
+    /// Wraps `SKEmitterNode`.
     #[must_use]
     pub fn particle_size(&self) -> CGSize {
         CGSize::new(
@@ -238,73 +281,89 @@ impl EmitterNode {
         )
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_size(&self, size: CGSize) {
         unsafe { ffi::sk_emitter_node_set_particle_size(self.ptr, size.width, size.height) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_scale(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_scale(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_scale(&self, scale: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_scale(self.ptr, scale) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_scale_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_scale_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_scale_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_scale_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_scale_speed(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_scale_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_scale_speed(&self, speed: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_scale_speed(self.ptr, speed) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_alpha(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_alpha(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_alpha(&self, alpha: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_alpha(self.ptr, alpha) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_alpha_range(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_alpha_range(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_alpha_range(&self, range: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_alpha_range(self.ptr, range) };
     }
 
+    /// Returns a property exposed by `SKEmitterNode`.
     #[must_use]
     pub fn particle_alpha_speed(&self) -> f64 {
         unsafe { ffi::sk_emitter_node_get_particle_alpha_speed(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_particle_alpha_speed(&self, speed: f64) {
         unsafe { ffi::sk_emitter_node_set_particle_alpha_speed(self.ptr, speed) };
     }
 
+    /// Wraps `SKEmitterNode`.
     #[must_use]
     pub fn field_bitmask(&self) -> u32 {
         unsafe { ffi::sk_emitter_node_get_field_bitmask(self.ptr) }
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_field_bitmask(&self, mask: u32) {
         unsafe { ffi::sk_emitter_node_set_field_bitmask(self.ptr, mask) };
     }
 
+    /// Sets a property exposed by `SKEmitterNode`.
     pub fn set_target_node<N: AsNode>(&self, node: Option<&N>) {
         unsafe {
             ffi::sk_emitter_node_set_target_node(

@@ -58,16 +58,19 @@ extern "C" fn physics_contact_delegate_release(context: *mut c_void) {
 }
 
 impl PhysicsContact {
+    /// Wraps `SKPhysicsContact`.
     #[must_use]
     pub fn body_a(&self) -> Option<PhysicsBody> {
         unsafe { PhysicsBody::from_raw(ffi::sk_physics_contact_get_body_a(self.ptr)) }
     }
 
+    /// Wraps `SKPhysicsContact`.
     #[must_use]
     pub fn body_b(&self) -> Option<PhysicsBody> {
         unsafe { PhysicsBody::from_raw(ffi::sk_physics_contact_get_body_b(self.ptr)) }
     }
 
+    /// Wraps `SKPhysicsContact`.
     #[must_use]
     pub fn contact_point(&self) -> CGPoint {
         CGPoint::new(
@@ -76,6 +79,7 @@ impl PhysicsContact {
         )
     }
 
+    /// Wraps `SKPhysicsContact`.
     #[must_use]
     pub fn contact_normal(&self) -> CGVector {
         CGVector::new(
@@ -84,6 +88,7 @@ impl PhysicsContact {
         )
     }
 
+    /// Wraps `SKPhysicsContact`.
     #[must_use]
     pub fn collision_impulse(&self) -> f64 {
         unsafe { ffi::sk_physics_contact_get_collision_impulse(self.ptr) }
@@ -91,11 +96,13 @@ impl PhysicsContact {
 }
 
 impl PhysicsContactDelegate {
+    /// Wraps `SKPhysicsContactDelegate`.
     #[must_use]
     pub fn new() -> Option<Self> {
         Self::from_callbacks(None::<fn(PhysicsContact)>, None::<fn(PhysicsContact)>)
     }
 
+    /// Wraps `SKPhysicsContactDelegate`.
     #[must_use]
     pub fn from_callbacks<FB, FE>(did_begin: Option<FB>, did_end: Option<FE>) -> Option<Self>
     where

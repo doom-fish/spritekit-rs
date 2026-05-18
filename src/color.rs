@@ -9,41 +9,49 @@ pub struct Color {
 }
 
 impl Color {
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
         Self { r, g, b, a }
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn rgb(r: f32, g: f32, b: f32) -> Self {
         Self::rgba(r, g, b, 1.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn black() -> Self {
         Self::rgb(0.0, 0.0, 0.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn white() -> Self {
         Self::rgb(1.0, 1.0, 1.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn red() -> Self {
         Self::rgb(1.0, 0.0, 0.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn green() -> Self {
         Self::rgb(0.0, 1.0, 0.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn blue() -> Self {
         Self::rgb(0.0, 0.0, 1.0)
     }
 
+    /// Wraps `SKColor`.
     #[must_use]
     pub const fn clear() -> Self {
         Self::rgba(0.0, 0.0, 0.0, 0.0)
