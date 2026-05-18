@@ -68,10 +68,10 @@ impl Texture {
         unsafe {
             Self::from_raw(ffi::sk_texture_subrect(
                 self.ptr,
-                rect.x,
-                rect.y,
-                rect.width,
-                rect.height,
+                rect.origin.x,
+                rect.origin.y,
+                rect.size.width,
+                rect.size.height,
             ))
         }
     }

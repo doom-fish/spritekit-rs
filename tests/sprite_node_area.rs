@@ -19,10 +19,10 @@ fn sprite_node_tracks_textures_and_masks() {
     assert!(sprite.normal_texture().is_some());
     assert!((anchor.x - 0.2).abs() < 1e-6);
     assert!((anchor.y - 0.8).abs() < 1e-6);
-    assert!((center.x - 0.2).abs() < 1e-6);
-    assert!((center.y - 0.2).abs() < 1e-6);
-    assert!((center.width - 0.6).abs() < 1e-6);
-    assert!((center.height - 0.6).abs() < 1e-6);
+    assert!((center.origin.x - 0.2).abs() < 1e-6);
+    assert!((center.origin.y - 0.2).abs() < 1e-6);
+    assert!((center.size.width - 0.6).abs() < 1e-6);
+    assert!((center.size.height - 0.6).abs() < 1e-6);
     assert_eq!(sprite.lighting_bitmask(), 7);
     assert_eq!(sprite.shadow_cast_bitmask(), 3);
     assert_eq!(sprite.shadowed_bitmask(), 5);

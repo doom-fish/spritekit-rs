@@ -19,10 +19,10 @@ impl ShapeNode {
     pub fn with_rect(rect: CGRect) -> Option<Self> {
         unsafe {
             Self::from_raw(ffi::sk_shape_node_new_with_rect(
-                rect.x,
-                rect.y,
-                rect.width,
-                rect.height,
+                rect.origin.x,
+                rect.origin.y,
+                rect.size.width,
+                rect.size.height,
             ))
         }
     }

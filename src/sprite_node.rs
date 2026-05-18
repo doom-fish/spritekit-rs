@@ -187,7 +187,13 @@ impl SpriteNode {
     /// Sets a property exposed by `SKSpriteNode`.
     pub fn set_center_rect(&self, rect: CGRect) {
         unsafe {
-            ffi::sk_sprite_node_set_center_rect(self.ptr, rect.x, rect.y, rect.width, rect.height);
+            ffi::sk_sprite_node_set_center_rect(
+                self.ptr,
+                rect.origin.x,
+                rect.origin.y,
+                rect.size.width,
+                rect.size.height,
+            );
         };
     }
 

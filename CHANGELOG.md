@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-18
+
+### Changed
+
+- Updated `apple-cf` to the `0.8.x` release line and widened the Metal dependency range so Cargo can resolve the new dependency graph
+- Migrated `CGRect` field access to the nested `origin`/`size` layout and replaced struct literals with `CGRect::new(...)`
+- Bumped the crate version for the `apple-cf 0.8` compatibility release
+
 ## [0.2.3] - 2026-05-18
 
 ### Changed

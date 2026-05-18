@@ -49,10 +49,10 @@ impl PhysicsBody {
     pub fn edge_loop_rect(rect: CGRect) -> Option<Self> {
         unsafe {
             Self::from_raw(ffi::sk_physics_body_edge_loop_rect(
-                rect.x,
-                rect.y,
-                rect.width,
-                rect.height,
+                rect.origin.x,
+                rect.origin.y,
+                rect.size.width,
+                rect.size.height,
             ))
         }
     }

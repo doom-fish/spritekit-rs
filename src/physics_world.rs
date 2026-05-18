@@ -49,10 +49,10 @@ impl PhysicsWorld {
         unsafe {
             PhysicsBody::from_raw(ffi::sk_physics_world_body_in_rect(
                 self.ptr,
-                rect.x,
-                rect.y,
-                rect.width,
-                rect.height,
+                rect.origin.x,
+                rect.origin.y,
+                rect.size.width,
+                rect.size.height,
             ))
         }
     }

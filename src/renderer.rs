@@ -106,10 +106,10 @@ impl Renderer {
         unsafe {
             ffi::sk_renderer_render(
                 self.ptr,
-                viewport.x,
-                viewport.y,
-                viewport.width,
-                viewport.height,
+                viewport.origin.x,
+                viewport.origin.y,
+                viewport.size.width,
+                viewport.size.height,
                 command_buffer.as_ptr(),
                 pass_descriptor.as_ptr(),
             );

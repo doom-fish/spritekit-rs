@@ -76,10 +76,10 @@ impl View {
     pub fn with_frame(frame: CGRect) -> Option<Self> {
         unsafe {
             Self::from_raw(ffi::sk_view_new_with_frame(
-                frame.x,
-                frame.y,
-                frame.width,
-                frame.height,
+                frame.origin.x,
+                frame.origin.y,
+                frame.size.width,
+                frame.size.height,
             ))
         }
     }
