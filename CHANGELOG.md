@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.2] - 2026-05-20
+
+### Added
+
+- Wrapped `SKMutableTexture.modifyPixelDataWithBlock:` as `MutableTexture::modify_pixel_data`.
+- Wrapped `SKTextureAtlas` completion-handler preloading APIs, including the named-atlas result callback.
+- Added an optional `async` feature with `TextureAtlas::*_async` helpers for atlas preloading callbacks.
+
+### Notes
+
+- Phase 32 completeness + async sweep.
+- Bumped the crate version from `0.3.1` to `0.3.2`, refreshed the coverage docs, and added headless smoke coverage for the new callback and async surfaces.
+
 ## [0.3.1] - 2026-05-18
 
 - Widen apple-cf version bound to `<0.10` so 0.9.x resolves.

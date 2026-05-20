@@ -43,10 +43,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68ab91017fe16c622486840e4c83c9a37afeff978bd239b5293d61ece587de66"
 
 [[package]]
-name = "spritekit-rs"
+name = "pollster"
 version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "22686f4785f02a4fcc856d3b3bb19bf6c8160d103f7a99cc258bddd0251dc7f2"
+
+[[package]]
+name = "spritekit-rs"
+version = "0.3.2"
 dependencies = [
  "apple-cf 0.8.0",
  "apple-metal",
  "libc",
+ "pollster",
 ]

@@ -1,3 +1,6 @@
+use std::sync::mpsc;
+use std::time::Duration;
+
 use spritekit::{
     Action, Attribute, AttributeType, AttributeValue, CGPoint, CGRect, CGSize, CGVector,
     CameraNode, Color, CropNode, EffectNode, EmitterNode, Event, FieldNode, MutableTexture, Node,
@@ -8,6 +11,8 @@ use spritekit::{
     TransformNode, Transition, TransitionDirection, UniformType, View, ViewDelegate,
     WarpGeometryGrid, WarpableNode,
 };
+
+const CALLBACK_TIMEOUT: Duration = Duration::from_secs(5);
 
 #[test]
 fn foundation_wrappers_smoke() {
@@ -268,4 +273,71 @@ fn physics_contact_delegate_and_limit_joint_smoke() {
     }
 
     world.set_contact_delegate(None);
+}
+
+#[test]
+fn mutable_texture_modify_pixel_data_smoke() {
+    let texture = MutableTexture::with_size(CGSize::new(2.0, 2.0)).expect("mutable texture");
+    let (tx, rx) = mpsc::channel();
+    texture.modify_pixel_data(move |pixels| {
+        for pixel in pixels.chunks_exact_mut(4) {
+            pixel.copy_from_slice(&[255, 0, 0, 255]);
+        }
+        let _ = tx.send(pixels.len());
+    });
+
+    assert_eq!(
+        rx.recv_timeout(CALLBACK_TIMEOUT)
+            .expect("mutable texture callback"),
+        16
+    );
+}
+
+#[test]
+fn texture_atlas_preload_callbacks_smoke() {
+    let atlas = TextureAtlas::named("MissingAtlas").expect("atlas handle");
+
+    let (instance_tx, instance_rx) = mpsc::channel();
+    atlas.preload_with_completion_handler(move || {
+        let _ = instance_tx.send(());
+    });
+    instance_rx
+        .recv_timeout(CALLBACK_TIMEOUT)
+        .expect("instance preload callback");
+
+    let (class_tx, class_rx) = mpsc::channel();
+    TextureAtlas::preload_texture_atlases_with_completion_handler(&[&atlas], move || {
+        let _ = class_tx.send(());
+    });
+    class_rx
+        .recv_timeout(CALLBACK_TIMEOUT)
+        .expect("class preload callback");
+
+    let (named_tx, named_rx) = mpsc::channel();
+    TextureAtlas::preload_texture_atlases_named_with_completion_handler(&[], move |result| {
+        let _ = named_tx.send(result.map(|atlases| atlases.len()).map_err(|error| error.to_string()));
+    })
+    .expect("named preload scheduling");
+    assert_eq!(
+        named_rx
+            .recv_timeout(CALLBACK_TIMEOUT)
+            .expect("named preload callback")
+            .expect("named preload result"),
+        0
+    );
+}
+
+#[cfg(feature = "async")]
+#[test]
+fn texture_atlas_async_smoke() {
+    let atlas = TextureAtlas::named("MissingAtlas").expect("atlas handle");
+
+    pollster::block_on(async {
+        atlas.preload_async().await;
+        TextureAtlas::preload_texture_atlases_async(&[&atlas]).await;
+        let atlases = TextureAtlas::preload_texture_atlases_named_async(&[])
+            .await
+            .expect("named async preload");
+        assert!(atlases.is_empty());
+    });
 }

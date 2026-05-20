@@ -1,6 +1,6 @@
 # SpriteKit coverage map
 
-This release tracks coverage by SpriteKit logical area rather than by every individual selector. `v0.2.1` also closes the remaining public-header symbol gaps tracked in `COVERAGE_AUDIT.md`, so this file focuses on practical area coverage and the few still-intentional headless validation omissions.
+This release tracks coverage by SpriteKit logical area rather than by every individual selector. `v0.3.2` keeps the crate at full public-header symbol coverage while also closing the mutable-texture and atlas-preloading sweep gaps, so this file focuses on practical area coverage and the few still-intentional headless validation omissions.
 
 Status key:
 
@@ -40,7 +40,8 @@ Status key:
 | `NSEvent (SKNodeEvent)` / `SKNode (NSAccessibility)` / `SKReachConstraints` | ✅ implemented | `src/event.rs`, `src/node.rs`, `src/reach_constraints.rs` | — | macOS event-to-node coordinate conversion plus node accessibility and reach-constraint helpers. |
 | `SKCameraNode` / `SKSceneDelegate` / `SKViewDelegate` / `SKTransition` | ✅ implemented | `src/camera_node.rs`, `src/scene.rs`, `src/view.rs`, `src/transition.rs` | `examples/10_view_present_scene.rs` | Camera attachment, scene/view delegates, and transition-driven presentation are exposed. |
 | `SKCropNode` / `SKFieldNode` / `SKRegion` / `SKReferenceNode` / `SKShapeNode` / `SKTransformNode` | ✅ implemented | `src/crop_node.rs`, `src/field_node.rs`, `src/region.rs`, `src/reference_node.rs`, `src/shape_node.rs`, `src/transform_node.rs` | — | Additional node families and region helpers are covered by `tests/coverage_fill_area.rs`. |
-| `SKMutableTexture` / `SKTextureAtlas` | 🟡 partial | `src/mutable_texture.rs`, `src/texture_atlas.rs` | — | Size, creation, and lookup helpers are exposed; advanced mutable-texture update callbacks and async atlas preloading are still omitted. |
+| `SKMutableTexture` | ✅ implemented | `src/mutable_texture.rs`, `src/ffi/texture_extras.rs` | — | Size, constructors, and `modify_pixel_data` callback updates are exposed and covered by `tests/coverage_fill_area.rs`. |
+| `SKTextureAtlas` | ✅ implemented | `src/texture_atlas.rs`, `src/ffi/texture_extras.rs` | — | Naming, texture lookup, completion-handler preloading, and optional `async` feature futures are exposed and covered by `tests/coverage_fill_area.rs`. |
 | `SKPhysicsContact` / `SKPhysicsContactDelegate` | ✅ implemented | `src/physics_contact.rs`, `src/ffi/physics_contact.rs` | — | Contact inspection and delegate bridging are exposed on `PhysicsWorld`. |
 | `SKTileDefinition` / `SKTileGroupRule` / `SKTileGroup` / `SKTileSet` / `SKTileMapNode` | ✅ implemented | `src/tile.rs`, `src/ffi/tile.rs` | — | Tile definitions, adjacency masks, groups, sets, and map-node placement/query APIs are exposed. |
 | `SKWarpGeometry` / `SKWarpGeometryGrid` / `SKWarpable` | ✅ implemented | `src/warp.rs`, `src/ffi/warp.rs` | — | Grid construction, vertex replacement, warpable node accessors, and warp actions are exposed. |
@@ -56,7 +57,7 @@ Status key:
 
 The coverage above is backed by:
 
-- `cargo clippy --all-targets -- -D warnings`
-- `cargo test`
-- Running every example in `examples/*.rs`
-- `tests/coverage_fill_area.rs` for the newly added symbol-surface smoke coverage
+- `cargo build --all-features`
+- `cargo test --lib --all-features`
+- `cargo test --test coverage_fill_area --all-features`
+- `cargo clippy --all-targets --all-features -- -D warnings`

@@ -2,7 +2,7 @@
 
 Safe Rust bindings for Apple's [SpriteKit](https://developer.apple.com/documentation/spritekit) framework on macOS.
 
-> **Status:** v0.2.1 closes the remaining macOS SpriteKit header gaps and brings the crate to 100% symbol-level coverage in [`COVERAGE_AUDIT.md`](COVERAGE_AUDIT.md), while keeping the same retained-handle `screencapturekit-rs` bridge pattern.
+> **Status:** v0.3.2 keeps the crate at 100% symbol-level header coverage while closing the mutable-texture and atlas-preloading sweep gaps with callback and optional async wrappers, all on the same retained-handle `screencapturekit-rs` bridge pattern.
 
 ## Quick start
 
@@ -62,7 +62,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 - Bridge architecture follows the `screencapturekit-rs` pattern: per-area Rust modules, per-area Swift bridge files, `@_cdecl` exports, retained opaque handles, and explicit `sk_release` cleanup.
 - Scene graph coverage now spans `SKScene`, `SKNode`, `SKCameraNode`, `SKCropNode`, `SKShapeNode`, `SKTransformNode`, `SKSpriteNode`, `SKLabelNode`, `SKEffectNode`, `SKLightNode`, `SKFieldNode`, `SKReferenceNode`, and `SK3DNode`, plus shared `NodeExt` helpers for hierarchy, transforms, accessibility, actions, physics bodies, and reach constraints.
 - Animation and simulation coverage includes `SKAction` plus the physics-body, playback, mixer, audio-node, and warpable categories, `SKPhysicsBody`, `SKPhysicsWorld`, `SKPhysicsContact`/delegate bridging, `SKPhysicsJoint` wrappers including `SKPhysicsJointLimit`, `SKConstraint`/`SKRange`, and `SKKeyframeSequence`.
-- Rendering and asset coverage includes `SKTexture`, `SKMutableTexture`, `SKTextureAtlas`, `SKShader`, `SKAttribute`, `SKAttributeValue`, `SKTransition`, tile-map/tile-set APIs, warp geometry, `SKView`, and offline `SKRenderer` rendering into `apple-metal` textures.
+- Rendering and asset coverage includes `SKTexture`, `SKMutableTexture` pixel-data updates, `SKTextureAtlas` lookup plus completion-handler and optional `async` preloading, `SKShader`, `SKAttribute`, `SKAttributeValue`, `SKTransition`, tile-map/tile-set APIs, warp geometry, `SKView`, and offline `SKRenderer` rendering into `apple-metal` textures.
 - Media coverage includes `SKAudioNode` and `SKVideoNode` with asset-free AVFoundation-backed constructors for examples/tests.
 - The repository now includes 18 numbered examples under `examples/` and 18 focused integration tests under `tests/`, with dedicated smoke coverage for the newly added symbol surface.
 - Detailed logical-area status lives in [`COVERAGE.md`](COVERAGE.md), and the full header audit lives in [`COVERAGE_AUDIT.md`](COVERAGE_AUDIT.md).
@@ -82,6 +82,7 @@ cargo run --example 18_three_d_node_basic
 
 ## Coverage notes
 
+- `SKMutableTexture` now exposes `modify_pixel_data`, and `SKTextureAtlas` now exposes completion-handler preloading plus an optional `async` feature for atlas preload futures.
 - `SKPhysicsJointLimit` is now wrapped, but headless `SKPhysicsWorld.addJoint/removeJoint` flows still remain out of scope because `PhysicsKit` was unstable during direct validation.
 - `SKAudioNode` / `SKVideoNode` currently use default AVFoundation-backed constructors so examples and tests stay asset-free and deterministic.
 

@@ -1,4 +1,4 @@
-# spritekit-rs coverage audit (vs MacOSX26.2.sdk)
+# spritekit-rs coverage audit (vs MacOSX26.5.sdk)
 
 SDK_PUBLIC_SYMBOLS: 75
 VERIFIED: 75
@@ -43,7 +43,7 @@ Audit notes:
 | `SKLabelNode` | interface | `SKLabelNode.h` | `LabelNode` |
 | `SKLabelVerticalAlignmentMode` | enum | `SKLabelNode.h` | `VerticalAlignmentMode` |
 | `SKLightNode` | interface | `SKLightNode.h` | `LightNode` |
-| `SKMutableTexture` | interface | `SKMutableTexture.h` | `MutableTexture` |
+| `SKMutableTexture` | interface | `SKMutableTexture.h` | `MutableTexture::{with_size, with_size_pixel_format, modify_pixel_data}` |
 | `SKNode` | interface | `SKNode.h` | `Node + NodeExt` |
 | `SKNode (NSAccessibility)` | category | `SKNode+NSAccessibility.h` | `NodeExt::{is_accessibility_*, set_accessibility_*, accessibility_label}` |
 | `SKParticleRenderOrder` | enum | `SKEmitterNode.h` | `ParticleRenderOrder` |
@@ -70,7 +70,7 @@ Audit notes:
 | `SKShapeNode` | interface | `SKShapeNode.h` | `ShapeNode` |
 | `SKSpriteNode` | interface | `SKSpriteNode.h` | `SpriteNode` |
 | `SKTexture` | interface | `SKTexture.h` | `Texture` |
-| `SKTextureAtlas` | interface | `SKTextureAtlas.h` | `TextureAtlas` |
+| `SKTextureAtlas` | interface | `SKTextureAtlas.h` | `TextureAtlas::{named, texture_named, preload_*}` |
 | `SKTextureFilteringMode` | enum | `SKTexture.h` | `TextureFilteringMode` |
 | `SKTileAdjacencyMask` | enum | `SKTileSet.h` | `TileAdjacencyMask` |
 | `SKTileDefinition` | interface | `SKTileDefinition.h` | `TileDefinition` |
