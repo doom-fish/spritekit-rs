@@ -1,5 +1,4 @@
 use std::error::Error;
-use std::ffi::CStr;
 use std::fmt;
 
 /// Wrapper type for `SpriteKit`.
@@ -32,10 +31,5 @@ impl Error for SpriteKitError {}
 ///
 /// Follow the safety contract required by the underlying `SpriteKit` bridge failures API.
 pub(crate) unsafe fn take_string(ptr: *mut libc::c_char) -> Option<String> {
-    if ptr.is_null() {
-        return None;
-    }
-    let value = CStr::from_ptr(ptr).to_string_lossy().into_owned();
-    libc::free(ptr.cast());
-    Some(value)
+    doom_fish_utils::ffi_string::take_owned_cstring_c(ptr, |p| libc::free(p.cast()))
 }
