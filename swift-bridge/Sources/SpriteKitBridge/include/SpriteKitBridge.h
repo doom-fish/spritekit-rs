@@ -1,3 +1,0 @@
-#ifndef SPRITEKIT_BRIDGE_H
-#define SPRITEKIT_BRIDGE_H
-#endif
