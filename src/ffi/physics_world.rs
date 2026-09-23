@@ -29,4 +29,11 @@ extern "C" {
         end_x: f64,
         end_y: f64,
     ) -> *mut c_void;
+    pub fn sk_physics_world_add_joint(
+        world: *mut c_void,
+        joint: *mut c_void,
+        out_error: *mut *mut libc::c_char,
+    ) -> bool;
+    pub fn sk_physics_world_remove_joint(world: *mut c_void, joint: *mut c_void);
+    pub fn sk_physics_world_remove_all_joints(world: *mut c_void);
 }

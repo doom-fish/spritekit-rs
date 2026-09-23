@@ -47,3 +47,38 @@ public func sk_physics_world_body_along_ray(_ worldHandle: UnsafeMutableRawPoint
     guard let world: SKPhysicsWorld = skBorrow(worldHandle), let body = world.body(alongRayStart: CGPoint(x: startX, y: startY), end: CGPoint(x: endX, y: endY)) else { return nil }
     return skRetain(body)
 }
+
+@_cdecl("sk_physics_world_add_joint")
+public func sk_physics_world_add_joint(
+    _ worldHandle: UnsafeMutableRawPointer?,
+    _ jointHandle: UnsafeMutableRawPointer?,
+    _ outError: UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
+) -> Bool {
+    outError?.pointee = nil
+    guard let world: SKPhysicsWorld = skBorrow(worldHandle), let joint: SKPhysicsJoint = skBorrow(jointHandle) else {
+        outError?.pointee = skDup("missing physics world or joint")
+        return false
+    }
+    guard joint.bodyA.node?.scene != nil, joint.bodyB.node?.scene != nil else {
+        outError?.pointee = skDup("both joint bodies must be attached to nodes in a scene")
+        return false
+    }
+    guard !joint.bodyA.joints.contains(where: { $0 === joint }) else {
+        outError?.pointee = skDup("the joint was already added to a physics world")
+        return false
+    }
+    world.add(joint)
+    return true
+}
+
+@_cdecl("sk_physics_world_remove_joint")
+public func sk_physics_world_remove_joint(_ worldHandle: UnsafeMutableRawPointer?, _ jointHandle: UnsafeMutableRawPointer?) {
+    guard let world: SKPhysicsWorld = skBorrow(worldHandle), let joint: SKPhysicsJoint = skBorrow(jointHandle) else { return }
+    world.remove(joint)
+}
+
+@_cdecl("sk_physics_world_remove_all_joints")
+public func sk_physics_world_remove_all_joints(_ worldHandle: UnsafeMutableRawPointer?) {
+    guard let world: SKPhysicsWorld = skBorrow(worldHandle) else { return }
+    world.removeAllJoints()
+}

@@ -1,8 +1,10 @@
 use apple_cf::cg::{CGPoint, CGRect, CGVector};
 
+use crate::error::{bridge_result, SpriteKitError};
 use crate::ffi;
 use crate::physics_body::PhysicsBody;
 use crate::physics_contact::PhysicsContactDelegate;
+use crate::physics_joint::AsPhysicsJoint;
 use crate::private::handle_type;
 
 handle_type!(PhysicsWorld);
@@ -81,5 +83,21 @@ impl PhysicsWorld {
     #[must_use]
     pub fn has_contact_delegate(&self) -> bool {
         unsafe { ffi::sk_physics_world_has_contact_delegate(self.ptr) }
+    }
+
+    pub fn add_joint<J: AsPhysicsJoint>(&self, joint: &J) -> Result<(), SpriteKitError> {
+        let mut error = core::ptr::null_mut();
+        let added = unsafe {
+            ffi::sk_physics_world_add_joint(self.ptr, joint.as_joint_ptr(), &raw mut error)
+        };
+        unsafe { bridge_result(added, error, "SKPhysicsWorld refused the joint") }
+    }
+
+    pub fn remove_joint<J: AsPhysicsJoint>(&self, joint: &J) {
+        unsafe { ffi::sk_physics_world_remove_joint(self.ptr, joint.as_joint_ptr()) };
+    }
+
+    pub fn remove_all_joints(&self) {
+        unsafe { ffi::sk_physics_world_remove_all_joints(self.ptr) };
     }
 }
