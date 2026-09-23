@@ -49,7 +49,7 @@ public func sk_label_node_set_font_size(_ nodeHandle: UnsafeMutableRawPointer?, 
 @_cdecl("sk_label_node_get_vertical_alignment_mode")
 public func sk_label_node_get_vertical_alignment_mode(_ nodeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let node: SKLabelNode = skBorrow(nodeHandle) else { return 0 }
-    return Int32(node.verticalAlignmentMode.rawValue)
+    return Int32(clamping: node.verticalAlignmentMode.rawValue)
 }
 
 @_cdecl("sk_label_node_set_vertical_alignment_mode")
@@ -61,7 +61,7 @@ public func sk_label_node_set_vertical_alignment_mode(_ nodeHandle: UnsafeMutabl
 @_cdecl("sk_label_node_get_horizontal_alignment_mode")
 public func sk_label_node_get_horizontal_alignment_mode(_ nodeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let node: SKLabelNode = skBorrow(nodeHandle) else { return 0 }
-    return Int32(node.horizontalAlignmentMode.rawValue)
+    return Int32(clamping: node.horizontalAlignmentMode.rawValue)
 }
 
 @_cdecl("sk_label_node_set_horizontal_alignment_mode")
@@ -121,7 +121,7 @@ public func sk_label_node_set_color(_ nodeHandle: UnsafeMutableRawPointer?, _ r:
 @_cdecl("sk_label_node_get_blend_mode")
 public func sk_label_node_get_blend_mode(_ nodeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let node: SKLabelNode = skBorrow(nodeHandle) else { return 0 }
-    return Int32(node.blendMode.rawValue)
+    return Int32(clamping: node.blendMode.rawValue)
 }
 
 @_cdecl("sk_label_node_set_blend_mode")

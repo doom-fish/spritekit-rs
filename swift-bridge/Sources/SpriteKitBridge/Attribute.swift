@@ -15,7 +15,7 @@ public func sk_attribute_copy_name(_ attributeHandle: UnsafeMutableRawPointer?) 
 @_cdecl("sk_attribute_get_type")
 public func sk_attribute_get_type(_ attributeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let attribute: SKAttribute = skBorrow(attributeHandle) else { return 0 }
-    return Int32(attribute.type.rawValue)
+    return Int32(clamping: attribute.type.rawValue)
 }
 
 @_cdecl("sk_attribute_value_new_with_float")

@@ -116,7 +116,7 @@ public func sk_sprite_node_set_color_blend_factor(_ nodeHandle: UnsafeMutableRaw
 @_cdecl("sk_sprite_node_get_blend_mode")
 public func sk_sprite_node_get_blend_mode(_ nodeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let node: SKSpriteNode = skBorrow(nodeHandle) else { return 0 }
-    return Int32(node.blendMode.rawValue)
+    return Int32(clamping: node.blendMode.rawValue)
 }
 
 @_cdecl("sk_sprite_node_set_blend_mode")

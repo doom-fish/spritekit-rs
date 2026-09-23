@@ -32,7 +32,7 @@ public func sk_effect_node_set_should_rasterize(_ nodeHandle: UnsafeMutableRawPo
 @_cdecl("sk_effect_node_get_blend_mode")
 public func sk_effect_node_get_blend_mode(_ nodeHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let node: SKEffectNode = skBorrow(nodeHandle) else { return 0 }
-    return Int32(node.blendMode.rawValue)
+    return Int32(clamping: node.blendMode.rawValue)
 }
 
 @_cdecl("sk_effect_node_set_blend_mode")

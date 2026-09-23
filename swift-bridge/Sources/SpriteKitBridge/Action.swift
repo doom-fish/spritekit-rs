@@ -174,7 +174,7 @@ public func sk_action_set_duration(_ actionHandle: UnsafeMutableRawPointer?, _ d
 @_cdecl("sk_action_get_timing_mode")
 public func sk_action_get_timing_mode(_ actionHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let action: SKAction = skBorrow(actionHandle) else { return 0 }
-    return Int32(action.timingMode.rawValue)
+    return Int32(clamping: action.timingMode.rawValue)
 }
 
 @_cdecl("sk_action_set_timing_mode")

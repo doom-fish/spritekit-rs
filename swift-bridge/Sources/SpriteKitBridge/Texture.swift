@@ -50,7 +50,7 @@ public func sk_texture_get_size_h(_ textureHandle: UnsafeMutableRawPointer?) -> 
 @_cdecl("sk_texture_get_filtering_mode")
 public func sk_texture_get_filtering_mode(_ textureHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let texture: SKTexture = skBorrow(textureHandle) else { return 0 }
-    return Int32(texture.filteringMode.rawValue)
+    return Int32(clamping: texture.filteringMode.rawValue)
 }
 
 @_cdecl("sk_texture_set_filtering_mode")

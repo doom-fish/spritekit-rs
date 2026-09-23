@@ -82,7 +82,7 @@ public func sk_scene_set_size(_ sceneHandle: UnsafeMutableRawPointer?, _ width: 
 @_cdecl("sk_scene_get_scale_mode")
 public func sk_scene_get_scale_mode(_ sceneHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let scene: SKScene = skBorrow(sceneHandle) else { return 0 }
-    return Int32(scene.scaleMode.rawValue)
+    return Int32(clamping: scene.scaleMode.rawValue)
 }
 
 @_cdecl("sk_scene_set_scale_mode")

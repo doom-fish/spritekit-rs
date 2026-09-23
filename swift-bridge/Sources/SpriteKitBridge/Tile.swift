@@ -65,13 +65,13 @@ public func sk_tile_definition_set_size(_ definitionHandle: UnsafeMutableRawPoin
 @_cdecl("sk_tile_definition_get_placement_weight")
 public func sk_tile_definition_get_placement_weight(_ definitionHandle: UnsafeMutableRawPointer?) -> UInt64 {
     guard let definition: SKTileDefinition = skBorrow(definitionHandle) else { return 0 }
-    return UInt64(definition.placementWeight)
+    return UInt64(clamping: definition.placementWeight)
 }
 
 @_cdecl("sk_tile_definition_set_placement_weight")
 public func sk_tile_definition_set_placement_weight(_ definitionHandle: UnsafeMutableRawPointer?, _ weight: UInt64) {
     guard let definition: SKTileDefinition = skBorrow(definitionHandle) else { return }
-    definition.placementWeight = Int(weight)
+    definition.placementWeight = Int(clamping: weight)
 }
 
 @_cdecl("sk_tile_definition_get_rotation")

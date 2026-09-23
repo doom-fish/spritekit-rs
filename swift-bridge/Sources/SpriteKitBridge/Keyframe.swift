@@ -55,7 +55,7 @@ public func sk_keyframe_sequence_sample_scalar(_ sequenceHandle: UnsafeMutableRa
 @_cdecl("sk_keyframe_sequence_get_interpolation_mode")
 public func sk_keyframe_sequence_get_interpolation_mode(_ sequenceHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let sequence: SKKeyframeSequence = skBorrow(sequenceHandle) else { return 1 }
-    return Int32(sequence.interpolationMode.rawValue)
+    return Int32(clamping: sequence.interpolationMode.rawValue)
 }
 
 @_cdecl("sk_keyframe_sequence_set_interpolation_mode")
@@ -67,7 +67,7 @@ public func sk_keyframe_sequence_set_interpolation_mode(_ sequenceHandle: Unsafe
 @_cdecl("sk_keyframe_sequence_get_repeat_mode")
 public func sk_keyframe_sequence_get_repeat_mode(_ sequenceHandle: UnsafeMutableRawPointer?) -> Int32 {
     guard let sequence: SKKeyframeSequence = skBorrow(sequenceHandle) else { return 1 }
-    return Int32(sequence.repeatMode.rawValue)
+    return Int32(clamping: sequence.repeatMode.rawValue)
 }
 
 @_cdecl("sk_keyframe_sequence_set_repeat_mode")

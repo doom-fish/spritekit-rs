@@ -53,7 +53,7 @@ public func sk_shader_get_uniform_type(_ shaderHandle: UnsafeMutableRawPointer?,
           let outValue,
           let uniform = shader.uniformNamed(String(cString: name))
     else { return false }
-    outValue.pointee = Int32(uniform.uniformType.rawValue)
+    outValue.pointee = Int32(clamping: uniform.uniformType.rawValue)
     return true
 }
 
