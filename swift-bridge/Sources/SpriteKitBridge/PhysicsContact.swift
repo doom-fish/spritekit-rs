@@ -37,45 +37,57 @@ private final class PhysicsContactDelegateBridge: NSObject, SKPhysicsContactDele
     }
 }
 
+private func skBorrowContact(_ handle: UnsafeMutableRawPointer?) -> SKPhysicsContact? {
+    guard let handle else { return nil }
+    let object = Unmanaged<AnyObject>.fromOpaque(handle).takeUnretainedValue()
+    if let contact = object as? SKPhysicsContact {
+        return contact
+    }
+    guard object.responds(to: #selector(getter: SKPhysicsContact.bodyA)),
+          object.responds(to: #selector(getter: SKPhysicsContact.contactPoint))
+    else { return nil }
+    return unsafeBitCast(object, to: SKPhysicsContact.self)
+}
+
 @_cdecl("sk_physics_contact_get_body_a")
 public func sk_physics_contact_get_body_a(_ contactHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return nil }
+    guard let contact = skBorrowContact(contactHandle) else { return nil }
     return skRetain(contact.bodyA)
 }
 
 @_cdecl("sk_physics_contact_get_body_b")
 public func sk_physics_contact_get_body_b(_ contactHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return nil }
+    guard let contact = skBorrowContact(contactHandle) else { return nil }
     return skRetain(contact.bodyB)
 }
 
 @_cdecl("sk_physics_contact_get_contact_point_x")
 public func sk_physics_contact_get_contact_point_x(_ contactHandle: UnsafeMutableRawPointer?) -> Double {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return 0 }
+    guard let contact = skBorrowContact(contactHandle) else { return 0 }
     return Double(contact.contactPoint.x)
 }
 
 @_cdecl("sk_physics_contact_get_contact_point_y")
 public func sk_physics_contact_get_contact_point_y(_ contactHandle: UnsafeMutableRawPointer?) -> Double {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return 0 }
+    guard let contact = skBorrowContact(contactHandle) else { return 0 }
     return Double(contact.contactPoint.y)
 }
 
 @_cdecl("sk_physics_contact_get_contact_normal_dx")
 public func sk_physics_contact_get_contact_normal_dx(_ contactHandle: UnsafeMutableRawPointer?) -> Double {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return 0 }
+    guard let contact = skBorrowContact(contactHandle) else { return 0 }
     return Double(contact.contactNormal.dx)
 }
 
 @_cdecl("sk_physics_contact_get_contact_normal_dy")
 public func sk_physics_contact_get_contact_normal_dy(_ contactHandle: UnsafeMutableRawPointer?) -> Double {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return 0 }
+    guard let contact = skBorrowContact(contactHandle) else { return 0 }
     return Double(contact.contactNormal.dy)
 }
 
 @_cdecl("sk_physics_contact_get_collision_impulse")
 public func sk_physics_contact_get_collision_impulse(_ contactHandle: UnsafeMutableRawPointer?) -> Double {
-    guard let contact: SKPhysicsContact = skBorrow(contactHandle) else { return 0 }
+    guard let contact = skBorrowContact(contactHandle) else { return 0 }
     return Double(contact.collisionImpulse)
 }
 
