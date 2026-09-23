@@ -4,29 +4,17 @@ version = 3
 
 [[package]]
 name = "apple-cf"
-version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67ba5e8f49a0239ddb14da08ad41bb28b46880252bf4831380de20709c996574"
+version = "0.11.0"
 dependencies = [
- "doom-fish-utils 0.2.1",
-]
-
-[[package]]
-name = "apple-cf"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d110ec64ba49edcbc97fb77907ae336be72f6a89e0e1ca6be155f6e9b146e204"
-dependencies = [
- "doom-fish-utils 0.2.1",
+ "doom-fish-utils",
 ]
 
 [[package]]
 name = "apple-metal"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0c72da91f3ffaacd8375f80bf6c9ca40c44150e979e6e50b084fbb596cc0ccc4"
+version = "0.10.0"
 dependencies = [
- "apple-cf 0.7.1",
+ "apple-cf",
+ "doom-fish-utils",
  "libc",
 ]
 
@@ -47,13 +35,7 @@ checksum = "d0a5c400df2834b80a4c3327b3aad3a4c4cd4de0629063962b03235697506a28"
 
 [[package]]
 name = "doom-fish-utils"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "075caf2993a45abe1c2e60d8d1514ce43f947fcbcd31de19db0075e80e20c6a7"
-
-[[package]]
-name = "doom-fish-utils"
-version = "0.3.2"
+version = "0.4.1"
 dependencies = [
  "crossbeam-queue",
  "futures-util",
@@ -104,9 +86,9 @@ checksum = "22686f4785f02a4fcc856d3b3bb19bf6c8160d103f7a99cc258bddd0251dc7f2"
 name = "spritekit-rs"
 version = "0.3.3"
 dependencies = [
- "apple-cf 0.8.0",
+ "apple-cf",
  "apple-metal",
- "doom-fish-utils 0.3.2",
+ "doom-fish-utils",
  "libc",
  "pollster",
 ]

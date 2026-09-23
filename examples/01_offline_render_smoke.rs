@@ -19,12 +19,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a shared BGRA8 render-target texture.
     let texture = device
         .new_texture(TextureDescriptor {
-            pixel_format: pixel_format::BGRA8UNORM,
-            width: WIDTH,
-            height: HEIGHT,
-            mipmapped: false,
             usage: texture_usage::RENDER_TARGET | texture_usage::SHADER_READ,
             storage_mode: storage_mode::SHARED,
+            ..TextureDescriptor::new_2d(WIDTH, HEIGHT, pixel_format::BGRA8UNORM)
         })
         .ok_or("failed to allocate render target texture")?;
 
@@ -61,8 +58,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &pass,
     );
 
-    command_buffer.commit();
-    command_buffer.wait_until_completed();
+    command_buffer.commit()?;
+    command_buffer.wait_until_completed()?;
 
     // Read pixels back and assert at least one non-zero byte.
     let pixels = read_texture_bytes(&texture)?;
