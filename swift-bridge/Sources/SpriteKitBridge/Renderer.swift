@@ -41,10 +41,14 @@ public func sk_render_pass_descriptor_new_for_texture(
     return skRetain(box)
 }
 
+private let skRendererCreationLock = NSLock()
+
 @_cdecl("sk_renderer_new")
 public func sk_renderer_new(_ deviceHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
     let device: MTLDevice? = skBorrow(deviceHandle)
     guard let device else { return nil }
+    skRendererCreationLock.lock()
+    defer { skRendererCreationLock.unlock() }
     return skRetain(SKRenderer(device: device))
 }
 
