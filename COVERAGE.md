@@ -1,26 +1,25 @@
 # SpriteKit coverage map
 
-This release tracks coverage by SpriteKit logical area rather than by every individual selector. `v0.3.2` keeps the crate at full public-header symbol coverage while also closing the mutable-texture and atlas-preloading sweep gaps, so this file focuses on practical area coverage and the few still-intentional headless validation omissions.
+This file tracks coverage by SpriteKit logical area rather than by every individual selector. `COVERAGE_AUDIT.md` counts a public type, protocol or category as verified when at least one Rust API reaches it; that 100% figure is symbol-level only and does not mean every selector of a class is wrapped. The partial rows below list the known selector-level gaps.
 
 Status key:
 
 - `✅ implemented` — the crate exposes a useful core surface for the logical area and it is covered by examples/tests.
 - `🟡 partial` — the crate exposes a meaningful subset, but some constructors or API families are intentionally omitted.
-- `⏭️ skipped` — intentionally not exposed in this release.
 
 ## Requested logical areas
 
 | Area | Status | Rust modules | Example | Test | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `SKScene` | ✅ implemented | `src/scene.rs`, `src/ffi/scene.rs` | `examples/02_scene_basics.rs` | `tests/scene_area.rs` | Size, scale mode, background color, anchor point, camera attachment, scene delegates, physics world, attached view, point conversion. |
-| `SKNode` | ✅ implemented | `src/node.rs`, `src/ffi/node.rs` | `examples/03_node_hierarchy.rs` | `tests/node_area.rs` | Hierarchy, naming, frames, transforms, visibility, speed, physics body attachment, accessibility, reach constraints, actions, point containment. |
-| `SKAction` | ✅ implemented | `src/action.rs`, `src/ffi/action.rs` | `examples/04_action_basics.rs` | `tests/action_area.rs` | Core movement, rotation, scale, resize, fade, texture animation, grouping/repetition, timing properties, reverse, plus playback, mixer, audio-node, physics-body, and warp helpers. |
+| `SKScene` | ✅ implemented | `src/scene.rs`, `src/ffi/scene.rs` | `examples/02_scene_basics.rs` | `tests/scene_area.rs`, `tests/delegate_lifetime_tests.rs` | Size, scale mode, background color, anchor point, camera attachment, physics world, attached view (main thread only), point conversion, and a scene delegate with `update`, `didEvaluateActions`, `didSimulatePhysics`, `didApplyConstraints` and `didFinishUpdate`. |
+| `SKNode` | ✅ implemented | `src/node.rs`, `src/ffi/node.rs` | `examples/03_node_hierarchy.rs` | `tests/node_area.rs`, `tests/hierarchy_and_joint_tests.rs`, `tests/action_callback_tests.rs` | Hierarchy with parent and cycle checks, naming, frames, transforms, visibility, speed, physics body attachment, accessibility, reach constraints, actions with completion handlers and keys, point containment. |
+| `SKAction` | ✅ implemented | `src/action.rs`, `src/ffi/action.rs` | `examples/04_action_basics.rs` | `tests/action_area.rs`, `tests/action_callback_tests.rs` | Core movement, rotation, scale, resize, fade, texture animation, grouping/repetition, timing properties, reverse, block and custom actions, plus playback, mixer, audio-node, physics-body, and warp helpers. |
 | `SKPhysicsBody` | ✅ implemented | `src/physics_body.rs`, `src/ffi/physics_body.rs` | `examples/05_physics_body_properties.rs` | `tests/physics_body_area.rs` | Shape constructors, compound bodies, material properties, masks, velocity, force/impulse/torque APIs. |
-| `SKPhysicsWorld` | ✅ implemented | `src/physics_world.rs`, `src/ffi/physics_world.rs` | `examples/06_physics_world_queries.rs` | `tests/physics_world_area.rs` | Gravity, speed, body queries by point/rect/ray, and physics-contact delegate attachment. |
-| `SKPhysicsJoint` | 🟡 partial | `src/physics_joint.rs`, `src/ffi/physics_joint.rs` | `examples/07_physics_joint_basics.rs` | `tests/physics_joint_area.rs` | Covers pin/spring/fixed/sliding/limit joints and shared reaction-force accessors. Headless `SKPhysicsWorld.addJoint/removeJoint` flows remain intentionally skipped. |
+| `SKPhysicsWorld` | ✅ implemented | `src/physics_world.rs`, `src/ffi/physics_world.rs` | `examples/06_physics_world_queries.rs` | `tests/physics_world_area.rs`, `tests/delegate_lifetime_tests.rs` | Gravity, speed, body queries by point/rect/ray, a retained physics-contact delegate, and checked joint addition and removal. |
+| `SKPhysicsJoint` | ✅ implemented | `src/physics_joint.rs`, `src/ffi/physics_joint.rs` | `examples/07_physics_joint_basics.rs` | `tests/physics_joint_area.rs`, `tests/hierarchy_and_joint_tests.rs` | Covers pin/spring/fixed/sliding/limit joints, shared reaction-force accessors, and `PhysicsWorld::add_joint`/`remove_joint`/`remove_all_joints`, which reject joints whose bodies are not attached to nodes in a scene. |
 | `SKLabelNode` | ✅ implemented | `src/label_node.rs`, `src/ffi/label_node.rs` | `examples/08_label_node_text.rs` | `tests/label_node_area.rs` | Text, font, size, alignment, line count, layout width, color/blend mode. |
 | `SKSpriteNode` | ✅ implemented | `src/sprite_node.rs`, `src/ffi/sprite_node.rs` | `examples/09_sprite_node_features.rs` | `tests/sprite_node_area.rs` | Color/texture constructors, normal textures, size, anchor point, blend mode, light/shadow masks, center rect, shader attachment. |
-| `SKView` | ✅ implemented | `src/view.rs`, `src/ffi/view.rs` | `examples/10_view_present_scene.rs` | `tests/view_area.rs` | Headless view creation, diagnostics flags, preferred FPS, transparency/sibling-order options, view delegates, scene presentation with transitions, texture capture. |
+| `SKView` | ✅ implemented | `src/view.rs`, `src/ffi/view.rs` | `examples/10_view_present_scene.rs` | `tests/main_thread.rs`, `tests/view_area.rs` | Main-thread view creation, diagnostics flags, preferred FPS, transparency/sibling-order options, view delegates, scene presentation with transitions, texture capture. Off the main thread, creation fails and calls do nothing. |
 | `SKConstraint` / `SKRange` | ✅ implemented | `src/constraint.rs`, `src/ffi/constraint.rs` | `examples/11_constraint_ranges.rs` | `tests/constraint_area.rs` | Range constructors, position/distance/orientation/zRotation constraints, enabled flag, reference node. |
 | `SKKeyframeSequence` | 🟡 partial | `src/keyframe.rs`, `src/ffi/keyframe.rs` | `examples/12_keyframe_sequence.rs` | `tests/keyframe_area.rs` | Scalar keyframes, interpolation mode, repeat mode, sampling, mutation. Non-scalar payload types are not wrapped yet. |
 | `SKEmitterNode` | 🟡 partial | `src/emitter_node.rs`, `src/ffi/emitter_node.rs` | `examples/13_emitter_node_particles.rs` | `tests/emitter_node_area.rs` | Core particle texture, blend, render order, position, speed, birth/lifetime, size/scale/alpha, target node, field bitmask. Advanced action/keyframe-based particle properties are not wrapped yet. |
@@ -40,24 +39,17 @@ Status key:
 | `NSEvent (SKNodeEvent)` / `SKNode (NSAccessibility)` / `SKReachConstraints` | ✅ implemented | `src/event.rs`, `src/node.rs`, `src/reach_constraints.rs` | — | macOS event-to-node coordinate conversion plus node accessibility and reach-constraint helpers. |
 | `SKCameraNode` / `SKSceneDelegate` / `SKViewDelegate` / `SKTransition` | ✅ implemented | `src/camera_node.rs`, `src/scene.rs`, `src/view.rs`, `src/transition.rs` | `examples/10_view_present_scene.rs` | Camera attachment, scene/view delegates, and transition-driven presentation are exposed. |
 | `SKCropNode` / `SKFieldNode` / `SKRegion` / `SKReferenceNode` / `SKShapeNode` / `SKTransformNode` | ✅ implemented | `src/crop_node.rs`, `src/field_node.rs`, `src/region.rs`, `src/reference_node.rs`, `src/shape_node.rs`, `src/transform_node.rs` | — | Additional node families and region helpers are covered by `tests/coverage_fill_area.rs`. |
-| `SKMutableTexture` | ✅ implemented | `src/mutable_texture.rs`, `src/ffi/texture_extras.rs` | — | Size, constructors, and `modify_pixel_data` callback updates are exposed and covered by `tests/coverage_fill_area.rs`. |
+| `SKMutableTexture` | ✅ implemented | `src/mutable_texture.rs`, `src/ffi/texture_extras.rs` | — | Size, constructors, and `modify_pixel_data` callback updates, whose closure is released even if SpriteKit never runs it; covered by `tests/texture_readback_tests.rs`. |
 | `SKTextureAtlas` | ✅ implemented | `src/texture_atlas.rs`, `src/ffi/texture_extras.rs` | — | Naming, texture lookup, completion-handler preloading, and optional `async` feature futures are exposed and covered by `tests/coverage_fill_area.rs`. |
-| `SKPhysicsContact` / `SKPhysicsContactDelegate` | ✅ implemented | `src/physics_contact.rs`, `src/ffi/physics_contact.rs` | — | Contact inspection and delegate bridging are exposed on `PhysicsWorld`. |
+| `SKPhysicsContact` / `SKPhysicsContactDelegate` | ✅ implemented | `src/physics_contact.rs`, `src/ffi/physics_contact.rs` | — | Contact inspection and delegate bridging on `PhysicsWorld`, exercised with real contacts in `tests/delegate_lifetime_tests.rs`. |
 | `SKTileDefinition` / `SKTileGroupRule` / `SKTileGroup` / `SKTileSet` / `SKTileMapNode` | ✅ implemented | `src/tile.rs`, `src/ffi/tile.rs` | — | Tile definitions, adjacency masks, groups, sets, and map-node placement/query APIs are exposed. |
 | `SKWarpGeometry` / `SKWarpGeometryGrid` / `SKWarpable` | ✅ implemented | `src/warp.rs`, `src/ffi/warp.rs` | — | Grid construction, vertex replacement, warpable node accessors, and warp actions are exposed. |
-| `SKRenderer` | ✅ implemented | `src/renderer.rs`, `src/ffi/renderer.rs` | `examples/01_offline_render_smoke.rs` | Offline rendering into `apple-metal` textures remains supported. |
-
-## Intentionally skipped APIs
-
-| API | Status | Reason |
-| --- | --- | --- |
-| `SKPhysicsWorld.addJoint` / `removeJoint` | ⏭️ skipped | Headless joint insertion/removal crashed during validation; examples/tests only exercise joint creation and property access. |
+| `SKRenderer` | ✅ implemented | `src/renderer.rs`, `src/ffi/renderer.rs` | `examples/01_offline_render_smoke.rs` | Offline rendering into `apple-metal` textures, with serialized renderer creation and pixel-format-aware `read_texture_bytes`. |
 
 ## Validation
 
 The coverage above is backed by:
 
-- `cargo build --all-features`
-- `cargo test --lib --all-features`
-- `cargo test --test coverage_fill_area --all-features`
+- `cargo build --all-targets --all-features`
+- `cargo test --all-features`, including the main-thread `tests/main_thread.rs` harness
 - `cargo clippy --all-targets --all-features -- -D warnings`

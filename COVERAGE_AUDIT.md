@@ -22,7 +22,7 @@ Audit notes:
 | `SKAction (MixerControl)` | category | `SKAction.h` | `Action::change_volume_to` |
 | `SKAction (NodeWithPhysicsBody)` | category | `SKAction.h` | `Action::{change_charge_to, apply_force}` |
 | `SKAction (PlaybackControl)` | category | `SKAction.h` | `Action::play` |
-| `SKAction (SKActions)` | category | `SKAction.h` | `Action::{move_*, rotate_*, scale_*, resize_*, fade_*, set_texture, animate_with_textures, wait, sequence, group, repeat_*}` |
+| `SKAction (SKActions)` | category | `SKAction.h` | `Action::{move_*, rotate_*, scale_*, resize_*, fade_*, set_texture, animate_with_textures, wait, sequence, group, repeat_*, run_block, custom}` |
 | `SKAction (SKAudioNode)` | category | `SKAudioNode.h` | `Action::stereo_pan_to` |
 | `SKAction (SKWarpable)` | category | `SKWarpGeometry.h` | `Action::{warp_to, animate_with_warps}` |
 | `SKActionTimingMode` | enum | `SKAction.h` | `ActionTimingMode` |
@@ -56,7 +56,7 @@ Audit notes:
 | `SKPhysicsJointPin` | interface | `SKPhysicsJoint.h` | `PhysicsJointPin` |
 | `SKPhysicsJointSliding` | interface | `SKPhysicsJoint.h` | `PhysicsJointSliding` |
 | `SKPhysicsJointSpring` | interface | `SKPhysicsJoint.h` | `PhysicsJointSpring` |
-| `SKPhysicsWorld` | interface | `SKPhysicsWorld.h` | `PhysicsWorld` |
+| `SKPhysicsWorld` | interface | `SKPhysicsWorld.h` | `PhysicsWorld` (including `add_joint`, `remove_joint`, `remove_all_joints`) |
 | `SKRange` | interface | `SKConstraint.h` | `ConstraintRange` |
 | `SKReachConstraints` | interface | `SKReachConstraints.h` | `ReachConstraints + NodeExt::{reach_constraints, set_reach_constraints}` |
 | `SKReferenceNode` | interface | `SKReferenceNode.h` | `ReferenceNode` |
@@ -64,7 +64,7 @@ Audit notes:
 | `SKRenderer` | interface | `SKRenderer.h` | `Renderer` |
 | `SKRepeatMode` | enum | `SKKeyframeSequence.h` | `RepeatMode` |
 | `SKScene` | interface | `SKScene.h` | `Scene` |
-| `SKSceneDelegate` | protocol | `SKScene.h` | `SceneDelegate + Scene::{set_delegate, has_delegate}` |
+| `SKSceneDelegate` | protocol | `SKScene.h` | `SceneDelegate + SceneDelegateCallbacks + Scene::{set_delegate, has_delegate}` |
 | `SKSceneScaleMode` | enum | `SKScene.h` | `SceneScaleMode` |
 | `SKShader` | interface | `SKShader.h` | `Shader` |
 | `SKShapeNode` | interface | `SKShapeNode.h` | `ShapeNode` |

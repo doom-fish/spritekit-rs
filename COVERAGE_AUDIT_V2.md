@@ -6,7 +6,7 @@ GAPS: 0
 EXEMPT: 0
 COVERAGE_PCT: 100.00%
 
-Re-audited all 75 symbols enumerated in the v1 audit against SpriteKit.framework headers in MacOSX26.2.sdk. Verified via header grep for @interface, @protocol, @property, and category declarations. Re-confirmed all EXEMPT entries: UITouch (SKNodeTouches) and SKNodeFocusBehavior enum remain API_UNAVAILABLE(macos) in 26.2 and are correctly excluded. All 75 VERIFIED symbols found in crate's swift-bridge FFI (32 Swift modules) and safe Rust wrapper APIs. No new symbol-level coverage gaps detected.
+Re-audited all 75 symbols enumerated in the v1 audit against SpriteKit.framework headers in MacOSX26.2.sdk. Verified via header grep for @interface, @protocol, @property, and category declarations. Re-confirmed the filtered symbols: UITouch (SKNodeTouches) and the SKNodeFocusBehavior enum remain API_UNAVAILABLE(macos) in 26.2 and are excluded from the count rather than listed as EXEMPT. All 75 VERIFIED symbols found in crate's swift-bridge FFI (32 Swift modules) and safe Rust wrapper APIs. No new symbol-level coverage gaps detected. VERIFIED means at least one public Rust API reaches the symbol; it does not imply selector-for-selector parity (for example, non-scalar keyframe payloads, vector shader uniforms and file-based audio/video constructors are not wrapped).
 
 ## 🟢 VERIFIED
 | Symbol | Kind | Header | Wrapped by |
@@ -17,7 +17,7 @@ Re-audited all 75 symbols enumerated in the v1 audit against SpriteKit.framework
 | `SKAction (MixerControl)` | category | `SKAction.h` | `Action::change_volume_to` |
 | `SKAction (NodeWithPhysicsBody)` | category | `SKAction.h` | `Action::{change_charge_to, apply_force}` |
 | `SKAction (PlaybackControl)` | category | `SKAction.h` | `Action::play` |
-| `SKAction (SKActions)` | category | `SKAction.h` | `Action::{move_*, rotate_*, scale_*, resize_*, fade_*, set_texture, animate_with_textures, wait, sequence, group, repeat_*}` |
+| `SKAction (SKActions)` | category | `SKAction.h` | `Action::{move_*, rotate_*, scale_*, resize_*, fade_*, set_texture, animate_with_textures, wait, sequence, group, repeat_*, run_block, custom}` |
 | `SKAction (SKAudioNode)` | category | `SKAudioNode.h` | `Action::stereo_pan_to` |
 | `SKAction (SKWarpable)` | category | `SKWarpGeometry.h` | `Action::{warp_to, animate_with_warps}` |
 | `SKActionTimingMode` | enum | `SKAction.h` | `ActionTimingMode` |
@@ -51,7 +51,7 @@ Re-audited all 75 symbols enumerated in the v1 audit against SpriteKit.framework
 | `SKPhysicsJointPin` | interface | `SKPhysicsJoint.h` | `PhysicsJointPin` |
 | `SKPhysicsJointSliding` | interface | `SKPhysicsJoint.h` | `PhysicsJointSliding` |
 | `SKPhysicsJointSpring` | interface | `SKPhysicsJoint.h` | `PhysicsJointSpring` |
-| `SKPhysicsWorld` | interface | `SKPhysicsWorld.h` | `PhysicsWorld` |
+| `SKPhysicsWorld` | interface | `SKPhysicsWorld.h` | `PhysicsWorld` (including `add_joint`, `remove_joint`, `remove_all_joints`) |
 | `SKRange` | interface | `SKConstraint.h` | `ConstraintRange` |
 | `SKReachConstraints` | interface | `SKReachConstraints.h` | `ReachConstraints + NodeExt::{reach_constraints, set_reach_constraints}` |
 | `SKReferenceNode` | interface | `SKReferenceNode.h` | `ReferenceNode` |
@@ -59,7 +59,7 @@ Re-audited all 75 symbols enumerated in the v1 audit against SpriteKit.framework
 | `SKRenderer` | interface | `SKRenderer.h` | `Renderer` |
 | `SKRepeatMode` | enum | `SKKeyframeSequence.h` | `RepeatMode` |
 | `SKScene` | interface | `SKScene.h` | `Scene` |
-| `SKSceneDelegate` | protocol | `SKScene.h` | `SceneDelegate + Scene::{set_delegate, has_delegate}` |
+| `SKSceneDelegate` | protocol | `SKScene.h` | `SceneDelegate + SceneDelegateCallbacks + Scene::{set_delegate, has_delegate}` |
 | `SKSceneScaleMode` | enum | `SKScene.h` | `SceneScaleMode` |
 | `SKShader` | interface | `SKShader.h` | `Shader` |
 | `SKShapeNode` | interface | `SKShapeNode.h` | `ShapeNode` |
