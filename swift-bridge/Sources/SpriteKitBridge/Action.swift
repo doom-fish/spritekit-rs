@@ -200,3 +200,28 @@ public func sk_action_reversed(_ actionHandle: UnsafeMutableRawPointer?) -> Unsa
     guard let action: SKAction = skBorrow(actionHandle) else { return nil }
     return skRetain(action.reversed())
 }
+
+@_cdecl("sk_action_run_block")
+public func sk_action_run_block(
+    _ context: UnsafeMutableRawPointer?,
+    _ block: (@convention(c) (UnsafeMutableRawPointer?) -> Void)?,
+    _ releaseContext: SKContextReleaseCallback?
+) -> UnsafeMutableRawPointer? {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
+    return skRetain(SKAction.run {
+        block?(owner.context)
+    })
+}
+
+@_cdecl("sk_action_custom")
+public func sk_action_custom(
+    _ duration: Double,
+    _ context: UnsafeMutableRawPointer?,
+    _ block: (@convention(c) (UnsafeMutableRawPointer?, UnsafeMutableRawPointer?, Double) -> Void)?,
+    _ releaseContext: SKContextReleaseCallback?
+) -> UnsafeMutableRawPointer? {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
+    return skRetain(SKAction.customAction(withDuration: duration) { node, elapsedTime in
+        block?(owner.context, Unmanaged.passUnretained(node).toOpaque(), Double(elapsedTime))
+    })
+}

@@ -1,4 +1,10 @@
+use core::ffi::c_void;
+use core::mem::ManuallyDrop;
+use std::sync::Mutex;
+
 use apple_cf::cg::{CGPoint, CGRect};
+use doom_fish_utils::callback_context::CallbackContext;
+use doom_fish_utils::panic_safe::catch_user_panic;
 
 use crate::action::Action;
 use crate::constraint::Constraint;
@@ -7,6 +13,21 @@ use crate::ffi;
 use crate::physics_body::PhysicsBody;
 use crate::private::{cstring_from_str, handle_type};
 use crate::reach_constraints::ReachConstraints;
+
+type ActionCompletion = Mutex<Option<Box<dyn FnOnce() + Send + 'static>>>;
+
+unsafe extern "C" fn action_completion_trampoline(context: *mut c_void) {
+    const SITE: &str = "spritekit::NodeExt::run_action_with_completion";
+    let completion = unsafe {
+        CallbackContext::<ActionCompletion>::with(context, SITE, |slot| {
+            slot.lock().ok().and_then(|mut slot| slot.take())
+        })
+    }
+    .flatten();
+    if let Some(completion) = completion {
+        catch_user_panic(SITE, completion);
+    }
+}
 
 handle_type!(Node);
 
@@ -270,6 +291,51 @@ pub trait NodeExt: AsNode {
 
     fn run_action(&self, action: &Action) {
         unsafe { ffi::sk_node_run_action(self.as_node_ptr(), action.as_ptr()) };
+    }
+
+    fn run_action_with_completion<F>(&self, action: &Action, completion: F)
+    where
+        F: FnOnce() + Send + 'static,
+    {
+        let completion: Box<dyn FnOnce() + Send + 'static> = Box::new(completion);
+        let context = ManuallyDrop::new(CallbackContext::<ActionCompletion>::new(Mutex::new(
+            Some(completion),
+        )));
+        unsafe {
+            ffi::sk_node_run_action_with_completion(
+                self.as_node_ptr(),
+                action.as_ptr(),
+                context.as_ptr(),
+                Some(action_completion_trampoline),
+                Some(CallbackContext::<ActionCompletion>::RELEASE),
+            );
+        };
+    }
+
+    fn run_action_with_key(&self, action: &Action, key: &str) -> Result<(), SpriteKitError> {
+        let key = cstring_from_str(key)
+            .ok_or_else(|| SpriteKitError::new("action keys cannot contain NUL bytes"))?;
+        unsafe {
+            ffi::sk_node_run_action_with_key(self.as_node_ptr(), action.as_ptr(), key.as_ptr());
+        };
+        Ok(())
+    }
+
+    #[must_use]
+    fn action_for_key(&self, key: &str) -> Option<Action> {
+        let key = cstring_from_str(key)?;
+        unsafe {
+            Action::from_raw(ffi::sk_node_action_for_key(
+                self.as_node_ptr(),
+                key.as_ptr(),
+            ))
+        }
+    }
+
+    fn remove_action_for_key(&self, key: &str) {
+        if let Some(key) = cstring_from_str(key) {
+            unsafe { ffi::sk_node_remove_action_for_key(self.as_node_ptr(), key.as_ptr()) };
+        }
     }
 
     #[must_use]

@@ -354,6 +354,46 @@ public func sk_node_run_action(_ nodeHandle: UnsafeMutableRawPointer?, _ actionH
     node.run(action)
 }
 
+@_cdecl("sk_node_run_action_with_completion")
+public func sk_node_run_action_with_completion(
+    _ nodeHandle: UnsafeMutableRawPointer?,
+    _ actionHandle: UnsafeMutableRawPointer?,
+    _ context: UnsafeMutableRawPointer?,
+    _ completion: (@convention(c) (UnsafeMutableRawPointer?) -> Void)?,
+    _ releaseContext: SKContextReleaseCallback?
+) {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
+    guard let node: SKNode = skBorrow(nodeHandle),
+          let action: SKAction = skBorrow(actionHandle)
+    else { return }
+    node.run(action) {
+        completion?(owner.context)
+    }
+}
+
+@_cdecl("sk_node_run_action_with_key")
+public func sk_node_run_action_with_key(_ nodeHandle: UnsafeMutableRawPointer?, _ actionHandle: UnsafeMutableRawPointer?, _ key: UnsafePointer<CChar>?) {
+    guard let node: SKNode = skBorrow(nodeHandle),
+          let action: SKAction = skBorrow(actionHandle),
+          let key
+    else { return }
+    node.run(action, withKey: String(cString: key))
+}
+
+@_cdecl("sk_node_action_for_key")
+public func sk_node_action_for_key(_ nodeHandle: UnsafeMutableRawPointer?, _ key: UnsafePointer<CChar>?) -> UnsafeMutableRawPointer? {
+    guard let node: SKNode = skBorrow(nodeHandle), let key,
+          let action = node.action(forKey: String(cString: key))
+    else { return nil }
+    return skRetain(action)
+}
+
+@_cdecl("sk_node_remove_action_for_key")
+public func sk_node_remove_action_for_key(_ nodeHandle: UnsafeMutableRawPointer?, _ key: UnsafePointer<CChar>?) {
+    guard let node: SKNode = skBorrow(nodeHandle), let key else { return }
+    node.removeAction(forKey: String(cString: key))
+}
+
 @_cdecl("sk_node_has_actions")
 public func sk_node_has_actions(_ nodeHandle: UnsafeMutableRawPointer?) -> Bool {
     guard let node: SKNode = skBorrow(nodeHandle) else { return false }

@@ -77,4 +77,15 @@ extern "C" {
     pub fn sk_action_set_speed(action: *mut c_void, speed: f64);
     /// Wraps `SKAction`.
     pub fn sk_action_reversed(action: *mut c_void) -> *mut c_void;
+    pub fn sk_action_run_block(
+        context: *mut c_void,
+        block: Option<unsafe extern "C" fn(*mut c_void)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
+    ) -> *mut c_void;
+    pub fn sk_action_custom(
+        duration: f64,
+        context: *mut c_void,
+        block: Option<unsafe extern "C" fn(*mut c_void, *mut c_void, f64)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
+    ) -> *mut c_void;
 }

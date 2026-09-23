@@ -111,6 +111,20 @@ extern "C" {
     pub fn sk_node_set_constraints(node: *mut c_void, constraints: *mut c_void, count: usize);
     /// Wraps `SKNode`.
     pub fn sk_node_run_action(node: *mut c_void, action: *mut c_void);
+    pub fn sk_node_run_action_with_completion(
+        node: *mut c_void,
+        action: *mut c_void,
+        context: *mut c_void,
+        completion: Option<unsafe extern "C" fn(*mut c_void)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
+    );
+    pub fn sk_node_run_action_with_key(
+        node: *mut c_void,
+        action: *mut c_void,
+        key: *const libc::c_char,
+    );
+    pub fn sk_node_action_for_key(node: *mut c_void, key: *const libc::c_char) -> *mut c_void;
+    pub fn sk_node_remove_action_for_key(node: *mut c_void, key: *const libc::c_char);
     /// Wraps `SKNode`.
     pub fn sk_node_has_actions(node: *mut c_void) -> bool;
     /// Wraps `SKNode`.

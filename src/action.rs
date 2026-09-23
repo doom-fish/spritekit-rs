@@ -1,13 +1,43 @@
 use core::ffi::c_void;
+use core::mem::ManuallyDrop;
 
 use apple_cf::cg::{CGPoint, CGSize, CGVector};
+use doom_fish_utils::callback_context::CallbackContext;
 
 use crate::ffi;
-use crate::private::handle_type;
+use crate::node::Node;
+use crate::private::{handle_type, invoke_callback};
 use crate::texture::Texture;
 use crate::warp::AsWarpGeometry;
 
 handle_type!(Action);
+
+type ActionBlock = Box<dyn Fn() + Send + Sync + 'static>;
+type CustomActionBlock = Box<dyn Fn(&Node, f64) + Send + Sync + 'static>;
+
+unsafe extern "C" fn action_block_trampoline(context: *mut c_void) {
+    unsafe {
+        invoke_callback::<ActionBlock, _>(context, "spritekit::Action::run_block", |block| {
+            block();
+        });
+    }
+}
+
+unsafe extern "C" fn custom_action_trampoline(
+    context: *mut c_void,
+    node: *mut c_void,
+    elapsed_time: f64,
+) {
+    if node.is_null() {
+        return;
+    }
+    let node = unsafe { Node::from_raw_borrowed(node) };
+    unsafe {
+        invoke_callback::<CustomActionBlock, _>(context, "spritekit::Action::custom", |block| {
+            block(&node, elapsed_time);
+        });
+    }
+}
 
 /// Enum for `SKActionTimingMode`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
@@ -286,5 +316,38 @@ impl Action {
     #[must_use]
     pub fn reversed(&self) -> Option<Self> {
         unsafe { Self::from_raw(ffi::sk_action_reversed(self.ptr)) }
+    }
+
+    #[must_use]
+    pub fn run_block<F>(block: F) -> Option<Self>
+    where
+        F: Fn() + Send + Sync + 'static,
+    {
+        let block: ActionBlock = Box::new(block);
+        let context = ManuallyDrop::new(CallbackContext::new(block));
+        unsafe {
+            Self::from_raw(ffi::sk_action_run_block(
+                context.as_ptr(),
+                Some(action_block_trampoline),
+                Some(CallbackContext::<ActionBlock>::RELEASE),
+            ))
+        }
+    }
+
+    #[must_use]
+    pub fn custom<F>(duration: f64, block: F) -> Option<Self>
+    where
+        F: Fn(&Node, f64) + Send + Sync + 'static,
+    {
+        let block: CustomActionBlock = Box::new(block);
+        let context = ManuallyDrop::new(CallbackContext::new(block));
+        unsafe {
+            Self::from_raw(ffi::sk_action_custom(
+                duration,
+                context.as_ptr(),
+                Some(custom_action_trampoline),
+                Some(CallbackContext::<CustomActionBlock>::RELEASE),
+            ))
+        }
     }
 }
