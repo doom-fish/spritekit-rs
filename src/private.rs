@@ -1,6 +1,76 @@
+use core::ffi::c_void;
 use std::ffi::CString;
 use std::os::unix::ffi::OsStrExt;
 use std::path::Path;
+
+use doom_fish_utils::callback_context::CallbackContext;
+
+pub unsafe fn invoke_callback<T: Send + Sync + 'static, R>(
+    context: *mut c_void,
+    site: &str,
+    f: impl FnOnce(&T) -> R,
+) -> Option<R> {
+    if context.is_null() {
+        return None;
+    }
+    unsafe { CallbackContext::<T>::RETAIN(context) };
+    let result = unsafe { CallbackContext::<T>::with(context, site, f) };
+    unsafe { CallbackContext::<T>::RELEASE(context) };
+    result
+}
+
+pub struct DelegateObject<T: Send + Sync + 'static> {
+    ptr: *mut c_void,
+    context: Option<CallbackContext<T>>,
+}
+
+impl<T: Send + Sync + 'static> DelegateObject<T> {
+    pub fn new(value: T, create: impl FnOnce(*mut c_void) -> *mut c_void) -> Option<Self> {
+        let context = CallbackContext::new(value);
+        let retained = context.retained_ptr();
+        let ptr = create(retained);
+        if ptr.is_null() {
+            unsafe { CallbackContext::<T>::RELEASE(retained) };
+            return None;
+        }
+        Some(Self {
+            ptr,
+            context: Some(context),
+        })
+    }
+
+    pub const fn as_ptr(&self) -> *mut c_void {
+        self.ptr
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.context
+            .as_ref()
+            .is_some_and(CallbackContext::is_active)
+    }
+}
+
+impl<T: Send + Sync + 'static> Drop for DelegateObject<T> {
+    fn drop(&mut self) {
+        if let Some(context) = &self.context {
+            context.deactivate();
+        }
+        if !self.ptr.is_null() {
+            unsafe { crate::ffi::sk_release(self.ptr) };
+            self.ptr = core::ptr::null_mut();
+        }
+    }
+}
+
+impl<T: Send + Sync + 'static> core::fmt::Debug for DelegateObject<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("DelegateObject")
+            .field("ptr", &self.ptr)
+            .field("owns_callbacks", &self.context.is_some())
+            .field("active", &self.is_active())
+            .finish()
+    }
+}
 
 macro_rules! handle_type {
     ($name:ident) => {

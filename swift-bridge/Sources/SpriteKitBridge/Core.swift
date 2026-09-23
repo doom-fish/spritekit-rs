@@ -2,6 +2,7 @@ import AppKit
 import CoreGraphics
 import Foundation
 import Metal
+import ObjectiveC
 import QuartzCore
 import SpriteKit
 
@@ -20,6 +21,13 @@ func skReleaseHandle(_ handle: UnsafeMutableRawPointer?) {
 func skBorrow<T>(_ handle: UnsafeMutableRawPointer?) -> T? {
     guard let handle else { return nil }
     return Unmanaged<AnyObject>.fromOpaque(handle).takeUnretainedValue() as? T
+}
+
+func skRetainDelegate(_ delegate: AnyObject?, by owner: AnyObject, key: UnsafeRawPointer, assign: () -> Void) {
+    let previous = objc_getAssociatedObject(owner, key)
+    objc_setAssociatedObject(owner, key, delegate, .OBJC_ASSOCIATION_RETAIN)
+    assign()
+    withExtendedLifetime(previous) {}
 }
 
 @inline(__always)
