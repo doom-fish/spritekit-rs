@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let sprite = SpriteNode::with_color(Color::red(), CGSize::new(32.0, 32.0))
         .ok_or("failed to create sprite node")?;
     sprite.set_position(CGPoint::new(0.0, 0.0));
-    scene.add_child(&sprite);
+    scene.add_child(&sprite)?;
 
     // Create SKRenderer and wire up the scene.
     let renderer = Renderer::new(&device).ok_or("failed to create SKRenderer")?;

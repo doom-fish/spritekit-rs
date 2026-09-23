@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let sprite = SpriteNode::with_color(Color::green(), CGSize::new(64.0, 64.0)).expect("sprite");
     sprite.set_position(CGPoint::new(0.0, 0.0));
-    scene.add_child(&sprite);
+    scene.add_child(&sprite)?;
 
     let renderer = Renderer::new(&device).expect("renderer");
     renderer.set_scene(Some(&scene));

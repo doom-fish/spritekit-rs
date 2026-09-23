@@ -8,7 +8,7 @@ fn node_tracks_children_and_position() {
     parent.set_name("parent-node");
     parent.set_position(CGPoint::new(3.0, 7.0));
     parent.set_user_interaction_enabled(true);
-    parent.add_child(&child);
+    parent.add_child(&child).expect("add child");
 
     let position = parent.position();
     assert_eq!(parent.name().as_deref(), Some("parent-node"));

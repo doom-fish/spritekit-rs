@@ -2,6 +2,7 @@ use apple_cf::cg::{CGPoint, CGRect};
 
 use crate::action::Action;
 use crate::constraint::Constraint;
+use crate::error::{bridge_result, SpriteKitError};
 use crate::ffi;
 use crate::physics_body::PhysicsBody;
 use crate::private::{cstring_from_str, handle_type};
@@ -23,12 +24,20 @@ impl AsNode for Node {
 
 /// Trait for `SKNode`.
 pub trait NodeExt: AsNode {
-    fn add_child<C: AsNode>(&self, child: &C) {
-        unsafe { ffi::sk_node_add_child(self.as_node_ptr(), child.as_node_ptr()) };
+    fn add_child<C: AsNode>(&self, child: &C) -> Result<(), SpriteKitError> {
+        let mut error = core::ptr::null_mut();
+        let added = unsafe {
+            ffi::sk_node_add_child(self.as_node_ptr(), child.as_node_ptr(), &raw mut error)
+        };
+        unsafe { bridge_result(added, error, "SKNode.addChild refused the child") }
     }
 
-    fn move_to_parent<P: AsNode>(&self, parent: &P) {
-        unsafe { ffi::sk_node_move_to_parent(self.as_node_ptr(), parent.as_node_ptr()) };
+    fn move_to_parent<P: AsNode>(&self, parent: &P) -> Result<(), SpriteKitError> {
+        let mut error = core::ptr::null_mut();
+        let moved = unsafe {
+            ffi::sk_node_move_to_parent(self.as_node_ptr(), parent.as_node_ptr(), &raw mut error)
+        };
+        unsafe { bridge_result(moved, error, "SKNode.move(toParent:) refused the parent") }
     }
 
     fn remove_from_parent(&self) {

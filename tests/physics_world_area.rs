@@ -9,7 +9,7 @@ fn physics_world_can_find_attached_bodies() {
 
     node.set_position(CGPoint::new(0.0, 0.0));
     node.set_physics_body(Some(&body));
-    scene.add_child(&node);
+    scene.add_child(&node).expect("add child");
 
     let world = scene.physics_world();
     assert!(world.body_at_point(CGPoint::new(0.0, 0.0)).is_some());

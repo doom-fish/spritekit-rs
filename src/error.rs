@@ -33,3 +33,18 @@ impl Error for SpriteKitError {}
 pub(crate) unsafe fn take_string(ptr: *mut libc::c_char) -> Option<String> {
     doom_fish_utils::ffi_string::take_owned_cstring_c(ptr, |p| libc::free(p.cast()))
 }
+
+pub(crate) unsafe fn bridge_result(
+    ok: bool,
+    error: *mut libc::c_char,
+    fallback: &str,
+) -> Result<(), SpriteKitError> {
+    let message = unsafe { take_string(error) };
+    if ok {
+        Ok(())
+    } else {
+        Err(SpriteKitError::new(
+            message.unwrap_or_else(|| fallback.to_owned()),
+        ))
+    }
+}

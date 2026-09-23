@@ -5,20 +5,59 @@ public func sk_node_new() -> UnsafeMutableRawPointer? {
     skRetain(SKNode())
 }
 
+private func skIsAncestor(_ candidate: SKNode, of node: SKNode) -> Bool {
+    var current: SKNode? = node
+    while let visited = current {
+        if visited === candidate { return true }
+        current = visited.parent
+    }
+    return false
+}
+
 @_cdecl("sk_node_add_child")
-public func sk_node_add_child(_ parentHandle: UnsafeMutableRawPointer?, _ childHandle: UnsafeMutableRawPointer?) {
+public func sk_node_add_child(
+    _ parentHandle: UnsafeMutableRawPointer?,
+    _ childHandle: UnsafeMutableRawPointer?,
+    _ outError: UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
+) -> Bool {
+    outError?.pointee = nil
     guard let parent: SKNode = skBorrow(parentHandle),
           let child: SKNode = skBorrow(childHandle)
-    else { return }
+    else {
+        outError?.pointee = skDup("missing parent or child node")
+        return false
+    }
+    guard child.parent == nil else {
+        outError?.pointee = skDup("the child already has a parent; remove it from its parent first")
+        return false
+    }
+    guard !skIsAncestor(child, of: parent) else {
+        outError?.pointee = skDup("a node cannot become a child of itself or of its own descendant")
+        return false
+    }
     parent.addChild(child)
+    return true
 }
 
 @_cdecl("sk_node_move_to_parent")
-public func sk_node_move_to_parent(_ nodeHandle: UnsafeMutableRawPointer?, _ parentHandle: UnsafeMutableRawPointer?) {
+public func sk_node_move_to_parent(
+    _ nodeHandle: UnsafeMutableRawPointer?,
+    _ parentHandle: UnsafeMutableRawPointer?,
+    _ outError: UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
+) -> Bool {
+    outError?.pointee = nil
     guard let node: SKNode = skBorrow(nodeHandle),
           let parent: SKNode = skBorrow(parentHandle)
-    else { return }
+    else {
+        outError?.pointee = skDup("missing node or parent")
+        return false
+    }
+    guard !skIsAncestor(node, of: parent) else {
+        outError?.pointee = skDup("a node cannot move under itself or one of its descendants")
+        return false
+    }
     node.move(toParent: parent)
+    return true
 }
 
 @_cdecl("sk_node_remove_from_parent")

@@ -7,7 +7,7 @@ fn main() {
             .expect("sprite");
     node.set_position(CGPoint::new(0.0, 0.0));
     node.set_physics_body(PhysicsBody::circle(8.0).as_ref());
-    scene.add_child(&node);
+    scene.add_child(&node).expect("add child");
 
     let world = scene.physics_world();
     assert!(world.body_at_point(CGPoint::new(0.0, 0.0)).is_some());

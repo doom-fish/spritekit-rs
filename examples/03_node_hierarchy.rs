@@ -7,7 +7,7 @@ fn main() {
     parent.set_name("parent");
     parent.set_user_interaction_enabled(true);
     parent.set_position(CGPoint::new(12.0, 34.0));
-    parent.add_child(&child);
+    parent.add_child(&child).expect("add child");
 
     let position = parent.position();
     assert_eq!(parent.name().as_deref(), Some("parent"));
@@ -17,7 +17,9 @@ fn main() {
     assert!((position.x - 12.0).abs() < 1e-6);
     assert!((position.y - 34.0).abs() < 1e-6);
 
-    child.move_to_parent(&Node::new().expect("other parent"));
+    child
+        .move_to_parent(&Node::new().expect("other parent"))
+        .expect("move to parent");
     child.remove_from_parent();
     parent.remove_all_children();
     assert_eq!(parent.children_count(), 0);

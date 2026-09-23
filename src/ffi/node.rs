@@ -4,9 +4,17 @@ extern "C" {
     /// Wraps `SKNode`.
     pub fn sk_node_new() -> *mut c_void;
     /// Wraps `SKNode`.
-    pub fn sk_node_add_child(parent: *mut c_void, child: *mut c_void);
+    pub fn sk_node_add_child(
+        parent: *mut c_void,
+        child: *mut c_void,
+        out_error: *mut *mut libc::c_char,
+    ) -> bool;
     /// Wraps `SKNode`.
-    pub fn sk_node_move_to_parent(node: *mut c_void, parent: *mut c_void);
+    pub fn sk_node_move_to_parent(
+        node: *mut c_void,
+        parent: *mut c_void,
+        out_error: *mut *mut libc::c_char,
+    ) -> bool;
     /// Wraps `SKNode`.
     pub fn sk_node_remove_from_parent(node: *mut c_void);
     /// Wraps `SKNode`.
