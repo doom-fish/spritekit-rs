@@ -82,7 +82,8 @@ impl Shader {
     pub fn float_uniform_named(&self, name: &str) -> Option<f32> {
         let name = cstring_from_str(name)?;
         let mut value = 0.0;
-        let ok = unsafe { ffi::sk_shader_get_float_uniform(self.ptr, name.as_ptr(), &mut value) };
+        let ok =
+            unsafe { ffi::sk_shader_get_float_uniform(self.ptr, name.as_ptr(), &raw mut value) };
         ok.then_some(value)
     }
 
@@ -98,7 +99,8 @@ impl Shader {
     pub fn uniform_type_named(&self, name: &str) -> Option<UniformType> {
         let name = cstring_from_str(name)?;
         let mut value = 0;
-        let ok = unsafe { ffi::sk_shader_get_uniform_type(self.ptr, name.as_ptr(), &mut value) };
+        let ok =
+            unsafe { ffi::sk_shader_get_uniform_type(self.ptr, name.as_ptr(), &raw mut value) };
         ok.then_some(UniformType::from_raw(value))
     }
 

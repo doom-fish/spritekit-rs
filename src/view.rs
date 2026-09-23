@@ -21,9 +21,10 @@ struct ViewDelegateContext {
 
 extern "C" fn view_delegate_should_render(context: *mut c_void, time: f64) -> bool {
     let context = unsafe { &*(context.cast::<ViewDelegateContext>()) };
-    context.should_render.as_ref().map_or(true, |callback| {
-        catch_unwind(AssertUnwindSafe(|| callback(time))).unwrap_or(true)
-    })
+    context
+        .should_render
+        .as_ref()
+        .is_none_or(|callback| catch_unwind(AssertUnwindSafe(|| callback(time))).unwrap_or(true))
 }
 
 extern "C" fn view_delegate_release(context: *mut c_void) {

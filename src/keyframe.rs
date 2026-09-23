@@ -97,7 +97,7 @@ impl KeyframeSequence {
     #[must_use]
     pub fn sample_scalar(&self, time: f64) -> Option<f64> {
         let mut value = 0.0;
-        let ok = unsafe { ffi::sk_keyframe_sequence_sample_scalar(self.ptr, time, &mut value) };
+        let ok = unsafe { ffi::sk_keyframe_sequence_sample_scalar(self.ptr, time, &raw mut value) };
         ok.then_some(value)
     }
 
