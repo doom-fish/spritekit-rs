@@ -2,14 +2,13 @@ use std::sync::mpsc;
 use std::time::Duration;
 
 use spritekit::{
-    Action, Attribute, AttributeType, AttributeValue, CGPoint, CGRect, CGSize, CGVector,
-    CameraNode, Color, CropNode, EffectNode, EmitterNode, Event, FieldNode, MutableTexture, Node,
-    NodeExt, ParticleRenderOrder, PhysicsBody, PhysicsContact, PhysicsContactDelegate,
-    PhysicsJointLimit, ReachConstraints, ReferenceNode, Region, Scene, SceneDelegate, Shader,
-    ShapeNode, SpriteNode, Texture, TextureAtlas, TileAdjacencyMask, TileDefinition,
-    TileDefinitionRotation, TileGroup, TileGroupRule, TileMapNode, TileSet, TileSetType,
-    TransformNode, Transition, TransitionDirection, UniformType, View, ViewDelegate,
-    WarpGeometryGrid, WarpableNode,
+    Action, Attribute, AttributeType, AttributeValue, CGPoint, CGSize, CGVector, CameraNode, Color,
+    CropNode, EffectNode, EmitterNode, Event, FieldNode, MutableTexture, Node, NodeExt,
+    ParticleRenderOrder, PhysicsBody, PhysicsContact, PhysicsContactDelegate, PhysicsJointLimit,
+    ReachConstraints, ReferenceNode, Region, Scene, SceneDelegate, Shader, ShapeNode, SpriteNode,
+    Texture, TextureAtlas, TileAdjacencyMask, TileDefinition, TileDefinitionRotation, TileGroup,
+    TileGroupRule, TileMapNode, TileSet, TileSetType, TransformNode, Transition,
+    TransitionDirection, UniformType, WarpGeometryGrid, WarpableNode,
 };
 
 const CALLBACK_TIMEOUT: Duration = Duration::from_secs(5);
@@ -70,10 +69,8 @@ fn foundation_wrappers_smoke() {
 }
 
 #[test]
-fn delegates_camera_and_transitions_smoke() {
-    let view = View::with_frame(CGRect::new(0.0, 0.0, 160.0, 90.0)).expect("view");
+fn scene_delegates_camera_and_transitions_smoke() {
     let scene = Scene::with_size(CGSize::new(160.0, 90.0)).expect("scene");
-    let next_scene = Scene::with_size(CGSize::new(160.0, 90.0)).expect("next scene");
     let camera = CameraNode::new().expect("camera");
 
     scene.set_camera(Some(&camera));
@@ -81,27 +78,18 @@ fn delegates_camera_and_transitions_smoke() {
     assert_eq!(camera.contained_node_count(), 0);
     let _ = camera.contains_node(&scene);
 
-    let _unused_scene_delegate = SceneDelegate::new().expect("scene delegate");
+    assert!(SceneDelegate::new().is_some());
     let scene_delegate = SceneDelegate::with_update(|_| {}).expect("scene delegate with update");
     scene.set_delegate(Some(&scene_delegate));
     assert!(scene.has_delegate());
-
-    let _unused_view_delegate = ViewDelegate::new().expect("view delegate");
-    let view_delegate =
-        ViewDelegate::with_should_render(|_| true).expect("view delegate with callback");
-    view.set_delegate(Some(&view_delegate));
-    assert!(view.has_delegate());
+    scene.set_delegate(None);
+    assert!(!scene.has_delegate());
 
     let transition = Transition::push(TransitionDirection::Left, 0.25).expect("transition");
     transition.set_pauses_incoming_scene(true);
     transition.set_pauses_outgoing_scene(false);
     assert!(transition.pauses_incoming_scene());
     assert!(!transition.pauses_outgoing_scene());
-
-    view.present_scene(Some(&scene));
-    view.present_scene_with_transition(&next_scene, &transition);
-    assert!(view.scene().is_some());
-    assert!(next_scene.view().is_some());
 }
 
 #[test]

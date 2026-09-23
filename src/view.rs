@@ -1,17 +1,17 @@
 use core::ffi::c_void;
-use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use apple_cf::cg::CGRect;
+use doom_fish_utils::callback_context::CallbackContext;
 
+use crate::error::SpriteKitError;
 use crate::ffi;
 use crate::node::AsNode;
-use crate::private::handle_type;
+use crate::private::{handle_type, invoke_callback, is_main_thread, DelegateObject};
 use crate::scene::Scene;
 use crate::texture::Texture;
 use crate::transition::Transition;
 
 handle_type!(View);
-handle_type!(ViewDelegate);
 
 type ViewShouldRenderCallback = Box<dyn Fn(f64) -> bool + Send + Sync + 'static>;
 
@@ -19,37 +19,33 @@ struct ViewDelegateContext {
     should_render: Option<ViewShouldRenderCallback>,
 }
 
-extern "C" fn view_delegate_should_render(context: *mut c_void, time: f64) -> bool {
-    let context = unsafe { &*(context.cast::<ViewDelegateContext>()) };
-    context
-        .should_render
-        .as_ref()
-        .is_none_or(|callback| catch_unwind(AssertUnwindSafe(|| callback(time))).unwrap_or(true))
+#[derive(Debug)]
+pub struct ViewDelegate {
+    inner: DelegateObject<ViewDelegateContext>,
 }
 
-extern "C" fn view_delegate_release(context: *mut c_void) {
-    if context.is_null() {
-        return;
-    }
+unsafe extern "C" fn view_delegate_should_render(context: *mut c_void, time: f64) -> bool {
     unsafe {
-        drop(Box::from_raw(context.cast::<ViewDelegateContext>()));
+        invoke_callback::<ViewDelegateContext, _>(
+            context,
+            "spritekit::ViewDelegate::should_render",
+            |delegate| {
+                delegate
+                    .should_render
+                    .as_ref()
+                    .map(|callback| callback(time))
+            },
+        )
     }
+    .flatten()
+    .unwrap_or(true)
 }
 
 impl ViewDelegate {
     /// Wraps `SKViewDelegate`.
     #[must_use]
     pub fn new() -> Option<Self> {
-        let context = Box::new(ViewDelegateContext {
-            should_render: None,
-        });
-        unsafe {
-            Self::from_raw(ffi::sk_view_delegate_new(
-                Box::into_raw(context).cast(),
-                Some(view_delegate_should_render),
-                Some(view_delegate_release),
-            ))
-        }
+        Self::create(None)
     }
 
     /// Wraps `SKViewDelegate`.
@@ -58,23 +54,34 @@ impl ViewDelegate {
     where
         F: Fn(f64) -> bool + Send + Sync + 'static,
     {
-        let context = Box::new(ViewDelegateContext {
-            should_render: Some(Box::new(should_render)),
-        });
-        unsafe {
-            Self::from_raw(ffi::sk_view_delegate_new(
-                Box::into_raw(context).cast(),
+        Self::create(Some(Box::new(should_render)))
+    }
+
+    fn create(should_render: Option<ViewShouldRenderCallback>) -> Option<Self> {
+        DelegateObject::new(ViewDelegateContext { should_render }, |context| unsafe {
+            ffi::sk_view_delegate_new(
+                context,
                 Some(view_delegate_should_render),
-                Some(view_delegate_release),
-            ))
-        }
+                Some(CallbackContext::<ViewDelegateContext>::RELEASE),
+            )
+        })
+        .map(|inner| Self { inner })
+    }
+
+    #[must_use]
+    pub const fn as_ptr(&self) -> *mut c_void {
+        self.inner.as_ptr()
     }
 }
 
 impl View {
     /// Wraps `SKView`.
-    #[must_use]
-    pub fn with_frame(frame: CGRect) -> Option<Self> {
+    pub fn with_frame(frame: CGRect) -> Result<Self, SpriteKitError> {
+        if !is_main_thread() {
+            return Err(SpriteKitError::new(
+                "SKView must be created and used on the main thread",
+            ));
+        }
         unsafe {
             Self::from_raw(ffi::sk_view_new_with_frame(
                 frame.origin.x,
@@ -83,6 +90,7 @@ impl View {
                 frame.size.height,
             ))
         }
+        .ok_or_else(|| SpriteKitError::new("SKView(frame:) returned nil"))
     }
 
     /// Returns a property exposed by `SKView`.

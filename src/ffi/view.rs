@@ -58,8 +58,8 @@ extern "C" {
     /// Wraps `SKView` and `SKViewDelegate`.
     pub fn sk_view_delegate_new(
         context: *mut c_void,
-        should_render: Option<extern "C" fn(*mut c_void, f64) -> bool>,
-        release_context: Option<extern "C" fn(*mut c_void)>,
+        should_render: Option<unsafe extern "C" fn(*mut c_void, f64) -> bool>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     ) -> *mut c_void;
     /// Wraps `SKView` and `SKViewDelegate`.
     pub fn sk_view_set_delegate(view: *mut c_void, delegate: *mut c_void);

@@ -30,6 +30,11 @@ func skRetainDelegate(_ delegate: AnyObject?, by owner: AnyObject, key: UnsafeRa
     withExtendedLifetime(previous) {}
 }
 
+func skBorrowView(_ handle: UnsafeMutableRawPointer?) -> SKView? {
+    guard Thread.isMainThread else { return nil }
+    return skBorrow(handle)
+}
+
 @inline(__always)
 func skDup(_ value: String?) -> UnsafeMutablePointer<CChar>? {
     guard let value else { return nil }

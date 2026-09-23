@@ -72,6 +72,10 @@ impl<T: Send + Sync + 'static> core::fmt::Debug for DelegateObject<T> {
     }
 }
 
+pub fn is_main_thread() -> bool {
+    unsafe { libc::pthread_main_np() != 0 }
+}
+
 macro_rules! handle_type {
     ($name:ident) => {
         /// Wrapper type for retained `SpriteKit` wrapper handles.

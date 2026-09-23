@@ -130,7 +130,7 @@ public func sk_scene_physics_world(_ sceneHandle: UnsafeMutableRawPointer?) -> U
 
 @_cdecl("sk_scene_get_view")
 public func sk_scene_get_view(_ sceneHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
-    guard let scene: SKScene = skBorrow(sceneHandle), let view = scene.view else { return nil }
+    guard Thread.isMainThread, let scene: SKScene = skBorrow(sceneHandle), let view = scene.view else { return nil }
     return skRetain(view)
 }
 
