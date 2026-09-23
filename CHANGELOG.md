@@ -1,5 +1,46 @@
 # Changelog
 
+All notable changes to `spritekit-rs` will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.4.0] - Unreleased
+
+### Security
+
+- `PhysicsWorld` retains its contact delegate while it is set. `SKPhysicsWorld.contactDelegate` is `assign`, so dropping a `PhysicsContactDelegate` while the scene simulated left SpriteKit calling a freed bridge object and closure, and `has_contact_delegate` read the dangling pointer. Dropping the Rust handle now only stops the callbacks; the bridge object is released when the delegate is cleared or replaced, or when the world is freed.
+- `read_texture_bytes` sizes its buffer with `apple_metal::bytes_per_pixel`, passes the buffer length to the bridge and checks the copy. It used to assume 4 bytes per pixel, so RGBA16Float, RGBA32Float and BGRA10_XR textures overflowed the heap. Compressed, depth/stencil, framebuffer-only, non-2D, and private or memoryless textures are rejected.
+
+### Fixed
+
+- `NodeExt::add_child` rejects children that already have a parent, self-parenting and cycles, and `move_to_parent` rejects moves under the node itself or a descendant, instead of letting SpriteKit raise `NSInvalidArgumentException` and abort the process.
+- Contact callbacks can read the contact. SpriteKit delivers a private contact class that failed the bridge's `SKPhysicsContact` cast, so `body_a`, `body_b`, `contact_point`, `contact_normal` and `collision_impulse` always returned `None` or zero.
+- `Renderer::new` serializes `SKRenderer` creation. SpriteKit's shader loading is not thread-safe, and creating renderers on several threads at once crashed.
+- `MutableTexture::modify_pixel_data` and the `TextureAtlas` completion-handler preloads release their closures when SpriteKit drops the block without calling it, instead of leaking them.
+- Swift bridge conversions of enum raw values, particle render order and tile placement weights no longer trap on out-of-range values.
+
+### Changed
+
+- **Breaking:** `NodeExt::add_child` and `NodeExt::move_to_parent` return `Result<(), SpriteKitError>`.
+- **Breaking:** `View::with_frame` returns `Result<View, SpriteKitError>` and fails off the main thread. Other `SKView` calls do nothing and return defaults off the main thread, and `Scene::view` returns `None` there.
+- **Breaking:** raw `ffi` declarations follow the bridge: `sk_node_add_child` and `sk_node_move_to_parent` return `bool` with an error out-pointer; the delegate constructors, `sk_mutable_texture_modify_pixel_data` and the atlas preload functions take a context-release callback; `sk_scene_delegate_new` takes the four new phase callbacks; `sk_texture_copy_bytes` takes the buffer length and bytes per pixel; callback parameters are `unsafe extern "C" fn` pointers.
+- `PhysicsContactDelegate`, `SceneDelegate` and `ViewDelegate` keep their closures in a `doom_fish_utils::callback_context::CallbackContext`; dropping a handle deactivates its callbacks immediately.
+- **Breaking:** require `apple-cf` 0.11 and `apple-metal` 0.10, whose types appear in this crate's API (`CGRect`, `MetalDevice`, `MetalTexture`, `CommandBuffer`), and `doom-fish-utils` 0.4.1. `rust-version` rises from 1.76 to 1.82.
+
+### Added
+
+- `Action::run_block`, and `Action::custom`, whose block receives `&Node` and the elapsed time.
+- `NodeExt::run_action_with_completion`, `run_action_with_key`, `action_for_key` and `remove_action_for_key`.
+- `SceneDelegateCallbacks` and `SceneDelegate::from_callbacks`, adding `didEvaluateActions`, `didSimulatePhysics`, `didApplyConstraints` and `didFinishUpdate` to `update`.
+- `PhysicsWorld::add_joint`, `remove_joint` and `remove_all_joints`. `add_joint` rejects joints that were already added and joints whose bodies are not attached to nodes in a scene, which SpriteKit crashes on.
+- `color::verify_ffi_layout` and compile-time size and alignment checks for `Color`, which crosses the bridge by value.
+- Tests that drop delegates while they are set and then drive the simulation, check frame-phase order, action callbacks, hierarchy and joint errors, texture readback (RGBA16Float, BGRA10_XR and rejected formats) and closure release. `SKView` tests run on the main thread in `tests/main_thread.rs`.
+
+### Removed
+
+- The empty `SpriteKitBridge.h` header, its module map and the `publicHeadersPath` setting of the Swift package.
+
 ## [0.3.3] - 2026-05-20
 
 - Migrated local `take_string` body to call `doom_fish_utils::ffi_string::take_owned_cstring_c`. Centralises the duplicated FFI take-string pattern fleet-wide. No public API change.
@@ -20,13 +61,6 @@
 ## [0.3.1] - 2026-05-18
 
 - Widen apple-cf version bound to `<0.10` so 0.9.x resolves.
-
-All notable changes to `spritekit-rs` will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
 
 ## [0.3.0] - 2026-05-18
 

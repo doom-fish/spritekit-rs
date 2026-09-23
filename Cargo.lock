@@ -84,7 +84,7 @@ checksum = "22686f4785f02a4fcc856d3b3bb19bf6c8160d103f7a99cc258bddd0251dc7f2"
 
 [[package]]
 name = "spritekit-rs"
-version = "0.3.3"
+version = "0.4.0"
 dependencies = [
  "apple-cf",
  "apple-metal",

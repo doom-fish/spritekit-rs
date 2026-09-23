@@ -2,7 +2,16 @@
 
 Safe Rust bindings for Apple's [SpriteKit](https://developer.apple.com/documentation/spritekit) framework on macOS.
 
-> **Status:** v0.3.2 keeps the crate at 100% symbol-level header coverage while closing the mutable-texture and atlas-preloading sweep gaps with callback and optional async wrappers, all on the same retained-handle `screencapturekit-rs` bridge pattern.
+> **Status:** v0.4.0 retains the physics contact delegate while it is set, sizes texture readback by pixel format, returns errors instead of `SpriteKit` exceptions for invalid hierarchy and joint operations, and keeps `SKView` on the main thread. It adds action completion, block, custom and keyed actions, the full scene frame-phase delegate and physics-joint management. Every public macOS `SpriteKit` type, protocol and category is reachable from Rust, but this is symbol-level coverage, not selector-for-selector parity.
+
+## Installation
+
+```toml
+[dependencies]
+spritekit-rs = "0.4"
+```
+
+The library is imported as `spritekit`. It needs macOS 11 or later, Rust 1.82 or later, and a Swift toolchain (Xcode or the Command Line Tools), which `build.rs` uses to compile the bundled Swift bridge.
 
 ## Quick start
 
