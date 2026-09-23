@@ -1,16 +1,33 @@
 import SpriteKit
 
 public typealias SceneUpdateCallback = @convention(c) (UnsafeMutableRawPointer?, Double) -> Void
+public typealias SceneStepCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
 public typealias SceneReleaseCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
 
 private final class SceneDelegateBridge: NSObject, SKSceneDelegate {
-    private let context: UnsafeMutableRawPointer?
+    private let context: UnsafeMutableRawPointer
     private let updateCallback: SceneUpdateCallback?
+    private let didEvaluateActionsCallback: SceneStepCallback?
+    private let didSimulatePhysicsCallback: SceneStepCallback?
+    private let didApplyConstraintsCallback: SceneStepCallback?
+    private let didFinishUpdateCallback: SceneStepCallback?
     private let releaseCallback: SceneReleaseCallback?
 
-    init(context: UnsafeMutableRawPointer?, updateCallback: SceneUpdateCallback?, releaseCallback: SceneReleaseCallback?) {
+    init(
+        context: UnsafeMutableRawPointer,
+        updateCallback: SceneUpdateCallback?,
+        didEvaluateActionsCallback: SceneStepCallback?,
+        didSimulatePhysicsCallback: SceneStepCallback?,
+        didApplyConstraintsCallback: SceneStepCallback?,
+        didFinishUpdateCallback: SceneStepCallback?,
+        releaseCallback: SceneReleaseCallback?
+    ) {
         self.context = context
         self.updateCallback = updateCallback
+        self.didEvaluateActionsCallback = didEvaluateActionsCallback
+        self.didSimulatePhysicsCallback = didSimulatePhysicsCallback
+        self.didApplyConstraintsCallback = didApplyConstraintsCallback
+        self.didFinishUpdateCallback = didFinishUpdateCallback
         self.releaseCallback = releaseCallback
     }
 
@@ -20,6 +37,22 @@ private final class SceneDelegateBridge: NSObject, SKSceneDelegate {
 
     func update(_ currentTime: TimeInterval, for scene: SKScene) {
         updateCallback?(context, currentTime)
+    }
+
+    func didEvaluateActions(for scene: SKScene) {
+        didEvaluateActionsCallback?(context)
+    }
+
+    func didSimulatePhysics(for scene: SKScene) {
+        didSimulatePhysicsCallback?(context)
+    }
+
+    func didApplyConstraints(for scene: SKScene) {
+        didApplyConstraintsCallback?(context)
+    }
+
+    func didFinishUpdate(for scene: SKScene) {
+        didFinishUpdateCallback?(context)
     }
 }
 
@@ -86,9 +119,22 @@ public func sk_scene_set_camera(_ sceneHandle: UnsafeMutableRawPointer?, _ camer
 public func sk_scene_delegate_new(
     _ context: UnsafeMutableRawPointer?,
     _ update: SceneUpdateCallback?,
+    _ didEvaluateActions: SceneStepCallback?,
+    _ didSimulatePhysics: SceneStepCallback?,
+    _ didApplyConstraints: SceneStepCallback?,
+    _ didFinishUpdate: SceneStepCallback?,
     _ releaseContext: SceneReleaseCallback?
 ) -> UnsafeMutableRawPointer? {
-    skRetain(SceneDelegateBridge(context: context, updateCallback: update, releaseCallback: releaseContext))
+    guard let context else { return nil }
+    return skRetain(SceneDelegateBridge(
+        context: context,
+        updateCallback: update,
+        didEvaluateActionsCallback: didEvaluateActions,
+        didSimulatePhysicsCallback: didSimulatePhysics,
+        didApplyConstraintsCallback: didApplyConstraints,
+        didFinishUpdateCallback: didFinishUpdate,
+        releaseCallback: releaseContext
+    ))
 }
 
 @_cdecl("sk_scene_set_delegate")

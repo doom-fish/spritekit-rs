@@ -113,7 +113,7 @@ pub use reach_constraints::ReachConstraints;
 pub use reference_node::ReferenceNode;
 pub use region::Region;
 pub use renderer::{read_texture_bytes, LoadAction, RenderPassDescriptor, Renderer, StoreAction};
-pub use scene::{Scene, SceneDelegate, SceneScaleMode};
+pub use scene::{Scene, SceneDelegate, SceneDelegateCallbacks, SceneScaleMode};
 pub use shader::{Shader, UniformType};
 pub use shape_node::ShapeNode;
 pub use sprite_node::SpriteNode;

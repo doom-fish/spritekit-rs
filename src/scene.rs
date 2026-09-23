@@ -1,37 +1,157 @@
 use core::ffi::c_void;
-use std::panic::{catch_unwind, AssertUnwindSafe};
 
 use apple_cf::cg::{CGPoint, CGSize};
+use doom_fish_utils::callback_context::CallbackContext;
 
 use crate::camera_node::CameraNode;
 use crate::ffi;
 use crate::node::AsNode;
 use crate::physics_world::PhysicsWorld;
-use crate::private::handle_type;
+use crate::private::{handle_type, invoke_callback, DelegateObject};
 use crate::view::View;
 
 handle_type!(Scene);
-handle_type!(SceneDelegate);
 
 type SceneUpdateCallback = Box<dyn Fn(f64) + Send + Sync + 'static>;
+type SceneStepCallback = Box<dyn Fn() + Send + Sync + 'static>;
 
-struct SceneDelegateContext {
+#[derive(Default)]
+pub struct SceneDelegateCallbacks {
     update: Option<SceneUpdateCallback>,
+    did_evaluate_actions: Option<SceneStepCallback>,
+    did_simulate_physics: Option<SceneStepCallback>,
+    did_apply_constraints: Option<SceneStepCallback>,
+    did_finish_update: Option<SceneStepCallback>,
 }
 
-extern "C" fn scene_delegate_update(context: *mut c_void, current_time: f64) {
-    let context = unsafe { &*(context.cast::<SceneDelegateContext>()) };
-    if let Some(callback) = &context.update {
-        let _ = catch_unwind(AssertUnwindSafe(|| callback(current_time)));
+impl SceneDelegateCallbacks {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self {
+            update: None,
+            did_evaluate_actions: None,
+            did_simulate_physics: None,
+            did_apply_constraints: None,
+            did_finish_update: None,
+        }
+    }
+
+    #[must_use]
+    pub fn on_update<F>(mut self, callback: F) -> Self
+    where
+        F: Fn(f64) + Send + Sync + 'static,
+    {
+        self.update = Some(Box::new(callback));
+        self
+    }
+
+    #[must_use]
+    pub fn on_did_evaluate_actions<F>(mut self, callback: F) -> Self
+    where
+        F: Fn() + Send + Sync + 'static,
+    {
+        self.did_evaluate_actions = Some(Box::new(callback));
+        self
+    }
+
+    #[must_use]
+    pub fn on_did_simulate_physics<F>(mut self, callback: F) -> Self
+    where
+        F: Fn() + Send + Sync + 'static,
+    {
+        self.did_simulate_physics = Some(Box::new(callback));
+        self
+    }
+
+    #[must_use]
+    pub fn on_did_apply_constraints<F>(mut self, callback: F) -> Self
+    where
+        F: Fn() + Send + Sync + 'static,
+    {
+        self.did_apply_constraints = Some(Box::new(callback));
+        self
+    }
+
+    #[must_use]
+    pub fn on_did_finish_update<F>(mut self, callback: F) -> Self
+    where
+        F: Fn() + Send + Sync + 'static,
+    {
+        self.did_finish_update = Some(Box::new(callback));
+        self
     }
 }
 
-extern "C" fn scene_delegate_release(context: *mut c_void) {
-    if context.is_null() {
-        return;
-    }
+#[derive(Debug)]
+pub struct SceneDelegate {
+    inner: DelegateObject<SceneDelegateCallbacks>,
+}
+
+unsafe extern "C" fn scene_delegate_update(context: *mut c_void, current_time: f64) {
     unsafe {
-        drop(Box::from_raw(context.cast::<SceneDelegateContext>()));
+        invoke_callback::<SceneDelegateCallbacks, _>(
+            context,
+            "spritekit::SceneDelegate::update",
+            |callbacks| {
+                if let Some(callback) = &callbacks.update {
+                    callback(current_time);
+                }
+            },
+        );
+    }
+}
+
+unsafe fn scene_delegate_step(
+    context: *mut c_void,
+    site: &str,
+    select: fn(&SceneDelegateCallbacks) -> Option<&SceneStepCallback>,
+) {
+    unsafe {
+        invoke_callback::<SceneDelegateCallbacks, _>(context, site, |callbacks| {
+            if let Some(callback) = select(callbacks) {
+                callback();
+            }
+        });
+    }
+}
+
+unsafe extern "C" fn scene_delegate_did_evaluate_actions(context: *mut c_void) {
+    unsafe {
+        scene_delegate_step(
+            context,
+            "spritekit::SceneDelegate::did_evaluate_actions",
+            |callbacks| callbacks.did_evaluate_actions.as_ref(),
+        );
+    }
+}
+
+unsafe extern "C" fn scene_delegate_did_simulate_physics(context: *mut c_void) {
+    unsafe {
+        scene_delegate_step(
+            context,
+            "spritekit::SceneDelegate::did_simulate_physics",
+            |callbacks| callbacks.did_simulate_physics.as_ref(),
+        );
+    }
+}
+
+unsafe extern "C" fn scene_delegate_did_apply_constraints(context: *mut c_void) {
+    unsafe {
+        scene_delegate_step(
+            context,
+            "spritekit::SceneDelegate::did_apply_constraints",
+            |callbacks| callbacks.did_apply_constraints.as_ref(),
+        );
+    }
+}
+
+unsafe extern "C" fn scene_delegate_did_finish_update(context: *mut c_void) {
+    unsafe {
+        scene_delegate_step(
+            context,
+            "spritekit::SceneDelegate::did_finish_update",
+            |callbacks| callbacks.did_finish_update.as_ref(),
+        );
     }
 }
 
@@ -68,14 +188,7 @@ impl SceneDelegate {
     /// Wraps `SKSceneDelegate`.
     #[must_use]
     pub fn new() -> Option<Self> {
-        let context = Box::new(SceneDelegateContext { update: None });
-        unsafe {
-            Self::from_raw(ffi::sk_scene_delegate_new(
-                Box::into_raw(context).cast(),
-                Some(scene_delegate_update),
-                Some(scene_delegate_release),
-            ))
-        }
+        Self::from_callbacks(SceneDelegateCallbacks::new())
     }
 
     /// Wraps `SKSceneDelegate`.
@@ -84,16 +197,28 @@ impl SceneDelegate {
     where
         F: Fn(f64) + Send + Sync + 'static,
     {
-        let context = Box::new(SceneDelegateContext {
-            update: Some(Box::new(update)),
-        });
-        unsafe {
-            Self::from_raw(ffi::sk_scene_delegate_new(
-                Box::into_raw(context).cast(),
+        Self::from_callbacks(SceneDelegateCallbacks::new().on_update(update))
+    }
+
+    #[must_use]
+    pub fn from_callbacks(callbacks: SceneDelegateCallbacks) -> Option<Self> {
+        DelegateObject::new(callbacks, |context| unsafe {
+            ffi::sk_scene_delegate_new(
+                context,
                 Some(scene_delegate_update),
-                Some(scene_delegate_release),
-            ))
-        }
+                Some(scene_delegate_did_evaluate_actions),
+                Some(scene_delegate_did_simulate_physics),
+                Some(scene_delegate_did_apply_constraints),
+                Some(scene_delegate_did_finish_update),
+                Some(CallbackContext::<SceneDelegateCallbacks>::RELEASE),
+            )
+        })
+        .map(|inner| Self { inner })
+    }
+
+    #[must_use]
+    pub const fn as_ptr(&self) -> *mut c_void {
+        self.inner.as_ptr()
     }
 }
 

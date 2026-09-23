@@ -22,8 +22,12 @@ extern "C" {
     /// Wraps `SKScene` and `SKSceneScaleMode`.
     pub fn sk_scene_delegate_new(
         context: *mut c_void,
-        update: Option<extern "C" fn(*mut c_void, f64)>,
-        release_context: Option<extern "C" fn(*mut c_void)>,
+        update: Option<unsafe extern "C" fn(*mut c_void, f64)>,
+        did_evaluate_actions: Option<unsafe extern "C" fn(*mut c_void)>,
+        did_simulate_physics: Option<unsafe extern "C" fn(*mut c_void)>,
+        did_apply_constraints: Option<unsafe extern "C" fn(*mut c_void)>,
+        did_finish_update: Option<unsafe extern "C" fn(*mut c_void)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     ) -> *mut c_void;
     /// Wraps `SKScene` and `SKSceneScaleMode`.
     pub fn sk_scene_set_delegate(scene: *mut c_void, delegate: *mut c_void);
