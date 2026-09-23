@@ -1,16 +1,20 @@
 use core::{
     ffi::{c_char, c_void},
+    mem::ManuallyDrop,
     ptr, slice,
 };
 use std::ffi::CString;
-use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::sync::Mutex;
 #[cfg(feature = "async")]
 use std::{
     future::Future,
     pin::Pin,
-    sync::{Arc, Mutex, MutexGuard},
+    sync::{Arc, MutexGuard},
     task::{Context, Poll, Waker},
 };
+
+use doom_fish_utils::callback_context::CallbackContext;
+use doom_fish_utils::panic_safe::catch_user_panic;
 
 use crate::error::SpriteKitError;
 use crate::ffi;
@@ -23,22 +27,11 @@ type TextureAtlasCompletionCallback = Box<dyn FnOnce() + Send + 'static>;
 type TextureAtlasNamedCompletionCallback =
     Box<dyn FnOnce(Result<Vec<TextureAtlas>, SpriteKitError>) + Send + 'static>;
 
-struct TextureAtlasCompletionContext {
-    callback: Option<TextureAtlasCompletionCallback>,
-}
-
-struct TextureAtlasNamedCompletionContext {
-    callback: Option<TextureAtlasNamedCompletionCallback>,
-}
-
 #[cfg(feature = "async")]
 type TextureAtlasNamedAsyncCompletionCallback =
     Box<dyn FnOnce(Result<Vec<OwnedTextureAtlasHandle>, SpriteKitError>) + Send + 'static>;
 
-#[cfg(feature = "async")]
-struct TextureAtlasNamedAsyncCompletionContext {
-    callback: Option<TextureAtlasNamedAsyncCompletionCallback>,
-}
+type ReleaseContext = unsafe extern "C" fn(*mut c_void);
 
 #[cfg(feature = "async")]
 struct OwnedTextureAtlasHandle(usize);
@@ -66,29 +59,39 @@ impl Drop for OwnedTextureAtlasHandle {
     }
 }
 
-extern "C" fn texture_atlas_completion(context: *mut c_void) {
-    if context.is_null() {
-        return;
-    }
-
-    let mut context = unsafe { Box::from_raw(context.cast::<TextureAtlasCompletionContext>()) };
-    let Some(callback) = context.callback.take() else {
-        return;
-    };
-    let _ = catch_unwind(AssertUnwindSafe(callback));
+fn one_shot_context<T: Send + 'static>(callback: T) -> (*mut c_void, ReleaseContext) {
+    let context = ManuallyDrop::new(CallbackContext::new(Mutex::new(Some(callback))));
+    (
+        context.as_ptr(),
+        CallbackContext::<Mutex<Option<T>>>::RELEASE,
+    )
 }
 
-extern "C" fn texture_atlas_named_completion(
+unsafe fn take_one_shot<T: Send + 'static>(context: *mut c_void, site: &str) -> Option<T> {
+    unsafe {
+        CallbackContext::<Mutex<Option<T>>>::with(context, site, |slot| {
+            slot.lock().ok().and_then(|mut slot| slot.take())
+        })
+    }
+    .flatten()
+}
+
+unsafe extern "C" fn texture_atlas_completion(context: *mut c_void) {
+    const SITE: &str = "spritekit::TextureAtlas::preload_completion";
+    if let Some(callback) =
+        unsafe { take_one_shot::<TextureAtlasCompletionCallback>(context, SITE) }
+    {
+        catch_user_panic(SITE, callback);
+    }
+}
+
+unsafe extern "C" fn texture_atlas_named_completion(
     context: *mut c_void,
     error: *mut c_char,
     atlas_handles: *mut *mut c_void,
     atlas_count: usize,
 ) {
-    let mut context = if context.is_null() {
-        None
-    } else {
-        Some(unsafe { Box::from_raw(context.cast::<TextureAtlasNamedCompletionContext>()) })
-    };
+    const SITE: &str = "spritekit::TextureAtlas::preload_named_completion";
     let atlases = take_texture_atlases(atlas_handles, atlas_count);
     let result = match unsafe { crate::error::take_string(error) } {
         Some(message) => {
@@ -97,28 +100,21 @@ extern "C" fn texture_atlas_named_completion(
         }
         None => Ok(atlases),
     };
-
-    let Some(context) = &mut context else {
-        return;
-    };
-    let Some(callback) = context.callback.take() else {
-        return;
-    };
-    let _ = catch_unwind(AssertUnwindSafe(|| callback(result)));
+    if let Some(callback) =
+        unsafe { take_one_shot::<TextureAtlasNamedCompletionCallback>(context, SITE) }
+    {
+        catch_user_panic(SITE, || callback(result));
+    }
 }
 
 #[cfg(feature = "async")]
-extern "C" fn texture_atlas_named_async_completion(
+unsafe extern "C" fn texture_atlas_named_async_completion(
     context: *mut c_void,
     error: *mut c_char,
     atlas_handles: *mut *mut c_void,
     atlas_count: usize,
 ) {
-    let mut context = if context.is_null() {
-        None
-    } else {
-        Some(unsafe { Box::from_raw(context.cast::<TextureAtlasNamedAsyncCompletionContext>()) })
-    };
+    const SITE: &str = "spritekit::TextureAtlas::preload_named_async_completion";
     let atlases = take_owned_texture_atlas_handles(atlas_handles, atlas_count);
     let result = match unsafe { crate::error::take_string(error) } {
         Some(message) => {
@@ -127,45 +123,36 @@ extern "C" fn texture_atlas_named_async_completion(
         }
         None => Ok(atlases),
     };
-
-    let Some(context) = &mut context else {
-        return;
-    };
-    let Some(callback) = context.callback.take() else {
-        return;
-    };
-    let _ = catch_unwind(AssertUnwindSafe(|| callback(result)));
+    if let Some(callback) =
+        unsafe { take_one_shot::<TextureAtlasNamedAsyncCompletionCallback>(context, SITE) }
+    {
+        catch_user_panic(SITE, || callback(result));
+    }
 }
 
-fn texture_atlas_completion_context<F>(completion: F) -> *mut c_void
+fn texture_atlas_completion_context<F>(completion: F) -> (*mut c_void, ReleaseContext)
 where
     F: FnOnce() + Send + 'static,
 {
-    Box::into_raw(Box::new(TextureAtlasCompletionContext {
-        callback: Some(Box::new(completion)),
-    }))
-    .cast()
+    let callback: TextureAtlasCompletionCallback = Box::new(completion);
+    one_shot_context(callback)
 }
 
-fn texture_atlas_named_completion_context<F>(completion: F) -> *mut c_void
+fn texture_atlas_named_completion_context<F>(completion: F) -> (*mut c_void, ReleaseContext)
 where
     F: FnOnce(Result<Vec<TextureAtlas>, SpriteKitError>) + Send + 'static,
 {
-    Box::into_raw(Box::new(TextureAtlasNamedCompletionContext {
-        callback: Some(Box::new(completion)),
-    }))
-    .cast()
+    let callback: TextureAtlasNamedCompletionCallback = Box::new(completion);
+    one_shot_context(callback)
 }
 
 #[cfg(feature = "async")]
-fn texture_atlas_named_async_completion_context<F>(completion: F) -> *mut c_void
+fn texture_atlas_named_async_completion_context<F>(completion: F) -> (*mut c_void, ReleaseContext)
 where
     F: FnOnce(Result<Vec<OwnedTextureAtlasHandle>, SpriteKitError>) + Send + 'static,
 {
-    Box::into_raw(Box::new(TextureAtlasNamedAsyncCompletionContext {
-        callback: Some(Box::new(completion)),
-    }))
-    .cast()
+    let callback: TextureAtlasNamedAsyncCompletionCallback = Box::new(completion);
+    one_shot_context(callback)
 }
 
 fn texture_atlas_name_cstrings(atlas_names: &[&str]) -> Result<Vec<CString>, SpriteKitError> {
@@ -307,8 +294,15 @@ impl TextureAtlas {
     where
         F: FnOnce() + Send + 'static,
     {
-        let context = texture_atlas_completion_context(completion);
-        unsafe { ffi::sk_texture_atlas_preload(self.ptr, context, Some(texture_atlas_completion)) };
+        let (context, release) = texture_atlas_completion_context(completion);
+        unsafe {
+            ffi::sk_texture_atlas_preload(
+                self.ptr,
+                context,
+                Some(texture_atlas_completion),
+                Some(release),
+            );
+        };
     }
 
     /// Wraps `SKTextureAtlas`.
@@ -325,13 +319,14 @@ impl TextureAtlas {
         } else {
             raw.as_mut_ptr().cast()
         };
-        let context = texture_atlas_completion_context(completion);
+        let (context, release) = texture_atlas_completion_context(completion);
         unsafe {
             ffi::sk_texture_atlas_preload_texture_atlases(
                 raw_ptr,
                 raw.len(),
                 context,
                 Some(texture_atlas_completion),
+                Some(release),
             );
         };
     }
@@ -355,13 +350,14 @@ impl TextureAtlas {
         } else {
             raw_names.as_mut_ptr().cast()
         };
-        let context = texture_atlas_named_completion_context(completion);
+        let (context, release) = texture_atlas_named_completion_context(completion);
         unsafe {
             ffi::sk_texture_atlas_preload_texture_atlases_named(
                 raw_ptr,
                 raw_names.len(),
                 context,
                 Some(texture_atlas_named_completion),
+                Some(release),
             );
         };
         Ok(())
@@ -405,15 +401,17 @@ impl TextureAtlas {
                 } else {
                     raw_names.as_mut_ptr().cast()
                 };
-                let context = texture_atlas_named_async_completion_context(move |result| {
-                    completer.complete(result);
-                });
+                let (context, release) =
+                    texture_atlas_named_async_completion_context(move |result| {
+                        completer.complete(result);
+                    });
                 unsafe {
                     ffi::sk_texture_atlas_preload_texture_atlases_named(
                         raw_ptr,
                         raw_names.len(),
                         context,
                         Some(texture_atlas_named_async_completion),
+                        Some(release),
                     );
                 };
                 future

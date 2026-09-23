@@ -13,7 +13,8 @@ extern "C" {
     pub fn sk_mutable_texture_modify_pixel_data(
         texture: *mut c_void,
         context: *mut c_void,
-        modify: Option<extern "C" fn(*mut c_void, *mut c_void, usize)>,
+        modify: Option<unsafe extern "C" fn(*mut c_void, *mut c_void, usize)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     );
 
     /// Wraps `SKTextureAtlas`.
@@ -30,19 +31,24 @@ extern "C" {
         atlases: *mut c_void,
         count: usize,
         context: *mut c_void,
-        completion: Option<extern "C" fn(*mut c_void)>,
+        completion: Option<unsafe extern "C" fn(*mut c_void)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     );
     /// Wraps `SKTextureAtlas`.
     pub fn sk_texture_atlas_preload_texture_atlases_named(
         atlas_names: *mut c_void,
         count: usize,
         context: *mut c_void,
-        completion: Option<extern "C" fn(*mut c_void, *mut c_char, *mut *mut c_void, usize)>,
+        completion: Option<
+            unsafe extern "C" fn(*mut c_void, *mut c_char, *mut *mut c_void, usize),
+        >,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     );
     /// Wraps `SKTextureAtlas`.
     pub fn sk_texture_atlas_preload(
         atlas: *mut c_void,
         context: *mut c_void,
-        completion: Option<extern "C" fn(*mut c_void)>,
+        completion: Option<unsafe extern "C" fn(*mut c_void)>,
+        release_context: Option<unsafe extern "C" fn(*mut c_void)>,
     );
 }

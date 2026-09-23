@@ -23,6 +23,22 @@ func skBorrow<T>(_ handle: UnsafeMutableRawPointer?) -> T? {
     return Unmanaged<AnyObject>.fromOpaque(handle).takeUnretainedValue() as? T
 }
 
+public typealias SKContextReleaseCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
+
+final class SKCallbackOwner {
+    let context: UnsafeMutableRawPointer?
+    private let release: SKContextReleaseCallback?
+
+    init(context: UnsafeMutableRawPointer?, release: SKContextReleaseCallback?) {
+        self.context = context
+        self.release = release
+    }
+
+    deinit {
+        release?(context)
+    }
+}
+
 func skRetainDelegate(_ delegate: AnyObject?, by owner: AnyObject, key: UnsafeRawPointer, assign: () -> Void) {
     let previous = objc_getAssociatedObject(owner, key)
     objc_setAssociatedObject(owner, key, delegate, .OBJC_ASSOCIATION_RETAIN)

@@ -1,30 +1,31 @@
-use core::{ffi::c_void, slice};
-use std::panic::{catch_unwind, AssertUnwindSafe};
+use core::{ffi::c_void, mem::ManuallyDrop, slice};
+use std::sync::Mutex;
 
 use apple_cf::cg::CGSize;
+use doom_fish_utils::callback_context::CallbackContext;
+use doom_fish_utils::panic_safe::catch_user_panic;
 
 use crate::ffi;
 use crate::private::handle_type;
 
 handle_type!(MutableTexture);
 
-type MutableTextureModifyCallback = Box<dyn FnOnce(&mut [u8]) + Send + 'static>;
+type PixelDataModifier = Box<dyn FnOnce(&mut [u8]) + Send + 'static>;
+type MutableTextureModifyCallback = Mutex<Option<PixelDataModifier>>;
 
-struct MutableTextureModifyContext {
-    callback: Option<MutableTextureModifyCallback>,
-}
-
-extern "C" fn mutable_texture_modify_pixel_data(
+unsafe extern "C" fn mutable_texture_modify_pixel_data(
     context: *mut c_void,
     pixel_data: *mut c_void,
     length: usize,
 ) {
-    if context.is_null() {
-        return;
+    const SITE: &str = "spritekit::MutableTexture::modify_pixel_data";
+    let callback = unsafe {
+        CallbackContext::<MutableTextureModifyCallback>::with(context, SITE, |slot| {
+            slot.lock().ok().and_then(|mut slot| slot.take())
+        })
     }
-
-    let mut context = unsafe { Box::from_raw(context.cast::<MutableTextureModifyContext>()) };
-    let Some(callback) = context.callback.take() else {
+    .flatten();
+    let Some(callback) = callback else {
         return;
     };
     let pixels = if pixel_data.is_null() || length == 0 {
@@ -32,7 +33,7 @@ extern "C" fn mutable_texture_modify_pixel_data(
     } else {
         unsafe { slice::from_raw_parts_mut(pixel_data.cast::<u8>(), length) }
     };
-    let _ = catch_unwind(AssertUnwindSafe(|| callback(pixels)));
+    catch_user_panic(SITE, || callback(pixels));
 }
 
 impl MutableTexture {
@@ -67,14 +68,16 @@ impl MutableTexture {
     where
         F: FnOnce(&mut [u8]) + Send + 'static,
     {
-        let context = Box::new(MutableTextureModifyContext {
-            callback: Some(Box::new(modify)),
-        });
+        let modify: PixelDataModifier = Box::new(modify);
+        let context = ManuallyDrop::new(CallbackContext::<MutableTextureModifyCallback>::new(
+            Mutex::new(Some(modify)),
+        ));
         unsafe {
             ffi::sk_mutable_texture_modify_pixel_data(
                 self.ptr,
-                Box::into_raw(context).cast(),
+                context.as_ptr(),
                 Some(mutable_texture_modify_pixel_data),
+                Some(CallbackContext::<MutableTextureModifyCallback>::RELEASE),
             );
         };
     }

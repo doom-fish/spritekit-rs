@@ -40,11 +40,13 @@ public func sk_mutable_texture_new_with_size_pixel_format(_ width: Double, _ hei
 public func sk_mutable_texture_modify_pixel_data(
     _ textureHandle: UnsafeMutableRawPointer?,
     _ context: UnsafeMutableRawPointer?,
-    _ modify: MutableTextureModifyPixelDataCallback?
+    _ modify: MutableTextureModifyPixelDataCallback?,
+    _ releaseContext: SKContextReleaseCallback?
 ) {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
     guard let texture: SKMutableTexture = skBorrow(textureHandle) else { return }
     texture.modifyPixelData { pixelData, length in
-        modify?(context, pixelData, length)
+        modify?(owner.context, pixelData, length)
     }
 }
 
@@ -73,11 +75,13 @@ public func sk_texture_atlas_preload_texture_atlases(
     _ atlasHandles: UnsafeMutableRawPointer?,
     _ count: Int,
     _ context: UnsafeMutableRawPointer?,
-    _ completion: TextureAtlasCompletionCallback?
+    _ completion: TextureAtlasCompletionCallback?,
+    _ releaseContext: SKContextReleaseCallback?
 ) {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
     let atlases: [SKTextureAtlas] = skHandles(from: atlasHandles, count: count)
     SKTextureAtlas.preloadTextureAtlases(atlases) {
-        completion?(context)
+        completion?(owner.context)
     }
 }
 
@@ -86,8 +90,10 @@ public func sk_texture_atlas_preload_texture_atlases_named(
     _ rawAtlasNames: UnsafeMutableRawPointer?,
     _ count: Int,
     _ context: UnsafeMutableRawPointer?,
-    _ completion: TextureAtlasNamedCompletionCallback?
+    _ completion: TextureAtlasNamedCompletionCallback?,
+    _ releaseContext: SKContextReleaseCallback?
 ) {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
     let atlasNames = skTextureAtlasNames(from: rawAtlasNames, count: count)
     SKTextureAtlas.preloadTextureAtlasesNamed(atlasNames) { error, atlases in
         guard let completion else { return }
@@ -95,7 +101,7 @@ public func sk_texture_atlas_preload_texture_atlases_named(
         var atlasHandles = atlases.map { Optional(skRetain($0)) }
         let atlasHandleCount = atlasHandles.count
         atlasHandles.withUnsafeMutableBufferPointer { buffer in
-            completion(context, errorMessage, buffer.baseAddress, atlasHandleCount)
+            completion(owner.context, errorMessage, buffer.baseAddress, atlasHandleCount)
         }
     }
 }
@@ -104,10 +110,12 @@ public func sk_texture_atlas_preload_texture_atlases_named(
 public func sk_texture_atlas_preload(
     _ atlasHandle: UnsafeMutableRawPointer?,
     _ context: UnsafeMutableRawPointer?,
-    _ completion: TextureAtlasCompletionCallback?
+    _ completion: TextureAtlasCompletionCallback?,
+    _ releaseContext: SKContextReleaseCallback?
 ) {
+    let owner = SKCallbackOwner(context: context, release: releaseContext)
     guard let atlas: SKTextureAtlas = skBorrow(atlasHandle) else { return }
     atlas.preload {
-        completion?(context)
+        completion?(owner.context)
     }
 }
