@@ -229,7 +229,7 @@ fn tiles_warps_and_action_categories_smoke() {
 fn physics_contact_delegate_and_limit_joint_smoke() {
     let scene = Scene::with_size(CGSize::new(64.0, 64.0)).expect("scene");
     let world = scene.physics_world();
-    let _unused_delegate = PhysicsContactDelegate::new().expect("empty contact delegate");
+    assert!(PhysicsContactDelegate::new().is_some());
     let delegate = PhysicsContactDelegate::from_callbacks(
         Some(|contact: PhysicsContact| {
             let _ = contact.body_a();
@@ -261,6 +261,7 @@ fn physics_contact_delegate_and_limit_joint_smoke() {
     }
 
     world.set_contact_delegate(None);
+    assert!(!world.has_contact_delegate());
 }
 
 #[test]
