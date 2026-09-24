@@ -44,7 +44,7 @@ Status key:
 | `SKPhysicsContact` / `SKPhysicsContactDelegate` | ✅ implemented | `src/physics_contact.rs`, `src/ffi/physics_contact.rs` | — | Contact inspection and delegate bridging on `PhysicsWorld`, exercised with real contacts in `tests/delegate_lifetime_tests.rs`. |
 | `SKTileDefinition` / `SKTileGroupRule` / `SKTileGroup` / `SKTileSet` / `SKTileMapNode` | ✅ implemented | `src/tile.rs`, `src/ffi/tile.rs` | — | Tile definitions, adjacency masks, groups, sets, and map-node placement/query APIs are exposed. |
 | `SKWarpGeometry` / `SKWarpGeometryGrid` / `SKWarpable` | ✅ implemented | `src/warp.rs`, `src/ffi/warp.rs` | — | Grid construction, vertex replacement, warpable node accessors, and warp actions are exposed. |
-| `SKRenderer` | ✅ implemented | `src/renderer.rs`, `src/ffi/renderer.rs` | `examples/01_offline_render_smoke.rs` | Offline rendering into `apple-metal` textures (`render` into a new command buffer, the `unsafe` `render_into` for an existing one, both checked against command-buffer state and devices), with serialized renderer creation and pixel-format-aware `read_texture_bytes`. |
+| `SKRenderer` | ✅ implemented | `src/renderer.rs`, `src/ffi/renderer.rs` | `examples/01_offline_render_smoke.rs` | Offline rendering into `apple-metal` textures (`render` into a new command buffer, `render_into` for an existing one under apple-metal's command-buffer lock, both checked against command-buffer state, open encoders and devices), with serialized renderer creation and pixel-format-aware `read_texture_bytes`. |
 
 ## Validation
 
