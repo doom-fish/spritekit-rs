@@ -1,4 +1,4 @@
-use core::ffi::c_void;
+use core::ffi::{c_char, c_void};
 
 extern "C" {
     /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
@@ -26,7 +26,8 @@ extern "C" {
         vp_h: f64,
         command_buffer: *mut c_void,
         pass_descriptor: *mut c_void,
-    );
+        out_error: *mut *mut c_char,
+    ) -> bool;
     /// Wraps `SKRenderer` and `SKRenderPassDescriptor`.
     pub fn sk_texture_copy_bytes(
         texture: *mut c_void,

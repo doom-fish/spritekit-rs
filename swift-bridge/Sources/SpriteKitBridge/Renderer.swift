@@ -1,4 +1,5 @@
 import Metal
+import ObjectiveC
 import SpriteKit
 
 final class SpriteKitRenderPassDescriptorBox: NSObject {
@@ -42,6 +43,7 @@ public func sk_render_pass_descriptor_new_for_texture(
 }
 
 private let skRendererCreationLock = NSLock()
+private var skRendererDeviceKey: UInt8 = 0
 
 @_cdecl("sk_renderer_new")
 public func sk_renderer_new(_ deviceHandle: UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer? {
@@ -49,7 +51,9 @@ public func sk_renderer_new(_ deviceHandle: UnsafeMutableRawPointer?) -> UnsafeM
     guard let device else { return nil }
     skRendererCreationLock.lock()
     defer { skRendererCreationLock.unlock() }
-    return skRetain(SKRenderer(device: device))
+    let renderer = SKRenderer(device: device)
+    objc_setAssociatedObject(renderer, &skRendererDeviceKey, device, .OBJC_ASSOCIATION_RETAIN)
+    return skRetain(renderer)
 }
 
 @_cdecl("sk_renderer_set_scene")
@@ -73,17 +77,36 @@ public func sk_renderer_render(
     _ rendererHandle: UnsafeMutableRawPointer?,
     _ vpX: Double, _ vpY: Double, _ vpW: Double, _ vpH: Double,
     _ commandBufferHandle: UnsafeMutableRawPointer?,
-    _ passDescriptorHandle: UnsafeMutableRawPointer?
-) {
+    _ passDescriptorHandle: UnsafeMutableRawPointer?,
+    _ outError: UnsafeMutablePointer<UnsafeMutablePointer<CChar>?>?
+) -> Bool {
+    outError?.pointee = nil
     guard let renderer: SKRenderer = skBorrow(rendererHandle),
           let commandBuffer: MTLCommandBuffer = skBorrow(commandBufferHandle),
           let passDescriptor = skBorrowRenderPassDescriptor(passDescriptorHandle)
-    else { return }
+    else {
+        outError?.pointee = skDup("missing renderer, command buffer or render pass descriptor")
+        return false
+    }
+    guard commandBuffer.status == .notEnqueued || commandBuffer.status == .enqueued else {
+        let detail = commandBuffer.error.map { ": \($0.localizedDescription)" } ?? ""
+        outError?.pointee = skDup("the command buffer was already committed (status \(commandBuffer.status.rawValue))\(detail)")
+        return false
+    }
+    if let device = objc_getAssociatedObject(renderer, &skRendererDeviceKey) as? MTLDevice, device !== commandBuffer.device {
+        outError?.pointee = skDup("the command buffer belongs to a different Metal device than the renderer")
+        return false
+    }
+    if let texture = passDescriptor.colorAttachments[0].texture, texture.device !== commandBuffer.device {
+        outError?.pointee = skDup("the render target belongs to a different Metal device than the command buffer")
+        return false
+    }
     renderer.render(
         withViewport: CGRect(x: vpX, y: vpY, width: vpW, height: vpH),
         commandBuffer: commandBuffer,
         renderPassDescriptor: passDescriptor
     )
+    return true
 }
 
 @_cdecl("sk_texture_copy_bytes")

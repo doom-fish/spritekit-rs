@@ -43,20 +43,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let renderer = Renderer::new(&device).ok_or("failed to create SKRenderer")?;
     renderer.set_scene(Some(&scene));
 
-    // Build render-pass and command buffer.
+    // Build the render pass.
     let pass = RenderPassDescriptor::for_texture(&texture, Color::black())
         .ok_or("failed to create render pass descriptor")?;
-    let command_buffer = queue
-        .new_command_buffer()
-        .ok_or("failed to create command buffer")?;
 
     // Step the simulation then render.
     renderer.update_at_time(0.0);
-    renderer.render(
-        CGRect::new(0.0, 0.0, WIDTH_F, HEIGHT_F),
-        &command_buffer,
-        &pass,
-    );
+    let command_buffer =
+        renderer.render(CGRect::new(0.0, 0.0, WIDTH_F, HEIGHT_F), &queue, &pass)?;
 
     command_buffer.commit()?;
     command_buffer.wait_until_completed()?;

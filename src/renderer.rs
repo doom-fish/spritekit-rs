@@ -1,8 +1,11 @@
 use apple_cf::cg::CGRect;
-use apple_metal::{storage_mode, texture_type, CommandBuffer, MetalDevice, MetalTexture};
+use apple_metal::{
+    command_buffer_status, storage_mode, texture_type, CommandBuffer, CommandQueue, MetalDevice,
+    MetalTexture,
+};
 
 use crate::color::Color;
-use crate::error::SpriteKitError;
+use crate::error::{bridge_result, SpriteKitError};
 use crate::ffi;
 use crate::private::handle_type;
 use crate::scene::Scene;
@@ -93,17 +96,46 @@ impl Renderer {
         unsafe { ffi::sk_renderer_update_at_time(self.ptr, time) };
     }
 
-    /// Encodes a render pass into `command_buffer` using `pass_descriptor`.
+    /// Encodes a render pass into a new command buffer from `queue` using `pass_descriptor`.
     pub fn render(
+        &self,
+        viewport: CGRect,
+        queue: &CommandQueue,
+        pass_descriptor: &RenderPassDescriptor,
+    ) -> Result<CommandBuffer, SpriteKitError> {
+        let command_buffer = queue.new_command_buffer().ok_or_else(|| {
+            SpriteKitError::new("MTLCommandQueue could not create a command buffer")
+        })?;
+        unsafe { self.render_into(viewport, &command_buffer, pass_descriptor) }?;
+        Ok(command_buffer)
+    }
+
+    #[allow(clippy::missing_safety_doc)]
+    pub unsafe fn render_into(
         &self,
         viewport: CGRect,
         command_buffer: &CommandBuffer,
         pass_descriptor: &RenderPassDescriptor,
-    ) {
-        // SAFETY: sk_renderer_render accepts valid SKRenderer, MTLCommandBuffer, and
-        // SKRenderPassDescriptor pointers, all guaranteed to be valid because they come
-        // from constructed handle types. CGRect components are POD values safe to pass.
-        unsafe {
+    ) -> Result<(), SpriteKitError> {
+        let status = command_buffer.status();
+        if status == command_buffer_status::ERROR {
+            return Err(SpriteKitError::new(format!(
+                "the command buffer failed: {}",
+                command_buffer
+                    .error()
+                    .unwrap_or_else(|| "Metal reported no error message".to_owned())
+            )));
+        }
+        if !matches!(
+            status,
+            command_buffer_status::NOT_ENQUEUED | command_buffer_status::ENQUEUED
+        ) {
+            return Err(SpriteKitError::new(format!(
+                "the command buffer was already committed (status {status})"
+            )));
+        }
+        let mut error = core::ptr::null_mut();
+        let rendered = unsafe {
             ffi::sk_renderer_render(
                 self.ptr,
                 viewport.origin.x,
@@ -112,8 +144,10 @@ impl Renderer {
                 viewport.size.height,
                 command_buffer.as_ptr(),
                 pass_descriptor.as_ptr(),
-            );
+                &raw mut error,
+            )
         };
+        unsafe { bridge_result(rendered, error, "SKRenderer refused to render") }
     }
 }
 

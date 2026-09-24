@@ -151,9 +151,10 @@ fn rendered_scene_pixels_are_read_back() {
     let renderer = Renderer::new(&device).expect("renderer");
     renderer.set_scene(Some(&scene));
     let pass = RenderPassDescriptor::for_texture(&texture, Color::black()).expect("pass");
-    let command_buffer = queue.new_command_buffer().expect("command buffer");
     renderer.update_at_time(0.0);
-    renderer.render(CGRect::new(0.0, 0.0, 32.0, 32.0), &command_buffer, &pass);
+    let command_buffer = renderer
+        .render(CGRect::new(0.0, 0.0, 32.0, 32.0), &queue, &pass)
+        .expect("render");
     command_buffer.commit().expect("commit");
     command_buffer.wait_until_completed().expect("complete");
 
