@@ -47,12 +47,17 @@ fn dropping_a_contact_delegate_while_it_is_set_keeps_the_world_safe() {
 
     autoreleasepool(|| stage.scene.physics_world().set_contact_delegate(None));
     assert!(!has_contact_delegate(&stage));
-    assert_eq!(Arc::strong_count(&begins), 1);
+    assert_eq!(
+        Arc::strong_count(&begins),
+        2,
+        "a cleared delegate stays alive while SpriteKit may still be using it"
+    );
     stage.step(5);
+    assert_eq!(begins.load(Ordering::SeqCst), 0);
 }
 
 #[test]
-fn replacing_a_contact_delegate_releases_the_previous_one() {
+fn replacing_a_contact_delegate_keeps_the_previous_one_inactive() {
     let mut stage = Stage::new(128.0, 128.0);
     add_overlapping_bodies(&stage);
     let first = Arc::new(AtomicUsize::new(0));
@@ -71,7 +76,7 @@ fn replacing_a_contact_delegate_releases_the_previous_one() {
             .physics_world()
             .set_contact_delegate(Some(&replacement));
     });
-    assert_eq!(Arc::strong_count(&first), 1);
+    assert_eq!(Arc::strong_count(&first), 2);
 
     stage.step(10);
     assert_eq!(first.load(Ordering::SeqCst), 0);

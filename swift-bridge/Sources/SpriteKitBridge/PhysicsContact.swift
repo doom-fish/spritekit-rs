@@ -4,8 +4,6 @@ import SpriteKit
 public typealias PhysicsContactCallback = @convention(c) (UnsafeMutableRawPointer?, UnsafeMutableRawPointer?) -> Void
 public typealias PhysicsContactReleaseCallback = @convention(c) (UnsafeMutableRawPointer?) -> Void
 
-private var contactDelegateKey: UInt8 = 0
-
 private final class PhysicsContactDelegateBridge: NSObject, SKPhysicsContactDelegate {
     private let context: UnsafeMutableRawPointer
     private let didBeginCallback: PhysicsContactCallback?
@@ -111,13 +109,12 @@ public func sk_physics_contact_delegate_new(
 public func sk_physics_world_set_contact_delegate(_ worldHandle: UnsafeMutableRawPointer?, _ delegateHandle: UnsafeMutableRawPointer?) {
     guard let world: SKPhysicsWorld = skBorrow(worldHandle) else { return }
     let delegate: PhysicsContactDelegateBridge? = skBorrow(delegateHandle)
-    skRetainDelegate(delegate, by: world, key: &contactDelegateKey) {
-        world.contactDelegate = delegate
-    }
+    skKeepDelegate(delegate, by: world)
+    world.contactDelegate = delegate
 }
 
 @_cdecl("sk_physics_world_has_contact_delegate")
 public func sk_physics_world_has_contact_delegate(_ worldHandle: UnsafeMutableRawPointer?) -> Bool {
     guard let world: SKPhysicsWorld = skBorrow(worldHandle) else { return false }
-    return objc_getAssociatedObject(world, &contactDelegateKey) != nil
+    return world.contactDelegate is PhysicsContactDelegateBridge
 }

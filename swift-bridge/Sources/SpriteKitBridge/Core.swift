@@ -39,11 +39,25 @@ final class SKCallbackOwner {
     }
 }
 
-func skRetainDelegate(_ delegate: AnyObject?, by owner: AnyObject, key: UnsafeRawPointer, assign: () -> Void) {
-    let previous = objc_getAssociatedObject(owner, key)
-    objc_setAssociatedObject(owner, key, delegate, .OBJC_ASSOCIATION_RETAIN)
-    assign()
-    withExtendedLifetime(previous) {}
+private let skDelegateKeeperLock = NSLock()
+private var skDelegateKeeperKey: UInt8 = 0
+
+private final class SKDelegateKeeper: NSObject {
+    var delegates: [ObjectIdentifier: AnyObject] = [:]
+}
+
+func skKeepDelegate(_ delegate: AnyObject?, by owner: AnyObject) {
+    guard let delegate else { return }
+    skDelegateKeeperLock.lock()
+    defer { skDelegateKeeperLock.unlock() }
+    let keeper: SKDelegateKeeper
+    if let existing = objc_getAssociatedObject(owner, &skDelegateKeeperKey) as? SKDelegateKeeper {
+        keeper = existing
+    } else {
+        keeper = SKDelegateKeeper()
+        objc_setAssociatedObject(owner, &skDelegateKeeperKey, keeper, .OBJC_ASSOCIATION_RETAIN)
+    }
+    keeper.delegates[ObjectIdentifier(delegate)] = delegate
 }
 
 func skBorrowView(_ handle: UnsafeMutableRawPointer?) -> SKView? {
