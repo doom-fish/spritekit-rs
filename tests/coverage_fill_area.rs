@@ -322,8 +322,10 @@ fn texture_atlas_async_smoke() {
     let atlas = TextureAtlas::named("MissingAtlas").expect("atlas handle");
 
     pollster::block_on(async {
-        atlas.preload_async().await;
-        TextureAtlas::preload_texture_atlases_async(&[&atlas]).await;
+        atlas.preload_async().await.expect("preload");
+        TextureAtlas::preload_texture_atlases_async(&[&atlas])
+            .await
+            .expect("preload atlases");
         let atlases = TextureAtlas::preload_texture_atlases_named_async(&[])
             .await
             .expect("named async preload");

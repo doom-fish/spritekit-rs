@@ -200,13 +200,13 @@ struct CallbackFuture<T> {
 
 #[cfg(feature = "async")]
 struct CallbackFutureState<T> {
-    value: Option<T>,
+    value: Option<Result<T, SpriteKitError>>,
     waker: Option<Waker>,
 }
 
 #[cfg(feature = "async")]
 struct CallbackFutureCompleter<T> {
-    state: Arc<Mutex<CallbackFutureState<T>>>,
+    state: Option<Arc<Mutex<CallbackFutureState<T>>>>,
 }
 
 #[cfg(feature = "async")]
@@ -230,14 +230,14 @@ impl<T> CallbackFuture<T> {
             Self {
                 state: Arc::clone(&state),
             },
-            CallbackFutureCompleter { state },
+            CallbackFutureCompleter { state: Some(state) },
         )
     }
 }
 
 #[cfg(feature = "async")]
 impl<T> Future for CallbackFuture<T> {
-    type Output = T;
+    type Output = Result<T, SpriteKitError>;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let mut state = lock_callback_future_state(&self.state);
@@ -253,15 +253,27 @@ impl<T> Future for CallbackFuture<T> {
 
 #[cfg(feature = "async")]
 impl<T> CallbackFutureCompleter<T> {
-    fn complete(self, value: T) {
+    fn resolve(&mut self, value: Result<T, SpriteKitError>) {
+        let Some(state) = self.state.take() else {
+            return;
+        };
         let waker = {
-            let mut state = lock_callback_future_state(&self.state);
+            let mut state = lock_callback_future_state(&state);
             state.value = Some(value);
             state.waker.take()
         };
         if let Some(waker) = waker {
             waker.wake();
         }
+    }
+}
+
+#[cfg(feature = "async")]
+impl<T> Drop for CallbackFutureCompleter<T> {
+    fn drop(&mut self) {
+        self.resolve(Err(SpriteKitError::new(
+            "SpriteKit released the completion handler without calling it",
+        )));
     }
 }
 
@@ -366,9 +378,9 @@ impl TextureAtlas {
     /// Async wrapper for `preloadWithCompletionHandler:`.
     #[cfg(feature = "async")]
     #[cfg_attr(docsrs, doc(cfg(feature = "async")))]
-    pub fn preload_async(&self) -> impl Future<Output = ()> + Send {
-        let (future, completer) = CallbackFuture::new();
-        self.preload_with_completion_handler(move || completer.complete(()));
+    pub fn preload_async(&self) -> impl Future<Output = Result<(), SpriteKitError>> + Send {
+        let (future, mut completer) = CallbackFuture::new();
+        self.preload_with_completion_handler(move || completer.resolve(Ok(())));
         future
     }
 
@@ -377,10 +389,10 @@ impl TextureAtlas {
     #[cfg_attr(docsrs, doc(cfg(feature = "async")))]
     pub fn preload_texture_atlases_async(
         atlases: &[&Self],
-    ) -> impl Future<Output = ()> + Send {
-        let (future, completer) = CallbackFuture::new();
+    ) -> impl Future<Output = Result<(), SpriteKitError>> + Send {
+        let (future, mut completer) = CallbackFuture::new();
         Self::preload_texture_atlases_with_completion_handler(atlases, move || {
-            completer.complete(());
+            completer.resolve(Ok(()));
         });
         future
     }
@@ -392,7 +404,7 @@ impl TextureAtlas {
         atlas_names: &[&str],
     ) -> impl Future<Output = Result<Vec<Self>, SpriteKitError>> + Send {
         let scheduled = {
-            let (future, completer) = CallbackFuture::new();
+            let (future, mut completer) = CallbackFuture::new();
             texture_atlas_name_cstrings(atlas_names).map(|atlas_names| {
                 let mut raw_names: Vec<*const c_char> =
                     atlas_names.iter().map(|name| name.as_ptr()).collect();
@@ -403,7 +415,7 @@ impl TextureAtlas {
                 };
                 let (context, release) =
                     texture_atlas_named_async_completion_context(move |result| {
-                        completer.complete(result);
+                        completer.resolve(result);
                     });
                 unsafe {
                     ffi::sk_texture_atlas_preload_texture_atlases_named(
@@ -428,5 +440,75 @@ impl TextureAtlas {
                 Err(error) => Err(error),
             }
         }
+    }
+}
+
+#[cfg(all(test, feature = "async"))]
+mod tests {
+    use super::*;
+
+    const DROPPED: &str = "SpriteKit released the completion handler without calling it";
+
+    #[test]
+    fn preload_future_fails_when_the_bridge_drops_the_completion() {
+        let (future, mut completer) = CallbackFuture::<()>::new();
+        let (context, release) =
+            texture_atlas_completion_context(move || completer.resolve(Ok(())));
+        unsafe {
+            ffi::sk_texture_atlas_preload(
+                ptr::null_mut(),
+                context,
+                Some(texture_atlas_completion),
+                Some(release),
+            );
+        }
+        let error = pollster::block_on(future).expect_err("the completion never ran");
+        assert_eq!(error.to_string(), DROPPED);
+    }
+
+    #[test]
+    fn atlases_preload_future_fails_when_spritekit_frees_a_completion_that_never_reached_rust() {
+        let (future, mut completer) = CallbackFuture::<()>::new();
+        let (context, release) =
+            texture_atlas_completion_context(move || completer.resolve(Ok(())));
+        unsafe {
+            ffi::sk_texture_atlas_preload_texture_atlases(
+                ptr::null_mut(),
+                0,
+                context,
+                None,
+                Some(release),
+            );
+        }
+        let error = pollster::block_on(future).expect_err("the completion never ran");
+        assert_eq!(error.to_string(), DROPPED);
+    }
+
+    #[test]
+    fn named_preload_future_fails_when_spritekit_frees_a_completion_that_never_reached_rust() {
+        let (future, mut completer) = CallbackFuture::<Vec<OwnedTextureAtlasHandle>>::new();
+        let (context, release) =
+            texture_atlas_named_async_completion_context(move |result| completer.resolve(result));
+        unsafe {
+            ffi::sk_texture_atlas_preload_texture_atlases_named(
+                ptr::null_mut(),
+                0,
+                context,
+                None,
+                Some(release),
+            );
+        }
+        let Err(error) = pollster::block_on(future) else {
+            panic!("the completion never ran, so the future must fail");
+        };
+        assert_eq!(error.to_string(), DROPPED);
+    }
+
+    #[test]
+    fn dropping_a_completer_after_it_resolved_keeps_the_value() {
+        let (future, mut completer) = CallbackFuture::<u8>::new();
+        completer.resolve(Ok(7));
+        drop(completer);
+        assert_eq!(pollster::block_on(future), Ok(7));
     }
 }
