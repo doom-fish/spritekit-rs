@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-- `PhysicsWorld` retains its contact delegate while it is set. `SKPhysicsWorld.contactDelegate` is `assign`, so dropping a `PhysicsContactDelegate` while the scene simulated left SpriteKit calling a freed bridge object and closure, and `has_contact_delegate` read the dangling pointer. Dropping the Rust handle now only stops the callbacks; the bridge object is released when the delegate is cleared or replaced, or when the world is freed.
+- `PhysicsWorld` keeps its contact delegates alive. `SKPhysicsWorld.contactDelegate` is declared `assign`, so dropping a `PhysicsContactDelegate` while the scene simulated left SpriteKit calling a freed bridge object and closure, and `has_contact_delegate` read the dangling pointer. SpriteKit also reads the property on the simulation thread, so releasing a delegate as soon as another thread cleared or replaced it could free it under a callback. Dropping the Rust handle now only stops the callbacks, and the world keeps every contact delegate set on it until the world is freed. `tests/delegate_race_tests.rs` swaps delegates on one thread while another simulates.
+- `Renderer::render` encoded into whatever command buffer it was given; Metal aborts the process when `SKRenderer` encodes into a committed command buffer or one with an active encoder. See Changed.
 - `read_texture_bytes` sizes its buffer with `apple_metal::bytes_per_pixel`, passes the buffer length to the bridge and checks the copy. It used to assume 4 bytes per pixel, so RGBA16Float, RGBA32Float and BGRA10_XR textures overflowed the heap. Compressed, depth/stencil, framebuffer-only, non-2D, and private or memoryless textures are rejected.
 
 ### Fixed
@@ -18,10 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Contact callbacks can read the contact. SpriteKit delivers a private contact class that failed the bridge's `SKPhysicsContact` cast, so `body_a`, `body_b`, `contact_point`, `contact_normal` and `collision_impulse` always returned `None` or zero.
 - `Renderer::new` serializes `SKRenderer` creation. SpriteKit's shader loading is not thread-safe, and creating renderers on several threads at once crashed.
 - `MutableTexture::modify_pixel_data` and the `TextureAtlas` completion-handler preloads release their closures when SpriteKit drops the block without calling it, instead of leaking them.
+- The `async` atlas preload futures stayed pending forever when SpriteKit released the completion handler without calling it; they now resolve with an error.
 - Swift bridge conversions of enum raw values, particle render order and tile placement weights no longer trap on out-of-range values.
 
 ### Changed
 
+- **Breaking:** `Renderer::render(viewport, &CommandQueue, &RenderPassDescriptor)` encodes the frame into a new command buffer and returns it uncommitted as `Result<CommandBuffer, SpriteKitError>`, so nothing else can use the buffer while SpriteKit encodes. The `unsafe` `Renderer::render_into` encodes into an existing command buffer. Both return errors for committed or failed command buffers and for mismatched Metal devices instead of aborting. The raw `ffi::sk_renderer_render` takes an error out-pointer and returns `bool`.
+- **Breaking:** `TextureAtlas::preload_async` and `preload_texture_atlases_async` return `impl Future<Output = Result<(), SpriteKitError>>`.
+- **Breaking:** clearing or replacing a contact delegate no longer frees its closures; they are freed with the physics world. Dropping the Rust handle still stops them at once.
 - **Breaking:** `NodeExt::add_child` and `NodeExt::move_to_parent` return `Result<(), SpriteKitError>`.
 - **Breaking:** `View::with_frame` returns `Result<View, SpriteKitError>` and fails off the main thread. Other `SKView` calls do nothing and return defaults off the main thread, and `Scene::view` returns `None` there.
 - **Breaking:** raw `ffi` declarations follow the bridge: `sk_node_add_child` and `sk_node_move_to_parent` return `bool` with an error out-pointer; the delegate constructors, `sk_mutable_texture_modify_pixel_data` and the atlas preload functions take a context-release callback; `sk_scene_delegate_new` takes the four new phase callbacks; `sk_texture_copy_bytes` takes the buffer length and bytes per pixel; callback parameters are `unsafe extern "C" fn` pointers.
@@ -35,7 +40,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `SceneDelegateCallbacks` and `SceneDelegate::from_callbacks`, adding `didEvaluateActions`, `didSimulatePhysics`, `didApplyConstraints` and `didFinishUpdate` to `update`.
 - `PhysicsWorld::add_joint`, `remove_joint` and `remove_all_joints`. `add_joint` rejects joints that were already added and joints whose bodies are not attached to nodes in a scene, which SpriteKit crashes on.
 - `color::verify_ffi_layout` and compile-time size and alignment checks for `Color`, which crosses the bridge by value.
-- Tests that drop delegates while they are set and then drive the simulation, check frame-phase order, action callbacks, hierarchy and joint errors, texture readback (RGBA16Float, BGRA10_XR and rejected formats) and closure release. `SKView` tests run on the main thread in `tests/main_thread.rs`.
+- `Renderer::render_into`.
+- Tests that drop delegates while they are set and then drive the simulation, check frame-phase order, action callbacks, hierarchy and joint errors, texture readback (RGBA16Float, BGRA10_XR and rejected formats) and closure release. `SKView` tests run on the main thread in `tests/main_thread.rs`. Further tests swap contact delegates while another thread simulates, check command-buffer states for rendering, and drop atlas preload completions through the bridge.
 
 ### Removed
 
