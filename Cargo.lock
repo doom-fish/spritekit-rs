@@ -4,14 +4,14 @@ version = 3
 
 [[package]]
 name = "apple-cf"
-version = "0.11.0"
+version = "0.11.4"
 dependencies = [
  "doom-fish-utils",
 ]
 
 [[package]]
 name = "apple-metal"
-version = "0.10.0"
+version = "0.10.3"
 dependencies = [
  "apple-cf",
  "doom-fish-utils",
@@ -84,7 +84,7 @@ checksum = "22686f4785f02a4fcc856d3b3bb19bf6c8160d103f7a99cc258bddd0251dc7f2"
 
 [[package]]
 name = "spritekit-rs"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "apple-cf",
  "apple-metal",
